@@ -103,10 +103,8 @@ export default function AdminPROTracking() {
     }
     
     if (selectedClient !== "All") {
-      const search = selectedClient.toString().trim().toUpperCase();
       base = base.filter((c: any) => 
-        c.companyName?.toString().trim().toUpperCase() === search || 
-        c.clientName?.toString().trim().toUpperCase() === search
+        c.clientId?.toString() === selectedClient.toString()
       );
     }
     
@@ -141,10 +139,8 @@ export default function AdminPROTracking() {
       );
     }
     if (selectedClient !== "All") {
-      const search = selectedClient.toString().trim().toUpperCase();
       base = base.filter((d: any) => 
-        d.companyName?.toString().trim().toUpperCase() === search || 
-        d.clientName?.toString().trim().toUpperCase() === search
+        d.clientId?.toString() === selectedClient.toString()
       );
     }
     return base;
@@ -159,10 +155,8 @@ export default function AdminPROTracking() {
       );
     }
     if (selectedClient !== "All") {
-      const search = selectedClient.toString().trim().toUpperCase();
       base = base.filter((d: any) => 
-        d.companyName?.toString().trim().toUpperCase() === search || 
-        d.clientName?.toString().trim().toUpperCase() === search
+        d.clientId?.toString() === selectedClient.toString()
       );
     }
     return base;
@@ -245,7 +239,7 @@ export default function AdminPROTracking() {
             >
               <option value="All">All Clients</option>
               {sectorFilteredClients.map(client => (
-                <option key={client.id} value={client.name}>{client.name} ({client.contactPerson || 'No Contact'})</option>
+                <option key={client.id} value={client.id}>{client.name} ({client.contactPerson || 'No Contact'})</option>
               ))}
             </select>
           </div>
@@ -253,7 +247,7 @@ export default function AdminPROTracking() {
           <div className="flex flex-col gap-1 flex-1 max-w-xs">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Active Company</label>
             <div className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-500 min-h-[38px] flex items-center italic">
-              {selectedClient === "All" ? "Select a client to manage employees" : selectedClient}
+              {selectedClient === "All" ? "Select a client to manage employees" : (safeClients.find(c => c.id.toString() === selectedClient.toString())?.name || selectedClient)}
             </div>
           </div>
         </div>
@@ -262,7 +256,8 @@ export default function AdminPROTracking() {
           <button 
             onClick={() => {
               const params = new URLSearchParams();
-              params.append("company", selectedClient);
+              const client = safeClients.find(c => c.id.toString() === selectedClient.toString());
+              params.append("company", client?.name || selectedClient);
               params.append("from", "pro-tracking"); // Tracking source for return redirect
               
               // Find the client's division to pre-fill
@@ -277,7 +272,7 @@ export default function AdminPROTracking() {
             }}
             className="px-6 py-2 bg-brand-600 text-white rounded-lg text-xs font-black uppercase tracking-widest hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20 shrink-0 flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Users size={14} /> Add Employee to {safeClients.find(c => c.name === selectedClient)?.contactPerson || selectedClient}
+            <Users size={14} /> Add Employee to {safeClients.find(c => c.id.toString() === selectedClient.toString())?.contactPerson || selectedClient}
           </button>
         )}
       </div>
