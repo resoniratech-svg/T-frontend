@@ -261,7 +261,6 @@ export default function AdminPROTracking() {
               params.append("from", "pro-tracking"); // Tracking source for return redirect
               
               // Find the client's division to pre-fill
-              const client = safeClients.find(c => c.name === selectedClient);
               if (client?.division) {
                 params.append("division", client.division);
               } else if (activeDivision !== "all") {
