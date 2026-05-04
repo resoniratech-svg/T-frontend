@@ -22,6 +22,7 @@ import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { proService } from "../../services/proService";
+import { clientService } from "../../services/clientService";
 import { employeeService } from "../../services/employeeService";
 import { exportToCSV } from "../../utils/exportUtils";
 import StatCard from "../../components/StatCard";
@@ -54,6 +55,25 @@ export default function AdminPROTracking() {
     queryKey: ["pro-all-documents"],
     queryFn: () => proService.getAllDocuments()
   });
+  
+  // 2. Mutations
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => employeeService.deleteEmployee(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pro-contracts"] });
+      queryClient.invalidateQueries({ queryKey: ["pro-all-documents"] });
+      alert("Employee deleted successfully");
+    },
+    onError: (err: any) => {
+      alert("Failed to delete employee: " + err.message);
+    }
+  });
+
+  const handleDelete = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
 
 
   // Ensure data variables are arrays to prevent crashes
@@ -162,24 +182,6 @@ export default function AdminPROTracking() {
 
   const viewClientDetails = (clientId: string) => {
     navigate(`/client-details/${clientId}`);
-  };
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => employeeService.deleteEmployee(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pro-contracts"] });
-      queryClient.invalidateQueries({ queryKey: ["pro-all-documents"] });
-      alert("Employee deleted successfully");
-    },
-    onError: (err: any) => {
-      alert("Failed to delete employee: " + (err.response?.data?.message || err.message));
-    }
-  });
-
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete employee "${name}"?`)) {
-      deleteMutation.mutate(id);
-    }
   };
 
   if (clientsLoading || contractsLoading || tasksLoading || docsLoading) {
