@@ -14,14 +14,15 @@ import {
   X,
   Info,
   Users,
-  Edit2
+  Edit2,
+  Trash2
 } from "lucide-react";
 import PageLoader from "../../components/PageLoader";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { proService } from "../../services/proService";
-import { clientService } from "../../services/clientService";
+import { employeeService } from "../../services/employeeService";
 import { exportToCSV } from "../../utils/exportUtils";
 import StatCard from "../../components/StatCard";
 import { useDivision } from "../../context/DivisionContext";
@@ -163,6 +164,24 @@ export default function AdminPROTracking() {
     navigate(`/client-details/${clientId}`);
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => employeeService.deleteEmployee(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pro-contracts"] });
+      queryClient.invalidateQueries({ queryKey: ["pro-all-documents"] });
+      alert("Employee deleted successfully");
+    },
+    onError: (err: any) => {
+      alert("Failed to delete employee: " + (err.response?.data?.message || err.message));
+    }
+  });
+
+  const handleDelete = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete employee "${name}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   if (clientsLoading || contractsLoading || tasksLoading || docsLoading) {
     return <PageLoader message="Aggregating Global Compliance Data..." />;
   }
@@ -256,7 +275,7 @@ export default function AdminPROTracking() {
             }}
             className="px-6 py-2 bg-brand-600 text-white rounded-lg text-xs font-black uppercase tracking-widest hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20 shrink-0 flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Users size={14} /> Add Employee to {selectedClient}
+            <Users size={14} /> Add Employee to {safeClients.find(c => c.name === selectedClient)?.contactPerson || selectedClient}
           </button>
         )}
       </div>
@@ -316,6 +335,13 @@ export default function AdminPROTracking() {
                               title="Edit"
                             >
                               <Edit2 size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(contract.id, contract.title)}
+                              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
                             </button>
                             <button 
                               onClick={() => navigate(`/employees/details/${contract.id}`)}
