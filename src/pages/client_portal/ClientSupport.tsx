@@ -28,7 +28,8 @@ export default function ClientSupport() {
     desc: "",
     email: "",
     phone: "",
-    color: "blue"
+    color: "blue",
+    sector: ""
   });
 
   const [channels, setChannels] = useState<SupportChannel[]>([]);
@@ -68,14 +69,14 @@ export default function ClientSupport() {
       } else {
         await supportService.createChannel({
           ...newChannel,
-          sector: activeSector,
+          sector: newChannel.sector || activeSector,
           icon: "HelpCircle"
         });
       }
       await fetchChannels(); // Refresh the list
       setIsModalOpen(false);
       setEditingIndex(null);
-      setNewChannel({ title: "", desc: "", email: "", phone: "", color: "blue" });
+      setNewChannel({ title: "", desc: "", email: "", phone: "", color: "blue", sector: "" });
     } catch (error) {
       console.error("Failed to save channel", error);
     }
@@ -100,7 +101,8 @@ export default function ClientSupport() {
       desc: c.desc || "",
       email: c.email || "",
       phone: c.phone || "",
-      color: (c as any).color || "blue"
+      color: (c as any).color || "blue",
+      sector: c.sector || ""
     });
     setEditingIndex(index);
     setIsModalOpen(true);
@@ -142,7 +144,7 @@ export default function ClientSupport() {
       {user?.role === 'SUPER_ADMIN' && (
         <div className="flex flex-col items-center gap-6 mb-4">
           <div className="bg-white p-1 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-1">
-            {['SERVICE', 'TRADING', 'CONTRACTING'].map((s) => (
+            {['ALL', 'SERVICE', 'TRADING', 'CONTRACTING'].map((s) => (
               <button
                 key={s}
                 onClick={() => setActiveSector(s)}
@@ -158,7 +160,7 @@ export default function ClientSupport() {
           </div>
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">How can we help you?</h1>
-            <p className="text-slate-500">Our {activeSector.toLowerCase()} team is here to assist you with any queries.</p>
+            <p className="text-slate-500">Our {activeSector === 'ALL' ? 'entire' : activeSector.toLowerCase()} team is here to assist you with any queries.</p>
           </div>
         </div>
       )}
@@ -192,7 +194,7 @@ export default function ClientSupport() {
                 onClick={() => {
                   setIsModalOpen(false);
                   setEditingIndex(null);
-                  setNewChannel({ title: "", desc: "", email: "", phone: "", color: "blue" });
+                  setNewChannel({ title: "", desc: "", email: "", phone: "", color: "blue", sector: "" });
                 }}
                 className="text-slate-400 hover:text-slate-600 transition-colors"
               >
@@ -247,6 +249,22 @@ export default function ClientSupport() {
                     onChange={(e) => setNewChannel({...newChannel, phone: e.target.value})}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Assigned Sector</label>
+                <select 
+                  required
+                  className="w-full bg-slate-50 border border-slate-100 rounded-lg px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all"
+                  value={newChannel.sector}
+                  onChange={(e) => setNewChannel({...newChannel, sector: e.target.value})}
+                >
+                  <option value="">Select Sector</option>
+                  <option value="ALL">All Sectors</option>
+                  <option value="SERVICE">Service</option>
+                  <option value="TRADING">Trading</option>
+                  <option value="CONTRACTING">Contracting</option>
+                </select>
               </div>
 
               <div className="space-y-1">
