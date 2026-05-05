@@ -104,7 +104,7 @@ export default function ClientProjects() {
                     <h3 className={`text-sm font-bold truncate ${
                       effectiveSelectedId === project.id ? "text-white" : "text-slate-800"
                     }`}>
-                      {project.projectName || project.name || "Unnamed Project"}
+                      {project.project_name || project.projectName || project.name || "Unnamed Project"}
                     </h3>
                     <div className={`flex items-center gap-1.5 mt-1 text-[10px] ${
                       effectiveSelectedId === project.id ? "text-white/70" : "text-slate-400"
@@ -151,7 +151,7 @@ export default function ClientProjects() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                            {selectedProject.projectName || selectedProject.name}
+                            {selectedProject.project_name || selectedProject.projectName || selectedProject.name}
                           </h2>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider ${
                             selectedProject.status === "Active" || selectedProject.status === "Ongoing" || selectedProject.status === "In Progress"
@@ -222,7 +222,7 @@ export default function ClientProjects() {
                       if (selectedProject.uploadedDocument) {
                         allDocs.unshift({
                           id: "main-project-doc",
-                          name: `${selectedProject.projectName || selectedProject.name || 'Project'}_Document.pdf`,
+                          name: `${selectedProject.project_name || selectedProject.projectName || selectedProject.name || 'Project'}_Document.pdf`,
                           data: selectedProject.uploadedDocument,
                           size: selectedProject.uploadedDocument.length * 0.75 // Rough estimate for Base64 to bytes
                         });
