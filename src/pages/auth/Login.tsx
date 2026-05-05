@@ -77,18 +77,8 @@ export default function Login() {
 
     try {
       // 1. Attempt to login via the REAl backend
-<<<<<<< HEAD
       const { user } = await authService.login({ email: email.trim(), password });
-      
-=======
-      const { user, token } = await authService.login({ email: email.trim(), password });
 
-      // Enforce Super Admin only as requested
-      if (user.role !== 'SUPER_ADMIN') {
-        throw new Error("Invalid credentials.");
-      }
-
->>>>>>> e1c542c (Initial commit)
       // 2. Success!
       login(user); // update the context
       navigate('/select-company', { replace: true });
