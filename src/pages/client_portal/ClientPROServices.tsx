@@ -27,7 +27,7 @@ export default function ClientPROServices() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { activeDivision } = useDivision();
-  const [showDocModal, setShowDocModal] = useState({ open: false, type: "", docs: [] });
+  const [showDocModal, setShowDocModal] = useState({ open: false, type: "", docs: [] as any[] });
 
   const isClientRole = user?.role === "CLIENT";
   const [selectedClient, setSelectedClient] = useState(isClientRole ? (user?.company_name || user?.name || "") : "");
@@ -43,7 +43,7 @@ export default function ClientPROServices() {
     queryFn: proService.getAllDocuments
   });
 
-  const { data: clients = [], isLoading: clientsLoading } = useQuery({
+  const { data: clients = [] as any[], isLoading: clientsLoading } = useQuery({
     queryKey: ["clients"],
     queryFn: () => import("../../services/clientService").then(m => m.clientService.getClients())
   });
@@ -435,40 +435,4 @@ export default function ClientPROServices() {
   );
 }
 
-// Internal UI Components
-function StatBox({ title, value, icon: Icon, color }: any) {
-   const colorMap: any = {
-      sky: "text-sky-600 bg-sky-50 border-sky-100",
-      amber: "text-amber-600 bg-amber-50 border-amber-100",
-      rose: "text-rose-600 bg-rose-50 border-rose-100",
-      emerald: "text-emerald-600 bg-emerald-50 border-emerald-100"
-   };
 
-   return (
-      <div className={`p-6 rounded-lg border bg-white shadow-sm flex items-center gap-4 group hover:-translate-y-1 transition-all`}>
-         <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${colorMap[color]}`}>
-            <Icon size={24} />
-         </div>
-         <div>
-            <p className="text-3xl font-black text-slate-900 tracking-tight">{value}</p>
-            <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mt-1">{title}</p>
-         </div>
-      </div>
-   );
-}
-
-function InputField({ label, icon: Icon, value, readOnly = false, multiline = false }: any) {
-   return (
-      <div className="space-y-2">
-         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
-         <div className={`flex items-center gap-3 px-5 py-3.5 bg-slate-50 rounded-lg border border-slate-100 transition-all ${readOnly ? 'opacity-60 grayscale' : 'focus-within:border-brand-300 focus-within:bg-white'}`}>
-            <Icon size={18} className="text-slate-400" />
-            {multiline ? (
-               <textarea className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 outline-none resize-none h-12" defaultValue={value} readOnly={readOnly} />
-            ) : (
-               <input type="text" className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 outline-none" defaultValue={value} readOnly={readOnly} />
-            )}
-         </div>
-      </div>
-   );
-}

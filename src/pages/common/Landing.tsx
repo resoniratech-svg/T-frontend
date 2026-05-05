@@ -23,11 +23,11 @@ export default function Landing() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-              <Layers size={18} className="text-white" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img src="/logo.png" alt="Al Maha Logo" className="w-full h-full object-contain" />
             </div>
             <span className="text-xl font-extrabold tracking-tight text-gray-900">
-              Trek Group <span className="text-blue-600">ERP</span>
+              Al Maha <span className="text-blue-600">ERP</span>
             </span>
           </Link>
 
@@ -70,7 +70,7 @@ export default function Landing() {
             <h1 className="text-5xl lg:text-6xl font-black leading-tight text-gray-900 mb-6">
               Streamline Your Business with{" "}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Trek Group ERP
+                Al Maha ERP
               </span>
             </h1>
 
@@ -130,7 +130,7 @@ export default function Landing() {
                   <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                   <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
                 </div>
-                <div className="bg-gray-50 rounded-lg px-4 py-1.5 text-xs text-gray-400 font-medium">erp.trekgroup.com</div>
+                <div className="bg-gray-50 rounded-lg px-4 py-1.5 text-xs text-gray-400 font-medium">erp.Al Maha.com</div>
                 <div></div>
               </div>
 
@@ -277,7 +277,7 @@ export default function Landing() {
             viewport={{ once: true }} transition={{ delay: 0.2 }}
             className="text-blue-100 mb-8 max-w-xl mx-auto"
           >
-            Join Trek Group ERP and manage your entire business from one unified platform.
+            Join Al Maha ERP and manage your entire business from one unified platform.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
@@ -308,13 +308,13 @@ export default function Landing() {
             {/* Company Info */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <Layers size={18} className="text-white" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img src="/logo.png" alt="Al Maha Logo" className="w-full h-full object-contain" />
                 </div>
-                <span className="text-lg font-bold text-white">Trek Group</span>
+                <span className="text-lg font-bold text-white">Al Maha</span>
               </div>
               <p className="text-sm leading-relaxed mb-4">
-                TREK GROUP TRADING CONTRACTING AND SERVICES — Your trusted partner for business formation, contracting, and trading in Qatar.
+                Al Maha TRADING CONTRACTING AND SERVICES — Your trusted partner for business formation, contracting, and trading in Qatar.
               </p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
@@ -327,7 +327,7 @@ export default function Landing() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Mail size={14} className="text-blue-400 flex-shrink-0" />
-                  <span>info@trekgroup.qa</span>
+                  <span>info@Al Maha.qa</span>
                 </div>
               </div>
             </div>
@@ -394,7 +394,7 @@ export default function Landing() {
 
           {/* Bottom bar */}
           <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">© 2026 Trek Group Trading Contracting and Services. All rights reserved.</p>
+            <p className="text-xs text-gray-500">© 2026 Al Maha Trading Contracting and Services. All rights reserved.</p>
             <div className="flex gap-6 text-xs text-gray-500">
               <a href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-gray-300 transition-colors">Terms of Service</a>

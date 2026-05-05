@@ -83,10 +83,10 @@ export default function Signup() {
                     className="relative z-10 text-white max-w-md"
                 >
                     <div className="w-20 h-20 mb-8 bg-white rounded-lg p-2 shadow-lg ring-1 ring-white/20">
-                        <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
+                        <img src="/logo.png" alt="Al Maha Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-4xl font-bold leading-tight mb-4">
-                        TrekGroup
+                        Al Maha
                         <br />
                         <span className="text-brand-200">Client Portal</span>
                     </h1>
@@ -117,7 +117,7 @@ export default function Signup() {
                     {/* Mobile logo */}
                     <div className="lg:hidden text-center mb-8">
                         <div className="w-16 h-16 mx-auto mb-8 bg-white rounded-xl p-1.5 shadow-lg ring-1 ring-gray-100">
-                            <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
+                            <img src="/logo.png" alt="Al Maha Logo" className="w-full h-full object-contain" />
                         </div>
                     </div>
 
@@ -230,7 +230,7 @@ export default function Signup() {
                     </div>
 
                     <p className="text-center text-xs text-gray-400 mt-6">
-                        © 2026 TrekGroup. All rights reserved.
+                        © 2026 Al Maha. All rights reserved.
                     </p>
                 </motion.div>
             </div>

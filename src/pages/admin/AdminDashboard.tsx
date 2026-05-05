@@ -7,13 +7,10 @@ import ActivityLog from "../../components/ActivityLog";
 import { Banknote, Folder, TrendingUp, AlertTriangle, Target, ArrowRight, BarChart3, CreditCard, Briefcase, Clock, Eye, Edit, Trash2, Landmark, CheckCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useDivision } from "../../context/DivisionContext";
-import { useInventory } from "../../hooks/useInventory";
 import { DIVISIONS } from "../../constants/divisions";
 import type { DivisionId } from "../../constants/divisions";
 import { adminService } from "../../services/adminService";
-import { creditRequestService } from "../../services/creditRequestService";
 import type { AdminDashboardData, RevenueTrend, DivisionPerformance, LeadFunnelStage, AdminProject } from "../../types/admin";
-import type { InventoryProduct } from "../../types/inventory";
 import {
     XAxis,
     YAxis,
@@ -35,37 +32,9 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
     useAuth();
     const { activeDivision } = useDivision();
-    const { products } = useInventory();
 
-    const lowStockItems = (products || []).filter((p: InventoryProduct) => p.stockQuantity <= p.minStock);
 
-    // Credit Requests from localStorage
-    const [creditRequests, setCreditRequests] = useState<any[]>([]);
-    const [viewingCR, setViewingCR] = useState<any | null>(null);
 
-    useEffect(() => {
-        const fetchCreditRequests = async () => {
-          try {
-            const data = await creditRequestService.getAllRequests();
-            setCreditRequests(data.slice(0, 5));
-          } catch (error) {
-            console.error("Error fetching recent credit requests:", error);
-          }
-        };
-        fetchCreditRequests();
-    }, []);
-
-    const handleDeleteCR = useCallback(async (id: number | string) => {
-        if (!confirm("Are you sure you want to delete this credit request?")) return;
-        try {
-          await creditRequestService.deleteRequest(id);
-          const data = await creditRequestService.getAllRequests();
-          setCreditRequests(data.slice(0, 5));
-        } catch (err) {
-          console.error("Failed to delete credit request:", err);
-          alert("Failed to delete the request.");
-        }
-    }, []);
 
     // 1. Fetch all dashboard data from mock API
     const { data: dashboardData, isLoading, error, isError } = useQuery<AdminDashboardData>({
@@ -102,7 +71,6 @@ export default function AdminDashboard() {
     const stats = dashboardData.stats;
     const divisionPerformance: DivisionPerformance[] = dashboardData.divisionPerformance || [];
     const revenueTrends: RevenueTrend[] = dashboardData.revenueTrends || [];
-    const leadFunnel: LeadFunnelStage[] = dashboardData.leadFunnel || [];
     const activeProjects: AdminProject[] = dashboardData.activeProjects || [];
     const pendingPayments = dashboardData.pendingPayments || [];
     const recentInvoices = dashboardData.recentInvoices || [];
@@ -112,26 +80,6 @@ export default function AdminDashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Low Stock Alert */}
-            {lowStockItems.length > 0 && (
-                <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl shadow-sm">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-rose-100 text-rose-600 rounded-lg">
-                                <AlertTriangle size={20} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-black text-rose-900">Critical Low Stock Alert!</p>
-                                <p className="text-xs text-rose-700 font-medium">There are {lowStockItems.length} products currently below minimum stock levels.</p>
-                            </div>
-                        </div>
-                        <Link to="/inventory/low-stock" className="text-xs font-black text-rose-600 hover:underline px-4 py-2 bg-white rounded-lg border border-rose-200 shadow-sm">
-                            View Items
-                        </Link>
-                    </div>
-                </div>
-            )}
-
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -197,14 +145,7 @@ export default function AdminDashboard() {
                     path="/projects"
                     className="hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300"
                 />
-                <StatCard
-                    title="Lead Conversion"
-                    value={`${stats.conversionRate}%`}
-                    icon={<Target size={20} className="text-violet-500" />}
-                    trend={{ value: `${stats.convertedLeads} of ${stats.totalLeads} leads`, positive: stats.conversionRate > 0 }}
-                    path="/marketing/leads"
-                    className="hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300"
-                />
+
             </div>
 
             {/* === Row 2: Revenue Trends + Division Performance === */}
@@ -337,66 +278,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Lead Conversion Funnel */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
-                                <Target size={16} />
-                            </div>
-                            <h2 className="text-sm font-semibold text-gray-800">Lead Funnel</h2>
-                        </div>
-                        <Link to="/marketing/dashboard" className="text-xs text-brand-600 font-bold hover:underline">Details</Link>
-                    </div>
-                    {leadFunnel.some((f) => f.count > 0) ? (
-                        <>
-                            <ResponsiveContainer width="100%" height={190}>
-                                <PieChart>
-                                    <Pie
-                                        data={leadFunnel}
-                                        dataKey="count"
-                                        nameKey="stage"
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={55}
-                                        outerRadius={80}
-                                        paddingAngle={4}
-                                        strokeWidth={0}
-                                    >
-                                        {leadFunnel.map((_, index: number) => (
-                                            <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            borderRadius: '12px',
-                                            border: 'none',
-                                            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.07)',
-                                            fontSize: '12px'
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="space-y-2 mt-2">
-                                {leadFunnel.map((item, i: number) => (
-                                    <div key={item.stage} className="flex items-center justify-between text-xs">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: FUNNEL_COLORS[i] }} />
-                                            <span className="text-gray-600">{item.stage}</span>
-                                        </div>
-                                        <span className="font-bold text-gray-900">{item.count}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center py-6">
-                            <Target size={32} className="text-gray-200 mb-3" />
-                            <p className="text-sm text-gray-400 text-center">No leads data yet.</p>
-                            <Link to="/marketing/leads/new" className="text-xs text-brand-600 font-semibold mt-2 hover:underline">Add First Lead →</Link>
-                        </div>
-                    )}
-                </div>
+
             </div>
 
             {/* === Row 4: Active Projects + Recent Activity === */}
@@ -590,117 +472,7 @@ export default function AdminDashboard() {
                     </table>
                 </div>
             </div>
-            {/* === Row 7: Recent Credit Requests (Full Width) === */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-6">
-                <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                            <Landmark size={16} />
-                        </div>
-                        <h2 className="text-sm font-semibold text-gray-800">Recent Credit Requests</h2>
-                    </div>
-                    <Link to="/credit-requests" className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1">
-                        Manage All <ArrowRight size={12} />
-                    </Link>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="bg-gray-50/50 text-left">
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Request ID</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount (QAR)</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Reason</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {creditRequests.length > 0 ? creditRequests.map((cr: any) => (
-                                <tr key={cr.id} className="hover:bg-brand-50/30 transition-colors group">
-                                    <td className="px-5 py-3 font-medium text-brand-600">CR-{cr.id}</td>
-                                    <td className="px-5 py-3 text-gray-700 font-medium">{cr.client_name || cr.clientName}</td>
-                                    <td className="px-5 py-3 font-bold text-gray-900">QAR {Number(cr.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                    <td className="px-5 py-3 text-gray-500 text-xs hidden md:table-cell max-w-[200px] truncate">{cr.reason || 'N/A'}</td>
-                                    <td className="px-5 py-3">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                                            (cr.approval_status || cr.approvalStatus) === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                            (cr.approval_status || cr.approvalStatus) === 'rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                                            (cr.approval_status || cr.approvalStatus) === 'due' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                            'bg-amber-50 text-amber-600 border-amber-100'
-                                        }`}>
-                                            {(cr.approval_status || cr.approvalStatus || 'pending').toUpperCase()}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-3 text-gray-500 text-xs hidden lg:table-cell">
-                                        {cr.created_at || cr.createdAt ? new Date(cr.created_at || cr.createdAt).toLocaleDateString() : 'N/A'}
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan={6} className="py-10 text-center text-gray-400 italic text-sm">No credit requests recorded yet.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            {/* View Credit Request Modal */}
-            {viewingCR && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center" onClick={() => setViewingCR(null)}>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 transform" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <Landmark size={20} className="text-indigo-500" />
-                                Credit Request Details
-                            </h2>
-                            <button onClick={() => setViewingCR(null)} className="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Request ID</p>
-                                    <p className="text-sm font-semibold text-brand-600 mt-1">CR-{viewingCR.id}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</p>
-                                    <p className="text-sm font-semibold text-gray-800 mt-1">{viewingCR.client_name || viewingCR.clientName}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</p>
-                                    <p className="text-sm font-bold text-gray-900 mt-1">QAR {Number(viewingCR.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</p>
-                                    <span className={`inline-block mt-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
-                                        (viewingCR.approval_status || viewingCR.approvalStatus) === 'approved' ? 'bg-emerald-100 text-emerald-600' :
-                                        (viewingCR.approval_status || viewingCR.approvalStatus) === 'rejected' ? 'bg-rose-100 text-rose-600' :
-                                        'bg-amber-100 text-amber-600'
-                                    }`}>
-                                        {viewingCR.approval_status || viewingCR.approvalStatus || 'pending'}
-                                    </span>
-                                </div>
-                                <div className="col-span-2">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Reason</p>
-                                    <p className="text-sm text-gray-700 mt-1">{viewingCR.reason || 'N/A'}</p>
-                                </div>
-                                <div className="col-span-2">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Notes</p>
-                                    <p className="text-sm text-gray-700 mt-1">{viewingCR.notes || 'No notes'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date</p>
-                                    <p className="text-sm text-gray-700 mt-1">{(viewingCR.created_at || viewingCR.createdAt) ? new Date(viewingCR.created_at || viewingCR.createdAt).toLocaleString() : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-end">
-                            <button onClick={() => setViewingCR(null)} className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">Close</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

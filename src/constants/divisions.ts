@@ -2,32 +2,32 @@ export const DIVISIONS = [
   {
     id: "SERVICE",
     label: "Service Sector",
-    icon: "🧩",
-    color: "#3b82f6", // Blue
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    text: "text-blue-700",
+    icon: "⚙️",
+    color: "#000000",
+    bg: "bg-gray-50",
+    border: "border-gray-200",
+    text: "text-gray-900",
     taxRate: 0,
   },
   {
     id: "TRADING",
     label: "Trading Sector",
     icon: "📦",
-    color: "#f59e0b", // Amber/Orange
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-700",
+    color: "#000000",
+    bg: "bg-gray-100",
+    border: "border-gray-300",
+    text: "text-gray-900",
     taxRate: 0,
   },
   {
     id: "CONTRACTING",
     label: "Contracting Sector",
     icon: "🏗️",
-    color: "#8b5cf6", // Violet
-    bg: "bg-violet-50",
-    border: "border-violet-200",
-    text: "text-violet-700",
-    taxRate: 5, // Default Qatar VAT 5% (if applicable)
+    color: "#000000",
+    bg: "bg-gray-200",
+    border: "border-gray-400",
+    text: "text-gray-900",
+    taxRate: 5,
   },
 ] as const;
 

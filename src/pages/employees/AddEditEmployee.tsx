@@ -31,7 +31,7 @@ export default function AddEditEmployee() {
     division: "CONTRACTING" as DivisionId,
     role: "",
     status: "Active",
-    company: isClient ? (user?.company_name || user?.name || "") : "Trek Group",
+    company: isClient ? (user?.company_name || user?.name || "") : "Al Maha",
     joinedDate: new Date().toISOString().split("T")[0],
     documents: [
       { type: "QID", number: "", issueDate: "", expiryDate: "" },
@@ -211,7 +211,7 @@ export default function AddEditEmployee() {
                   name="email"
                   value={formData.email || ""}
                   onChange={handleBasicChange}
-                  placeholder="name@trekgroup.com"
+                  placeholder="name@Al Maha.com"
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
                 />
               </div>
@@ -266,7 +266,7 @@ export default function AddEditEmployee() {
                       name="company"
                       value={formData.company || ""}
                       onChange={handleBasicChange}
-                      placeholder="e.g. Trek Group"
+                      placeholder="e.g. Al Maha"
                       className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
                     />
                   )}

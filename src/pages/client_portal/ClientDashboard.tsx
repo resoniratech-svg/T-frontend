@@ -48,17 +48,9 @@ export default function ClientDashboard() {
     }
   });
 
-  // Fetch BOQs list for display
-  const { data: boqs = [], isLoading: boqsLoading } = useQuery({
-    queryKey: ["client-boqs-list"],
-    queryFn: async () => {
-      const { data } = await api.get("/boqs");
-      return data?.data || data || [];
-    }
-  });
+
 
   const safeProjects = Array.isArray(projects) ? projects : [];
-  const safeBoqs = Array.isArray(boqs) ? boqs : [];
   const safeQuotations = Array.isArray(quotations) ? quotations : [];
   const safeDocs = Array.isArray(proDocs) ? proDocs : [];
 
@@ -67,14 +59,13 @@ export default function ClientDashboard() {
     const dashStats = dashboard?.stats || {};
     return {
       activeProjects: dashStats.activeProjects || 0,
-      totalBoqs: dashStats.totalBoqs || 0,
       totalQuotations: dashStats.totalQuotations || 0,
       pendingBilling: Number(dashStats.pendingBilling || 0),
       totalExpiringEmployees: dashStats.expiringEmployees || 0
     };
   }, [dashboard]);
 
-  const isLoading = dashLoading || docsLoading || contractLoading || billingLoading || projectsLoading || boqsLoading || quotationsLoading;
+  const isLoading = dashLoading || docsLoading || contractLoading || billingLoading || projectsLoading || quotationsLoading;
 
   if (isLoading) {
     return <PageLoader message="Loading your dashboard..." />;
@@ -91,12 +82,6 @@ export default function ClientDashboard() {
           <p className="text-sm text-slate-500 mt-1">Your business overview at a glance</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link 
-            to="/client/support"
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
-          >
-             <MessageSquare size={14} className="text-brand-500" /> Support Desk
-          </Link>
         </div>
       </div>
 
@@ -108,12 +93,7 @@ export default function ClientDashboard() {
           icon={<Briefcase size={20} className="text-blue-500" />}
           path="/client/projects"
         />
-        <StatCard
-          title="BOQs"
-          value={stats.totalBoqs.toString()}
-          icon={<ClipboardList size={20} className="text-violet-500" />}
-          path="/client/boq"
-        />
+
         <StatCard
           title="Quotations"
           value={stats.totalQuotations.toString()}
@@ -336,48 +316,7 @@ export default function ClientDashboard() {
             </Link>
           </div>
 
-          {/* BOQ Summary */}
-          <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                <ClipboardList size={18} className="text-violet-600" />
-              </div>
-              <div>
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">BOQ Summary</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Bill of quantities overview</p>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {safeBoqs.slice(0, 3).map((boq: any) => (
-                <div key={boq.id} className="p-3 bg-slate-50 rounded-xl">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-800">{boq.title || boq.boq_number || `BOQ-${boq.id}`}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{dayjs(boq.created_at).format("DD MMM YYYY")}</p>
-                    </div>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
-                      boq.status?.toLowerCase() === "approved" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                      "bg-violet-50 text-violet-600 border-violet-100"
-                    }`}>
-                      {boq.status || "Draft"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {safeBoqs.length === 0 && (
-                <div className="text-center py-8 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
-                  <ClipboardList size={24} className="mx-auto text-slate-300 mb-2" />
-                  <p className="text-xs font-bold text-slate-400">No BOQs available</p>
-                </div>
-              )}
-            </div>
-            <Link 
-              to="/client/boq" 
-              className="mt-4 text-[10px] font-bold text-brand-600 hover:underline flex items-center gap-1"
-            >
-              View All BOQs <ArrowRight size={12} />
-            </Link>
-          </div>
+
         </div>
       </div>
     </div>

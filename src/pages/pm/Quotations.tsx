@@ -96,9 +96,9 @@ function Quotations() {
       const filtered = quotations.filter((item: any) => {
         if (activeDivision === "all") return true;
         const branchLower = (item.division || "CONTRACTING").toUpperCase();
-        
+
         if (activeDivision === "SERVICE") {
-            return branchLower === "SERVICE" || branchLower === "BUSINESS";
+          return branchLower === "SERVICE" || branchLower === "BUSINESS";
         }
         return branchLower === activeDivision;
       });
@@ -109,28 +109,27 @@ function Quotations() {
         "Project": item.project_name || item.project || "-",
         "Client": item.client_name || item.client,
         "Sector": (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                (item.division?.toLowerCase() === 'service' || item.division?.toLowerCase() === 'business') ? 'bg-amber-100 text-amber-600' :
-                item.division?.toLowerCase() === 'trading' ? 'bg-emerald-100 text-emerald-600' :
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${(item.division?.toLowerCase() === 'service' || item.division?.toLowerCase() === 'business') ? 'bg-amber-100 text-amber-600' :
+              item.division?.toLowerCase() === 'trading' ? 'bg-emerald-100 text-emerald-600' :
                 'bg-blue-100 text-blue-600'
             }`}>
-                {item.division?.toLowerCase() === 'business' ? 'Service' : (item.division || 'Contracting')}
-            </span>
+            {item.division?.toLowerCase() === 'business' ? 'Service' : (item.division || 'Contracting')}
+          </span>
         ),
         "Amount": `QAR ${Number(item.total_amount || item.netTotal || item.amount || 0).toLocaleString()}`,
         "Expiry Date": item.valid_until ? new Date(item.valid_until).toLocaleDateString() : "-",
         "Approval": <ApprovalBadge status={item.status || "pending"} />,
         "Actions": (
           <div className="flex gap-2">
-            <Link to={`/quotation-details/${item["Quote ID"] || item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
+            <Link to={`/quotation-details/${item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
               <Eye size={16} />
             </Link>
-            <Link to={`/edit-quotation/${item["Quote ID"] || item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
-                <Edit size={16} />
+            <Link to={`/edit-quotation/${item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
+              <Edit size={16} />
             </Link>
 
             <button
-              onClick={() => handleDeleteQuote(String(item["Quote ID"] || item.id))}
+              onClick={() => handleDeleteQuote(String(item.id))}
               className="p-1 text-slate-400 hover:text-red-600 transition-colors"
             >
               <Trash2 size={16} />
@@ -143,9 +142,9 @@ function Quotations() {
       const filtered = invoices.filter((item: any) => {
         if (activeDivision === "all") return true;
         const branchLower = (item.division || item.branch || "CONTRACTING").toUpperCase();
-        
+
         if (activeDivision === "SERVICE") {
-            return branchLower === "SERVICE" || branchLower === "BUSINESS";
+          return branchLower === "SERVICE" || branchLower === "BUSINESS";
         }
         return branchLower === activeDivision;
       });
@@ -161,13 +160,12 @@ function Quotations() {
         "Invoice No": invoice.invoice_number || invoice.invoiceNo,
         "Client": invoice.client_name || invoice.client,
         "Sector": (
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                (invoice.division?.toLowerCase() === 'service' || invoice.branch?.toLowerCase() === 'service' || invoice.branch?.toLowerCase() === 'business') ? 'bg-amber-100 text-amber-600' :
-                (invoice.division?.toLowerCase() === 'trading' || invoice.branch?.toLowerCase() === 'trading') ? 'bg-emerald-100 text-emerald-600' :
-                'bg-blue-100 text-blue-600'
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${(invoice.division?.toLowerCase() === 'service' || invoice.branch?.toLowerCase() === 'service' || invoice.branch?.toLowerCase() === 'business') ? 'bg-gray-900 text-white' :
+              (invoice.division?.toLowerCase() === 'trading' || invoice.branch?.toLowerCase() === 'trading') ? 'bg-gray-200 text-gray-800' :
+                'bg-gray-100 text-gray-600'
             }`}>
-                {invoice.branch?.toLowerCase() === 'business' ? 'Service' : (invoice.division || invoice.branch || 'Contracting')}
-            </span>
+            {invoice.branch?.toLowerCase() === 'business' ? 'Service' : (invoice.division || invoice.branch || 'Contracting')}
+          </span>
         ),
         "Ref Type": invoice.ref_type || invoice.refType || "General",
         "Ref No": invoice.reference_number || invoice.ref_no || invoice.refNo || "-",
@@ -181,7 +179,7 @@ function Quotations() {
               <Eye size={16} />
             </Link>
             <Link to={`/edit-invoice/${invoice.id}`} title="Edit" className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
-                <Edit size={16} />
+              <Edit size={16} />
             </Link>
             <button
               onClick={() => handleDeleteInvoice(invoice.id)}
@@ -208,6 +206,7 @@ function Quotations() {
         title={currentTitle}
         subtitle={`Manage and track ${activeTab} across sectors`}
         showBack={true}
+        backUrl="/dashboard"
         action={
           <div className="flex gap-3">
             {activeTab === "quotations" ? (
@@ -221,7 +220,7 @@ function Quotations() {
             ) : (
               <button
                 onClick={() => navigate("/create-invoice")}
-                className="btn-primary flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700"
+                className="btn-primary flex items-center gap-2"
               >
                 <Plus size={16} />
                 Create Invoice
