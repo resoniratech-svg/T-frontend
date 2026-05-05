@@ -8,7 +8,7 @@ import type { Proposal, ProposalActivity } from "../../types/pm";
 // UI Helper Components
 const TopNav = () => (
     <div className="flex justify-between items-center w-full mb-16 px-4">
-        <span className="font-serif text-[18px] tracking-wide text-[#2a2a2a] lowercase">Al Maha business services</span>
+        <span className="font-serif text-[18px] tracking-wide text-[#2a2a2a] lowercase">Trek group business services</span>
         <span className="text-[#2a2a2a]">⟶</span>
     </div>
 );
@@ -89,7 +89,7 @@ export default function ProposalDetails() {
                 <div className="page-break w-full h-[1122px] p-16 relative overflow-hidden flex flex-col bg-[#EFECE5]">
                     {/* Top Text */}
                     <div className="flex justify-between items-center w-full mb-12">
-                        <span className="font-serif text-[20px] tracking-wide text-[#2a2a2a] lowercase">Al Maha business services</span>
+                        <span className="font-serif text-[20px] tracking-wide text-[#2a2a2a] lowercase">Trek group business services</span>
                         <span className="text-[#2a2a2a] text-xl">⟶</span>
                     </div>
 
@@ -287,8 +287,8 @@ export default function ProposalDetails() {
                         <div className="mt-8 space-y-6 text-[22px] text-[#2a2a2a] pl-2 border-l-[3px] border-[#2a2a2a]">
                             <p className="font-bold">Contact us:</p>
                             <p className="pl-6"><span className="font-bold">Mobile</span>: +974 3051 6559, +974 3005 6030</p>
-                            <p className="pl-6"><span className="font-bold">Email</span>: info@Al Mahas.com</p>
-                            <p className="pl-6"><span className="font-bold">Website</span>: www.Al Mahas.com</p>
+                            <p className="pl-6"><span className="font-bold">Email</span>: info@trekgroups.com</p>
+                            <p className="pl-6"><span className="font-bold">Website</span>: www.trekgroups.com</p>
                             <p className="pl-6 pt-4 font-bold flex flex-col">
                                 <span>Location :</span>
                                 <span className="font-medium mt-1">Doha -Qatar</span>

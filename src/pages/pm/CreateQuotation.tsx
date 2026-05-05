@@ -30,9 +30,9 @@ export default function CreateQuotation() {
     const DEFAULTS = {
         service: {
             // ... (keeping same as before)
-            aboutUs: "Al Maha Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services.",
+            aboutUs: "Trek Group Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services.",
             whatWeDo: "Company formation and trade license registration\nIndustrial license applications and approvals\nGovernment liaison and PRO services\nSpecial approval coordination for industrial projects\nComprehensive project documentation and compliance",
-            proposalIntro: "Al Maha Business Services proposes to manage the complete setup of a new company in Qatar.\n\nThe company’s commercial activities will be as follows:\n\nActivity 1 – Provision of advertising services and advertising materials production\nProviding advertising and promotional services, including design, development, printing, and production of advertising materials such as banners, signboards, brochures, digital advertisements, promotional items, and related marketing materials in accordance with applicable regulations\n\nActivity 2 - Wholesale of stationery\nEngaging in the wholesale trading and distribution of stationery items including office supplies, paper products, writing instruments, school materials, filing products, and related accessories to retailers, institutions, and commercial establishments in accordance with applicable regulations.",
+            proposalIntro: "Trek Group Business Services proposes to manage the complete setup of a new company in Qatar.\n\nThe company’s commercial activities will be as follows:\n\nActivity 1 – Provision of advertising services and advertising materials production\nProviding advertising and promotional services, including design, development, printing, and production of advertising materials such as banners, signboards, brochures, digital advertisements, promotional items, and related marketing materials in accordance with applicable regulations\n\nActivity 2 - Wholesale of stationery\nEngaging in the wholesale trading and distribution of stationery items including office supplies, paper products, writing instruments, school materials, filing products, and related accessories to retailers, institutions, and commercial establishments in accordance with applicable regulations.",
             financialTerms: "Total Package Cost: QAR 11,000 (all-inclusive)\n\nThis charge includes:\n• Trade name registration\n• Commercial Registration (CR) issuance\n• Trade licence registration\n• All documentation and necessary approvals for company setup\n• Establishment ID issuance\n• Tax registration\n• Ministry of Labour (MOL) registration\n• Ministry of Interior (MOI) update\n\nNote: This activity is subject to obtaining prior approval from the Ministry of Culture – Department of Press and Publication for registration of press and publishing activities. This charge excludes all deposits and other government related charges.",
             clientDuties: "1. Provide required documents for CR approval (QID, Passport, Police Clearance, National Address, Mobile/Email)\n2. Provide office/building space documents for trade licence registration\n3. Responsible for providing and paying all bank-related deposits, requirements, and charges\n4. Submit signatures and info in a timely manner\n5. Arrange and cover all office-related services and costs\n6. Attend any ministry or authority appointments\n7. Ensure accuracy of all submitted documents",
             paymentTerms: "50% advance payment upon acceptance of this proposal.\nRemaining 50% payable upon completion and signing of company formation documentation.\n\nPrices are subject to revision in case of changes to client requirements or government fee structures. All government approval fees shall be paid directly by the client."
@@ -53,16 +53,12 @@ export default function CreateQuotation() {
     const [form, setForm] = useState({
         division: initialDivision,
         project: "",
-        owner: "",
-        location: "",
-        pinNo: "",
         client: "",
         customerCode: "",
         quoteId: "",
         status: "PENDING_APPROVAL",
         date: new Date().toISOString().split('T')[0],
         discount: 0,
-        docTitle: "FIRE ALARM AND FIGHTING QUOTATION",
         ...initialDefaults
     });
 
@@ -107,7 +103,7 @@ export default function CreateQuotation() {
     };
 
     const [items, setItems] = useState<QuotationItem[]>([
-        { description: "", brandName: "", madeIn: "", quantity: 1, unitPrice: 0, amount: 0 }
+        { description: "", quantity: 1, unitPrice: 0, amount: 0 }
     ]);
 
     // Fetch existing quotation from database if editing
@@ -136,10 +132,6 @@ export default function CreateQuotation() {
                 financialTerms: found.financialTerms || prev.financialTerms,
                 clientDuties: found.clientDuties || prev.clientDuties,
                 paymentTerms: found.paymentTerms || prev.paymentTerms,
-                owner: (found as any).owner || "",
-                location: (found as any).location || "",
-                pinNo: (found as any).pinNo || "",
-                docTitle: (found as any).docTitle || "FIRE ALARM AND FIGHTING QUOTATION",
             }));
 
             if (found.items && found.items.length > 0) {
@@ -169,7 +161,7 @@ export default function CreateQuotation() {
     };
 
     const addItem = () => {
-        setItems([...items, { description: "", brandName: "", madeIn: "", quantity: 1, unitPrice: 0, amount: 0 }]);
+        setItems([...items, { description: "", quantity: 1, unitPrice: 0, amount: 0 }]);
     };
 
     const removeItem = (index: number) => {
@@ -205,11 +197,7 @@ export default function CreateQuotation() {
             client_name: form.client,
             project_name: form.project,
             valid_until: new Date(new Date(form.date).getTime() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-            terms: form.financialTerms + "\n" + form.paymentTerms,
-            owner: form.owner,
-            location: form.location,
-            pinNo: form.pinNo,
-            docTitle: form.docTitle
+            terms: form.financialTerms + "\n" + form.paymentTerms
         };
 
         try {
@@ -297,30 +285,6 @@ export default function CreateQuotation() {
                             />
 
                             <FormInput label="Project Name" name="project" value={form.project} placeholder="e.g. ALWAAAB RESIDENCY MAIN ENTRANCE" onChange={handleChange} required />
-                            <FormInput label="Owner / Client" name="owner" value={form.owner} placeholder="e.g. M/S Omran Real Estate" onChange={handleChange} />
-                            <FormInput label="Location" name="location" value={form.location} placeholder="e.g. Bin Omran" onChange={handleChange} />
-                            <FormInput label="Pin No" name="pinNo" value={form.pinNo} placeholder="e.g. 37000013" onChange={handleChange} />
-                            
-                            <div className="col-span-2 space-y-1">
-                                <label className="text-xs font-semibold text-slate-500 uppercase">Quotation Header / Title *</label>
-                                <input 
-                                    list="title-options"
-                                    name="docTitle"
-                                    value={form.docTitle}
-                                    placeholder="Select or type custom title..."
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-red-600 focus:ring-2 focus:ring-brand-500"
-                                    required
-                                />
-                                <datalist id="title-options">
-                                    <option value="FIRE ALARM AND FIGHTING QUOTATION" />
-                                    <option value="PLUMBING QUOTATION" />
-                                    <option value="HVAC SYSTEMS QUOTATION" />
-                                    <option value="ELV SYSTEMS QUOTATION" />
-                                    <option value="TRADING QUOTATION" />
-                                    <option value="ELECTRICAL QUOTATION" />
-                                </datalist>
-                            </div>
                         </div>
                     </div>
 
@@ -337,61 +301,42 @@ export default function CreateQuotation() {
                             {items.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description</label>
-                                        <textarea
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description (Product Type)</label>
+                                        <input
+                                            type="text"
                                             value={item.description}
                                             onChange={(e) => handleItemChange(index, "description", e.target.value)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm"
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md"
                                             placeholder="Supply and installation of..."
-                                            rows={2}
                                             required
                                         />
                                     </div>
-                                    <div className="w-28">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Brand</label>
-                                        <input
-                                            type="text"
-                                            value={item.brandName}
-                                            onChange={(e) => handleItemChange(index, "brandName", e.target.value)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm"
-                                            placeholder="e.g. GST"
-                                        />
-                                    </div>
-                                    <div className="w-28">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Made In</label>
-                                        <input
-                                            type="text"
-                                            value={item.madeIn}
-                                            onChange={(e) => handleItemChange(index, "madeIn", e.target.value)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm"
-                                            placeholder="e.g. Doha"
-                                        />
-                                    </div>
-                                    <div className="w-20">
+                                    <div className="w-24">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">QTY</label>
                                         <input
-                                            type="text"
+                                            type="number"
+                                            min="1"
                                             value={item.quantity}
-                                            onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-center"
+                                            onChange={(e) => handleItemChange(index, "quantity", parseFloat(e.target.value) || 0)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md"
                                             required
                                         />
                                     </div>
-                                    <div className="w-28">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Rate</label>
+                                    <div className="w-32">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Price</label>
                                         <input
                                             type="number"
                                             min="0"
                                             value={item.unitPrice}
                                             onChange={(e) => handleItemChange(index, "unitPrice", parseFloat(e.target.value) || 0)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-right"
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md"
                                             required
                                         />
                                     </div>
-                                    <div className="w-28">
+                                    <div className="w-32">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total</label>
-                                        <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-md text-slate-600 font-bold text-sm text-right">
-                                            {(Number(item.quantity || 0) * Number(item.unitPrice || 0)).toLocaleString()}
+                                        <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-md text-slate-600 font-medium text-right">
+                                            {(item.quantity * item.unitPrice).toLocaleString()}
                                         </div>
                                     </div>
                                     <div className="pt-6">

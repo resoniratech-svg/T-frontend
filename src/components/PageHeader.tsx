@@ -9,26 +9,17 @@ interface Props {
   buttonLink?: string;
   action?: ReactNode;
   showBack?: boolean;
-  backUrl?: string;
 }
 
-function PageHeader({ title, subtitle, buttonText, buttonLink, action, showBack, backUrl }: Props) {
+function PageHeader({ title, subtitle, buttonText, buttonLink, action, showBack }: Props) {
   const navigate = useNavigate();
-  
-  const handleBack = () => {
-    if (backUrl) {
-      navigate(backUrl);
-    } else {
-      navigate(-1);
-    }
-  };
   
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
         {showBack && (
           <button
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="p-2 -ml-2 hover:bg-slate-100 rounded-full transition-colors text-slate-600 flex-shrink-0"
             title="Go Back"
           >

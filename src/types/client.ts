@@ -32,6 +32,4 @@ export interface Client {
   agreementTitle?: string;
   agreementUrl?: string;
   createdAt: string;
-  userId?: string | number;
-  companyName?: string;
 }

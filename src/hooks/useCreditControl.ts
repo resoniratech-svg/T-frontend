@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
-import api from '../services/api';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export interface Invoice {
   id: number;
@@ -34,7 +36,9 @@ export const useCreditControl = () => {
     try {
       const cleanFilters = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== undefined && v !== "all"));
       const params = new URLSearchParams(cleanFilters).toString();
-      const res = await api.get(`/v1/credit-control/summary?${params}`);
+      const res = await axios.get(`${API_BASE}/v1/credit-control/summary?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         setSummary(res.data.data);
       }
@@ -49,7 +53,9 @@ export const useCreditControl = () => {
     try {
       const cleanFilters = Object.fromEntries(Object.entries(filters).filter(([_, v]) => v !== undefined && v !== "all"));
       const params = new URLSearchParams(cleanFilters).toString();
-      const res = await api.get(`/v1/credit-control/invoices?${params}`);
+      const res = await axios.get(`${API_BASE}/v1/credit-control/invoices?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         setInvoices(res.data.data.invoices);
         setTotal(res.data.data.total);
@@ -64,7 +70,9 @@ export const useCreditControl = () => {
   const addPayment = async (paymentData: { invoiceId: number; amount: number; method: string; notes?: string }) => {
     if (!token) return { success: false, message: 'Unauthorized' };
     try {
-      const res = await api.post(`/v1/credit-control/payments`, paymentData);
+      const res = await axios.post(`${API_BASE}/v1/credit-control/payments`, paymentData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         await fetchSummary();
         return { success: true, data: res.data.data };

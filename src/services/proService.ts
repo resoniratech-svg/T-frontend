@@ -57,11 +57,6 @@ export const proService = {
     return response.data;
   },
 
-  addProDocument: async (data: any): Promise<PRODocument> => {
-    const response = await api.post("/pro/documents", data);
-    return response.data;
-  },
-
   getContractByClient: async (clientId: string): Promise<PROContract> => {
     const response = await api.get(`/pro/contracts/client/${clientId}`);
     return response.data;

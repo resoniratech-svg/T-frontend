@@ -16,8 +16,7 @@ import {
   CheckSquare,
   BookOpen,
   ShieldCheck,
-  MessageSquare,
-  Zap
+  MessageSquare
 } from "lucide-react";
 import type { Role } from "../types/user";
 import type { LucideIcon } from "lucide-react";
@@ -54,20 +53,12 @@ export const sidebarMenu: SidebarSection[] = [
     ],
   },
 
-  // Kahramaa Services
-  {
-    section: "Kahramaa Services",
-    roles: ["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS"],
-    items: [
-      { label: "Kahramaa Services", path: "/kahramaa-services", icon: Zap },
-    ],
-  },
-
   //  Estimations & Sales
   {
     section: "Estimations",
     roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"],
     items: [
+      { label: "BOQ", path: "/boq", icon: ClipboardList },
       { label: "Quotations", path: "/quotations", icon: FileText },
       { label: "Invoices", path: "/invoices", icon: Receipt },
     ],
@@ -82,7 +73,24 @@ export const sidebarMenu: SidebarSection[] = [
 
       { label: "Payments", path: "/payments", icon: CreditCard },
       { label: "Expenses", path: "/expenses", icon: Receipt },
+      { label: "Credit Request", path: "/credit-requests", icon: CreditCard },
       { label: "General Ledger", path: "/ledger", icon: BookOpen },
+    ],
+  },
+
+  //  Inventory Management (Stock/Trading)
+  {
+    section: "Inventory",
+    roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"],
+    items: [
+      { label: "Inventory Dashboard", path: "/inventory", icon: Package, roles: ["SUPER_ADMIN", "ACCOUNTS"] },
+      { label: "Products", path: "/products", icon: Package },
+      { label: "Purchase Orders", path: "/inventory/purchase-orders", icon: Package, roles: ["SUPER_ADMIN", "ACCOUNTS"] },
+      { label: "Sales Orders", path: "/inventory/sales-orders", icon: Package },
+      { label: "Inventory Movements", path: "/inventory-movements", icon: Package },
+      { label: "Day-wise Inventory", path: "/inventory/day-wise", icon: Package, roles: ["SUPER_ADMIN", "ACCOUNTS"] },
+      { label: "Profit Report", path: "/inventory/profit-report", icon: BarChart3, roles: ["SUPER_ADMIN", "ACCOUNTS"] },
+      { label: "Low Stock", path: "/inventory/low-stock", icon: AlertTriangle },
     ],
   },
 
@@ -131,6 +139,12 @@ export const sidebarMenu: SidebarSection[] = [
         roles: ["CLIENT"]
       },
       {
+        label: "BOQ",
+        path: "/client/boq",
+        icon: ClipboardList,
+        roles: ["CLIENT"]
+      },
+      {
         label: "Quotations",
         path: "/client/quotations",
         icon: FileText,
@@ -148,8 +162,29 @@ export const sidebarMenu: SidebarSection[] = [
         icon: ShieldCheck,
         roles: ["CLIENT"]
       },
+      {
+        label: "Credit Requests",
+        path: "/client/credit-requests",
+        icon: CreditCard,
+        roles: ["CLIENT"]
+      },
 
+      {
+        label: "Support",
+        path: "/client/support",
+        icon: MessageSquare,
+        roles: ["CLIENT", "SUPER_ADMIN"]
+      },
+    ],
+  },
 
+  //  Marketing & Lead Management
+  {
+    section: "Marketing",
+    roles: ["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS"],
+    items: [
+      { label: "Marketing Dashboard", path: "/marketing/dashboard", icon: LayoutDashboard },
+      { label: "Leads Management", path: "/marketing/leads", icon: Users },
     ],
   },
 

@@ -10,16 +10,9 @@ console.log("[API] Base URL:", api.defaults.baseURL);
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    const company = localStorage.getItem("selectedCompanyId");
-    
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    if (company && config.headers) {
-      config.headers["X-Company"] = company;
-    }
-    
     return config;
   },
   (error) => Promise.reject(error)

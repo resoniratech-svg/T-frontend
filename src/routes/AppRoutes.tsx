@@ -7,7 +7,6 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Landing from "../pages/common/Landing";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
-import CompanySelection from "../pages/auth/CompanySelection";
 import Unauthorized from "../pages/common/Unauthorized";
 
 // Route guard
@@ -38,10 +37,12 @@ import ClientDetails from "../pages/admin/ClientDetails";
 import EditClient from "../pages/admin/EditClient";
 import AdminPROTracking from "../pages/admin/AdminPROTracking";
 
+import BOQ from "../pages/pm/BOQ";
+import CreateBOQ from "../pages/pm/CreateBOQ";
+import BOQDetails from "../pages/pm/BOQDetails";
 import Quotations from "../pages/pm/Quotations";
 import CreateQuotation from "../pages/pm/CreateQuotation";
 import QuotationDetails from "../pages/pm/QuotationDetails";
-import QuotationPrint from "../pages/pm/QuotationPrint";
 
 import Proposals from "../pages/admin/Proposals";
 import CreateProposal from "../pages/admin/CreateProposal";
@@ -59,24 +60,48 @@ import ProfitLoss from "../pages/accounts/ProfitLoss";
 import BalanceSheet from "../pages/accounts/BalanceSheet";
 import FinancialReports from "../pages/accounts/FinancialReports";
 import Receipts from "../pages/accounts/Receipts";
+import CreditRequest from "../pages/accounts/CreditRequest";
+import CreditRequests from "../pages/accounts/CreditRequests";
 import Ledger from '../pages/accounts/Ledger';
 import CreditControl from "../pages/accounts/CreditControl";
 
+import Products from "../pages/inventory/Products";
+import CreateProduct from "../pages/inventory/CreateProduct";
+import InventoryDashboard from "../pages/inventory/InventoryDashboard";
+import InventoryMovements from "../pages/inventory/InventoryMovements";
+import CreateStockMovement from "../pages/inventory/CreateStockMovement";
+
 import ClientDashboard from "../pages/client_portal/ClientDashboard";
 import ClientProjects from "../pages/client_portal/ClientProjects";
+import ClientBOQ from "../pages/client_portal/ClientBOQ";
 import ClientBilling from "../pages/client_portal/ClientBilling";
 import ClientQuotations from "../pages/client_portal/ClientQuotations";
 import ClientDocuments from "../pages/client_portal/ClientDocuments";
 import ClientPROServices from "../pages/client_portal/ClientPROServices";
+import ClientSupport from "../pages/client_portal/ClientSupport";
+import ClientCreditRequests from "../pages/client_portal/ClientCreditRequests";
 // ClientProfile is now superseded by MyProfile
+
+import LowStock from "../pages/inventory/LowStock";
+import ProfitReport from "../pages/inventory/ProfitReport";
+import PurchaseOrders from "../pages/inventory/PurchaseOrders";
+import SalesOrders from "../pages/inventory/SalesOrders";
+import DayWiseInventory from "../pages/inventory/DayWiseInventory";
+import CreatePurchaseOrder from "../pages/inventory/CreatePurchaseOrder";
+import CreateSalesOrder from "../pages/inventory/CreateSalesOrder";
 
 // Employee Management
 import EmployeeDashboard from "../pages/employees/EmployeeDashboard";
 import EmployeeList from "../pages/employees/EmployeeList";
 import AddEditEmployee from "../pages/employees/AddEditEmployee";
 import EmployeeDetail from "../pages/employees/EmployeeDetail";
-import KahramaaServices from "../pages/kahramaa/KahramaaServices";
 import MyProfile from "../pages/common/MyProfile";
+
+// Marketing
+import MarketingDashboard from "../modules/marketing/pages/Dashboard";
+import LeadsList from "../modules/marketing/pages/LeadsList";
+import LeadDetails from "../modules/marketing/pages/LeadDetails";
+import AddEditLead from "../modules/marketing/pages/AddEditLead";
 
 import { useAuth } from "../context/AuthContext";
 import { ROLE_DASHBOARD_MAP } from "../types/user";
@@ -101,7 +126,6 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/select-company" element={<CompanySelection />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/dashboard" element={<DashboardRedirect />} />
 
@@ -145,6 +169,9 @@ function AppRoutes() {
 
         {/* Estimations & Sales (Consolidated) */}
         <Route element={<ProtectedRoute requiredSections={["Estimations"]} />}>
+          <Route path="/boq" element={<BOQ />} />
+          <Route path="/create-boq" element={<CreateBOQ />} />
+          <Route path="/edit-boq/:id" element={<CreateBOQ />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/:division" element={<Quotations />} />
           <Route path="/invoices" element={<Quotations />} />
@@ -183,6 +210,9 @@ function AppRoutes() {
           <Route path="/expense-details/:id" element={<ExpenseDetails />} />
 
           <Route path="/receipts" element={<Receipts />} />
+          <Route path="/credit-requests" element={<CreditRequests />} />
+          <Route path="/credit-request" element={<CreditRequest />} />
+          <Route path="/edit-credit-request/:id" element={<CreditRequest />} />
           <Route path="/ledger" element={<Ledger />} />
         </Route>
 
@@ -193,6 +223,35 @@ function AppRoutes() {
           <Route path="/balance-sheet" element={<BalanceSheet />} />
         </Route>
 
+        {/* Inventory */}
+        <Route element={<ProtectedRoute requiredSections={["Inventory"]} />}>
+          <Route path="/inventory" element={<InventoryDashboard />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/create-product" element={<CreateProduct />} />
+          <Route path="/inventory/edit-product/:id" element={<CreateProduct />} />
+          <Route path="/inventory-movements" element={<InventoryMovements />} />
+          <Route path="/create-stock-movement" element={<CreateStockMovement />} />
+          <Route path="/inventory/purchase-orders" element={<PurchaseOrders />} />
+          <Route path="/inventory/sales-orders" element={<SalesOrders />} />
+          <Route path="/inventory/day-wise" element={<DayWiseInventory />} />
+          <Route path="/inventory/profit-report" element={<ProfitReport />} />
+
+          {/* Super Admin & Accounts Explicit Protections */}
+          <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "ACCOUNTS"]} />}>
+            <Route path="/inventory/create-purchase-order" element={<CreatePurchaseOrder />} />
+          </Route>
+
+          {/* Super Admin, Accounts & PM Explicit Protections */}
+          <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"]} />}>
+            <Route path="/inventory/low-stock" element={<LowStock />} />
+          </Route>
+
+          {/* Super Admin & PM Explicit Protections */}
+          <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER"]} />}>
+             <Route path="/inventory/create-sales-order" element={<CreateSalesOrder />} />
+          </Route>
+        </Route>
+
         {/* Employee Management */}
         <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS", "CLIENT"]} />}>
           <Route path="/employees" element={<EmployeeDashboard />} />
@@ -201,20 +260,27 @@ function AppRoutes() {
           <Route path="/employees/edit/:id" element={<AddEditEmployee />} />
           <Route path="/employees/details/:id" element={<EmployeeDetail />} />
         </Route>
-        
-        {/* Kahramaa Services */}
-        <Route element={<ProtectedRoute requiredSections={["Kahramaa Services"]} />}>
-          <Route path="/kahramaa-services" element={<KahramaaServices />} />
+
+        {/* Marketing & Lead Management */}
+        <Route element={<ProtectedRoute requiredSections={["Marketing"]} />}>
+          <Route path="/marketing/dashboard" element={<MarketingDashboard />} />
+          <Route path="/marketing/leads" element={<LeadsList />} />
+          <Route path="/marketing/leads/new" element={<AddEditLead />} />
+          <Route path="/marketing/leads/edit/:id" element={<AddEditLead />} />
+          <Route path="/marketing/leads/:id" element={<LeadDetails />} />
         </Route>
 
         {/* Client Portal */}
         <Route element={<ProtectedRoute requiredSections={["Client Portal"]} />}>
           <Route path="/client/projects" element={<ClientProjects />} />
+          <Route path="/client/boq" element={<ClientBOQ />} />
           <Route path="/client/billing" element={<ClientBilling />} />
           <Route path="/client/quotations" element={<ClientQuotations />} />
           <Route path="/client/documents" element={<ClientDocuments />} />
           <Route path="/pro-services" element={<PROServicesPage />} />
           <Route path="/client/pro-services" element={<ClientPROServices />} />
+          <Route path="/client/support" element={<ClientSupport />} />
+          <Route path="/client/credit-requests" element={<ClientCreditRequests />} />
           <Route path="/client/profile" element={<MyProfile />} />
           <Route path="/profile" element={<MyProfile />} />
         </Route>
@@ -224,13 +290,9 @@ function AppRoutes() {
           <Route path="/job-documents" element={<JobDocuments />} />
           <Route path="/proposal-details/:id" element={<ProposalDetails />} />
           <Route path="/invoice-details/:id" element={<InvoiceDetails />} />
+          <Route path="/boq-details/:id" element={<BOQDetails />} />
           <Route path="/quotation-details/:id" element={<QuotationDetails />} />
         </Route>
-      </Route>
-
-      {/* Standalone Print Route (Bypasses Layout) */}
-      <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS"]} />}>
-        <Route path="/quotation/print/:id" element={<QuotationPrint />} />
       </Route>
     </Routes>
   );

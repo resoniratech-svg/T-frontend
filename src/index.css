@@ -42,13 +42,13 @@
   .btn-primary {
     @apply inline-flex items-center gap-2 text-white px-4 py-2.5 rounded-lg text-sm font-medium
            transition-colors duration-150 shadow-sm cursor-pointer;
-    background-color: #000000;
+    background-color: #4f46e5;
   }
   .btn-primary:hover {
-    background-color: #1a1a1a;
+    background-color: #4338ca;
   }
   .btn-primary:active {
-    background-color: #333333;
+    background-color: #3730a3;
   }
 
   /* Secondary / ghost button */
@@ -63,8 +63,8 @@
            placeholder:text-gray-400 outline-none transition-all duration-150;
   }
   .input:focus {
-    border-color: #000000;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
 
   /* Label */

@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import html2pdf from 'html2pdf.js';
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Printer, Edit, Loader2, CreditCard } from "lucide-react";
+import { ArrowLeft, Printer, Edit, Loader2 } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../context/AuthContext";
 import { financeService } from "../../services/financeService";
 import type { Invoice, InvoiceItem } from "../../types/finance";
-import AddPaymentModal from "../../components/modals/AddPaymentModal";
-import { numberToWords } from "../../utils/numberToWords";
 
 export default function InvoiceDetails() {
     const { id } = useParams();
@@ -16,17 +13,16 @@ export default function InvoiceDetails() {
     const [invoice, setInvoice] = useState<Invoice | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const invoiceRef = useRef<HTMLDivElement>(null);
-    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
     const isClient = user?.role === "CLIENT";
 
-    const fetchInvoice = async () => {
-        if (!id) return;
+    useEffect(() => {
+        const fetchInvoice = async () => {
+            if (!id) return;
             try {
                 setIsLoading(true);
                 const data: any = await financeService.getInvoice(id);
-
+                
                 if (data && data.invoice) {
                     const inv = data.invoice;
                     const items = (data.items || []).map((it: any) => ({
@@ -80,7 +76,6 @@ export default function InvoiceDetails() {
             }
         };
 
-    useEffect(() => {
         fetchInvoice();
     }, [id]);
 
@@ -105,19 +100,7 @@ export default function InvoiceDetails() {
     }
 
     const handlePrint = () => {
-        if (!invoiceRef.current) return;
-
-        const element = invoiceRef.current;
-        const opt = {
-            margin: 0,
-            filename: `Invoice_${invoice.invoiceNo}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // New Promise-based usage:
-        html2pdf().set(opt).from(element).save();
+        window.print();
     };
 
 
@@ -138,277 +121,220 @@ export default function InvoiceDetails() {
                     <StatusBadge status={invoice.status} />
                 </div>
                 <div className="flex gap-3">
-                    {!isClient && invoice.status !== "PAID" && (
-                        <button onClick={() => setIsPaymentModalOpen(true)} className="flex items-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-200 px-4 py-2 rounded-lg hover:bg-emerald-100 transition shadow-sm font-bold text-xs uppercase">
-                            <CreditCard size={16} />
-                            Record Payment
-                        </button>
-                    )}
                     {!isClient && (
-                        <button onClick={() => navigate(`/edit-invoice/${id}`)} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-slate-50 transition shadow-sm font-bold text-xs uppercase">
+                        <button onClick={() => navigate(`/edit-invoice/${id}`)} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-slate-50 transition">
                             <Edit size={16} />
                             Edit
                         </button>
                     )}
-                    <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition shadow-sm font-bold text-xs uppercase">
+                    <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition shadow-sm">
                         <Printer size={16} />
-                        Download
+                        Print / Download PDF
                     </button>
                 </div>
             </div>
 
-            {/* OFFICIAL INVOICE DESIGN (Matches Image) */}
-            <div ref={invoiceRef} className="max-w-[950px] mx-auto bg-white shadow-2xl p-6 print:p-0 print:shadow-none print:max-w-full font-serif text-black min-h-0 flex flex-col">
+            {/* NEW CONTRACTING INVOICE DESIGN (Visual Match) */}
+            <div className="max-w-[900px] mx-auto bg-white shadow-xl border border-black overflow-hidden print:shadow-none print:border-none print:m-0 print:w-full font-sans text-black">
 
-                {/* 1. Header (Names & Logo) */}
-                <div className="flex justify-between items-center mb-2">
-                    {/* Left: English Name */}
-                    <div className="w-[35%] text-[18px] font-bold leading-tight">
-                        {invoice.division?.toLowerCase() === 'mep' ? (
-                            <>
-                                Al Maha MEP Trading<br />
-                                & Contracting W.L.L.
-                            </>
-                        ) : (
-                            <>
-                                Al Maha Maintenance<br />
-                                & Electrical Equipment
-                            </>
-                        )}
+                {/* Header Section */}
+                <div className="p-8 pb-4 flex justify-between items-start border-b border-black">
+                    <div className="flex items-center gap-4">
+                        <img src="/logo.png" alt="TrekGroup Logo" className="w-16 h-16 object-contain" />
+                        <h1 className="text-4xl font-black tracking-tight self-center uppercase">INVOICE</h1>
                     </div>
 
-                    {/* Center: Logo */}
-                    <div className="w-[20%] flex flex-col items-center">
-                        <img
-                            src={invoice.division?.toLowerCase() === 'mep' ? "/logo_mep.png" : "/logo.png"}
-                            alt="Logo"
-                            className={`h-24 w-auto object-contain ${invoice.division?.toLowerCase() === 'mep' ? "bg-black p-1 rounded" : ""}`}
-                        />
-                    </div>
-
-                    {/* Right: Arabic Name */}
-                    <div className="w-[35%] text-right text-[22px] font-bold leading-tight" dir="rtl">
-                        {invoice.division?.toLowerCase() === 'mep' ? (
-                            <>
-                                المها للتجارة<br />
-                                والمقاولات ذ.م.م
-                            </>
-                        ) : (
-                            <>
-                                المها لبيع وصيانة<br />
-                                الادوات والتمديدات الكهربائية
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* 2. Sub-Header (License) */}
-                <div className="text-center border-t border-b border-black py-1 mb-4">
-                    <p className="text-[10px] font-black tracking-widest uppercase">
-                        <span className="text-sky-500">KAHRAMAA</span> APPROVED MEP CONTRACTOR | GRADE B | <span className="text-rose-500">KM</span> LICENSE NO 1492
-                    </p>
-                </div>
-
-                {/* 3. Title Bar */}
-                <div className="bg-black text-white text-center py-1.5 mb-6">
-                    <h2 className="text-xl font-black tracking-[0.3em] uppercase">INVOICE</h2>
-                </div>
-
-                {/* 4. Metadata Grid */}
-                <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-8 text-sm px-4">
-                    <div className="space-y-3">
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Client:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">{invoice.client}</span>
-                        </div>
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Project:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">{invoice.refNo || "General Maintenance"}</span>
-                        </div>
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Location:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">{invoice.address || "Doha, Qatar"}</span>
-                        </div>
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Pin No:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">{invoice.qid || "91210828"}</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3">
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Date:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">
-                                {new Date(invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    <div className="text-right flex flex-col items-end">
+                        <div className="text-brand-600 font-bold text-xl flex flex-col items-end leading-tight max-w-[400px] text-right">
+                            <span className="text-black text-xs font-bold opacity-60">TREK GROUP TRADING CONTRACTING AND SERVICES</span>
+                            <span className="text-brand-600 text-lg font-black tracking-[0.2em] uppercase mt-1">
+                                {(invoice.branch?.toLowerCase() === "service" || invoice.branch?.toLowerCase() === "business") ? "Service Sector" :
+                                    invoice.branch?.toLowerCase() === "trading" ? "Trading Sector" :
+                                        "Contracting Sector"}
                             </span>
                         </div>
-                        <div className="flex gap-2">
-                            <span className="font-bold min-w-[70px]">Ref No:</span>
-                            <span className="font-medium border-b border-dotted border-black flex-1">{invoice.invoiceNo.split('-').pop()}</span>
+                    </div>
+                </div>
+
+                {/* Metadata Grid */}
+                <div className="grid grid-cols-2 border-b border-black text-[13px]">
+                    <div className="border-r border-black p-4 space-y-2">
+                        <div className="grid grid-cols-[130px_1fr]">
+                            <span className="font-bold">Invoice Type:</span>
+                            <span>{invoice.invoiceType || "Credit"}</span>
+                        </div>
+                        <div className="grid grid-cols-[130px_1fr]">
+                            <span className="font-bold">Customer Name:</span>
+                            <span className="font-black">{invoice.client}</span>
+                        </div>
+                        <div className="grid grid-cols-[130px_1fr]">
+                            <span className="font-bold uppercase">PROJECT:</span>
+                            <span className="font-black uppercase">{invoice.refNo ? invoice.refNo : (invoice.project || "")}</span>
+                        </div>
+                        <div className="grid grid-cols-[130px_1fr] mt-4 min-h-[3rem]">
+                            <span className="font-bold">Address:</span>
+                            <span className="whitespace-pre-wrap">{invoice.address || ""}</span>
+                        </div>
+                        <div className="grid grid-cols-[130px_1fr]">
+                            <span className="font-bold">Tel:</span>
+                            <span>{invoice.tel || "+974 71716559"}</span>
+                        </div>
+                        <div className="grid grid-cols-[130px_1fr]">
+                            <span className="font-bold">QID:</span>
+                            <span>{invoice.qid || ""}</span>
+                        </div>
+                    </div>
+
+                    <div className="p-4 space-y-2 text-left">
+                        <div className="grid grid-cols-[100px_1fr]">
+                            <span className="font-bold">Invoice No.:</span>
+                            <span className="font-black">{invoice.invoiceNo.split('-').pop()}</span>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr]">
+                            <span className="font-bold">Date:</span>
+                            <span>{new Date(invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr] mt-4">
+                            <span className="font-bold uppercase">LPO No.:</span>
+                            <span className="font-black">{invoice.lpoNo || ""}</span>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr] mt-2">
+                            <span className="font-bold">Salesman:</span>
+                            <span>{invoice.salesman || ""}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* 5. Items Table */}
-                <div className="border border-black mb-8 flex-1">
+                {/* Main Table */}
+                <div className="min-h-[400px]">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-white border-b border-black">
-                                <th className="border-r border-black p-3 w-16 text-center text-xs font-black uppercase">S/N</th>
-                                <th className="border-r border-black p-3 text-center text-xs font-black uppercase">Description</th>
-                                <th className="p-3 w-32 text-center text-xs font-black uppercase">Total (QR)</th>
+                            <tr className="border-b border-black text-sm font-black">
+                                <th className="border-r border-black p-2 w-12 text-center uppercase">No.</th>
+                                <th className="border-r border-black p-2 w-24 text-center uppercase">Item Code</th>
+                                <th className="border-r border-black p-2 text-left uppercase">Item Description</th>
+                                <th className="border-r border-black p-2 w-20 text-center uppercase">Qty</th>
+                                <th className="border-r border-black p-2 w-28 text-center uppercase">Unit Price</th>
+                                <th className="border-r border-black p-2 w-24 text-center uppercase">Discount</th>
+                                <th className="p-2 w-32 text-center uppercase">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {items.map((item, idx) => (
-                                <tr key={idx} className="border-b border-black">
-                                    <td className="border-r border-black p-1 text-center text-[12px] font-medium align-middle">
-                                        {(idx + 1).toString().padStart(2, '0')}
-                                    </td>
-                                    <td className="border-r border-black p-1 text-[12px] font-medium leading-tight align-middle italic uppercase">
+                            {items.length > 0 ? items.map((item, idx: number) => (
+                                <tr key={idx} className="border-b border-black leading-tight h-10">
+                                    <td className="border-r border-black p-2 text-center align-top">{idx + 1}</td>
+                                    <td className="border-r border-black p-2 text-center align-top">{item.code || ""}</td>
+                                    <td className="border-r border-black p-2 text-[12px] align-top whitespace-pre-wrap font-medium">
                                         {item.description}
                                     </td>
-                                    <td className="p-1 text-center text-[12px] font-bold align-middle">
-                                        {Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 0 })} QR
-                                    </td>
+                                    <td className="border-r border-black p-2 text-center align-top">{item.quantity}</td>
+                                    <td className="border-r border-black p-2 text-center align-top">{Number(item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td className="border-r border-black p-2 text-center align-top">{item.discount || ""}</td>
+                                    <td className="p-2 text-right font-medium align-top">{Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                 </tr>
-                            ))}
-                            {/* Empty rows to maintain size */}
-                            {items.length < 2 && Array.from({ length: 2 - items.length }).map((_, i) => (
+                            )) : (
+                                Array.from({ length: 12 }).map((_, i) => (
+                                    <tr key={i} className="border-b border-black h-8 opacity-10">
+                                        <td className="border-r border-black"></td>
+                                        <td className="border-r border-black"></td>
+                                        <td className="border-r border-black"></td>
+                                        <td className="border-r border-black"></td>
+                                        <td className="border-r border-black"></td>
+                                        <td className="border-r border-black"></td>
+                                        <td></td>
+                                    </tr>
+                                ))
+                            )}
+                            {/* Filling empty space with grid lines */}
+                            {items.length > 0 && items.length < 12 && Array.from({ length: 12 - items.length }).map((_, i) => (
                                 <tr key={`empty-${i}`} className="border-b border-black h-8">
+                                    <td className="border-r border-black"></td>
+                                    <td className="border-r border-black"></td>
+                                    <td className="border-r border-black"></td>
+                                    <td className="border-r border-black"></td>
                                     <td className="border-r border-black"></td>
                                     <td className="border-r border-black"></td>
                                     <td></td>
                                 </tr>
                             ))}
                         </tbody>
-                        <tfoot>
-                            <tr className="border-t-2 border-black bg-white">
-                                <td colSpan={2} className="border-r border-black p-4 text-center text-base font-black uppercase tracking-wider">
-                                    TOTAL IN QRS ({numberToWords(totalAmount)})
-                                </td>
-                                <td className="p-4 text-center text-lg font-black bg-slate-50">
-                                    {Number(totalAmount).toLocaleString(undefined, { minimumFractionDigits: 0 })} QR
-                                </td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
 
-                {/* 7. Bank Details & Signature Section */}
-                <div className="px-4 mb-4 space-y-4">
-                    <div>
-                        <h4 className="font-black text-[12px] border-b border-black pb-0.5 mb-2 uppercase tracking-widest">General Note:</h4>
-                        <div className="space-y-2 text-[11px] font-bold">
-                            <div className="flex items-start gap-2">
-                                <span className="text-[10px] mt-0.5">◆</span>
-                                <div>
-                                    <p>Bank Transfer :</p>
-                                    <div className="pl-6 mt-1 space-y-1">
-                                        <p>Account Name: {invoice.division?.toLowerCase() === 'mep' ? "Al Maha MEP Trading & Contracting W.L.L." : "Al Maha Maintenance & Electrical Equipment"}</p>
-                                        <p>IBAN: QA09 QIIB 0000 0000 1112 0931 6300 1</p>
-                                        <p>Account No: 1112-093163-001</p>
-                                    </div>
-                                </div>
+                {/* Sub-Total Row */}
+                <div className="flex border-b border-black h-10 font-black text-sm">
+                    <div className="flex-1 flex items-center justify-end px-4 border-r border-black uppercase">Total</div>
+                    <div className="w-20 flex items-center justify-center border-r border-black text-lg">-</div>
+                    <div className="w-28 border-r border-black"></div>
+                    <div className="w-24 border-r border-black"></div>
+                    <div className="w-32 flex items-center justify-end px-4 border-l border-black">{Number(totalAmount).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                </div>
+
+                {/* Bottom Section: Remarks & Summary */}
+                <div className="flex text-[13px] border-b border-black">
+                    <div className="flex-1 border-r border-black flex flex-col min-h-[160px]">
+                        <div className="p-4 h-24 border-b border-black">
+                            <span className="font-extrabold uppercase text-[14px]">Remarks:</span>
+                        </div>
+                        <div className="p-4 flex-1 relative">
+                            <span className="font-extrabold uppercase text-[14px]">Notes:</span>
+                            <div className="absolute bottom-8 right-16 text-center leading-tight">
                             </div>
-                            <p className="flex items-start gap-2">
-                                <span className="text-[10px] mt-0.5">◆</span>
-                                <span>Fawran No: 7444 5969 , Name: Sajidur Rahman</span>
-                            </p>
-                            <p className="flex items-start gap-2">
-                                <span className="text-[10px] mt-0.5">◆</span>
-                                <span>Cash or Cheque</span>
-                            </p>
                         </div>
                     </div>
-                </div>
 
-                {/* Signature & Stamp Area */}
-                <div style={{ display: 'block', width: '100%', marginTop: '40px', pageBreakInside: 'avoid' }}>
-                    
-                    {/* RIGHT SIDE: Stamp and Details */}
-                    <div style={{ position: 'relative', width: '180px', height: '180px', marginLeft: 'auto', marginRight: '30px', background: 'transparent' }}>
-                        {/* Stamp */}
-                        <img 
-                            src="/stamp.png" 
-                            alt="Company Stamp" 
-                            style={{ width: '100%', height: 'auto', display: 'block', mixBlendMode: 'multiply' }}
-                            onError={(e) => (e.currentTarget.style.display = 'none')} 
-                        />
-                    </div>
-                    <div style={{ textAlign: 'center', marginTop: '8px', marginLeft: 'auto', marginRight: '30px', width: '180px' }}>
-                        <p style={{ fontWeight: 900, fontSize: '14px', margin: 0 }}>Sajidur Rahman</p>
-                        <p style={{ fontWeight: 700, fontSize: '11px', color: '#334155', margin: 0 }}>General Manager</p>
+                    <div className="w-[305px] flex flex-col">
+                        <div className="flex border-b border-black h-12">
+                            <div className="w-[120px] p-2 font-black flex items-center border-r border-black uppercase text-xs">Advance:</div>
+                            <div className="flex-1 p-2 flex items-center justify-end font-bold">{advance > 0 ? Number(advance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}</div>
+                        </div>
+                        <div className="flex border-b border-black h-12">
+                            <div className="w-[120px] p-2 font-black flex items-center border-r border-black uppercase text-xs">Discount</div>
+                            <div className="flex-1 p-2 flex items-center justify-end font-bold">{discount > 0 ? Number(discount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}</div>
+                        </div>
+                        <div className="flex h-16 border-b border-black">
+                            <div className="w-[120px] p-2 font-black flex items-center border-r border-black leading-tight uppercase text-xs">Balance<br />Payable</div>
+                            <div className="flex-1 p-2 flex items-center justify-end font-black text-xl">{Number(balance).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
+                        </div>
+                        <div className="flex-1"></div>
                     </div>
                 </div>
 
-                {/* 8. Bottom Footer (Contacts) */}
-                <div className="border-t-2 border-black pt-4 pb-1">
-                    <div className="flex justify-center gap-x-2 text-[10px] font-black text-center uppercase tracking-tighter">
-                        <span>C.R NO: 83684</span>
-                        <span>-</span>
-                        <span>Tel: +974 4001 9555</span>
-                        <span>-</span>
-                        <span>Mob No: +974 7444 5969</span>
-                        <span>-</span>
-                        <span>P.O BOX: 9592</span>
-                    </div>
-                    <div className="flex justify-center gap-x-2 text-[10px] font-black text-center mt-1">
-                        <span className="lowercase">Instagram: @almahacontracting.qa</span>
-                        <span className="mx-1">|</span>
-                        <span className="lowercase">E-mail: almaha263@gmail.com</span>
-                    </div>
+                {/* Footer Message */}
+                <div className="p-4 text-center text-[15px] font-black italic">
+                    Thanks for your business! Please Visit Again.
                 </div>
-
-                {/* Bottom Decorative Bar */}
-                <div className="h-8 bg-gradient-to-r from-black via-slate-800 to-black mt-4" />
 
             </div>
 
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700;900&display=swap');
-                
-                @media print {
-                    .no-print { display: none !important; }
-                    @page { 
-                        size: A4; 
-                        margin: 10mm; 
-                    }
-                    body { 
-                        background: white !important; 
-                        margin: 0 !important; 
-                        padding: 0 !important; 
-                        -webkit-print-color-adjust: exact !important;
-                    }
-                    .p-6 { padding: 0 !important; }
-                    .min-h-screen { min-height: auto !important; }
-                    .max-w-\\[950px\\] { 
-                        max-width: 100% !important; 
-                        margin: 0 !important;
-                        box-shadow: none !important;
-                    }
-                    @page { 
-                        size: A4; 
-                        margin: 15mm; 
-                    }
-                }
-                
-                .font-serif { font-family: 'Times New Roman', Times, serif; }
-                [dir="rtl"] { font-family: 'Noto Sans Arabic', sans-serif; }
-            `}</style>
-
-            {/* Payment Modal */}
-            {invoice && (
-                <AddPaymentModal
-                    isOpen={isPaymentModalOpen}
-                    onClose={() => setIsPaymentModalOpen(false)}
-                    invoice={invoice}
-                    onSuccess={() => {
-                        fetchInvoice();
-                        setIsPaymentModalOpen(false);
-                    }}
-                />
-            )}
+        @media print {
+          .no-print { display: none !important; }
+          body { 
+            background: white !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .bg-slate-50 { background: white !important; }
+          .p-6 { padding: 0 !important; }
+          .max-w-\\[900px\\] { 
+            max-width: 100% !important; 
+            width: 210mm !important;
+            border: 1px solid black !important; 
+            box-shadow: none !important; 
+            margin: 0 auto !important;
+            display: block !important;
+          }
+          .font-black { font-weight: 900 !important; }
+          .font-bold { font-weight: 700 !important; }
+          @page { 
+            size: A4 portrait; 
+            margin: 10mm; 
+          }
+        }
+      `}</style>
         </div>
     );
 }

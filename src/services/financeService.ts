@@ -38,18 +38,17 @@ export const financeService = {
   },
   
   getPayments: async (): Promise<any[]> => {
-    const response = await api.get("/payments");
-    // Extract data from paginated backend response
-    const rawData = response.data?.data?.data || response.data?.data || response.data || [];
+    const response = await api.get("/invoices");
+    const rawData = response.data?.data || response.data || [];
     return Array.isArray(rawData) ? rawData.map((p: any) => ({
-       id: `PAY-${p.id}`,
-       dbId: p.id,
-       client: p.explicit_client_name || p.user_client_name || "N/A",
-       invoice: p.invoice_number || `INV-${p.invoice_id}`,
-       amount: p.amount || 0,
-       date: p.payment_date || p.created_at?.split('T')[0] || '',
-       division: p.division || "SERVICE",
-       status: "Paid"
+       id: p.invoice_number || p.invoiceNo, // Show invoice No as payment ID
+       dbId: p.id, // Database ID for internal reference
+       client: p.client_name || p.company_name || p.client || "N/A",
+       invoice: p.invoice_number || p.invoiceNo,
+       amount: p.total_amount || p.total || p.amount || 0,
+       date: p.invoice_date || p.date || p.created_at?.split('T')[0] || '',
+       division: p.division || p.branch,
+       status: p.status
     })) : [];
   },
 
