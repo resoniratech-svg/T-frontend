@@ -253,7 +253,7 @@ function AppRoutes() {
         </Route>
 
         {/* Employee Management */}
-        <Route element={<ProtectedRoute requiredSections={["Employee Management"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS", "CLIENT"]} />}>
           <Route path="/employees" element={<EmployeeDashboard />} />
           <Route path="/employees/list" element={<EmployeeList />} />
           <Route path="/employees/create" element={<AddEditEmployee />} />
