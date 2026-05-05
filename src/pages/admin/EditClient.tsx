@@ -102,9 +102,21 @@ function EditClient() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    let { name, value } = e.target;
+
+    // Validation for letters only (Contact Person, Company)
+    if (name === "name" || name === "company") {
+      value = value.replace(/[^a-zA-Z\s]/g, "");
+    }
+    
+    // Validation for digits only (QID, CR, Computer Card)
+    if (name === "qid" || name === "crNumber" || name === "computerCard") {
+      value = value.replace(/[^0-9]/g, "");
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
