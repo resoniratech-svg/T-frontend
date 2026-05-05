@@ -53,9 +53,28 @@ function Projects() {
 
 
   const downloadFile = (doc: any) => {
+    let finalName = doc.name || 'document.pdf';
+    
+    if (doc.data && typeof doc.data === 'string' && doc.data.startsWith('data:')) {
+      const mimeMatch = doc.data.match(/^data:([^;]+);/);
+      if (mimeMatch) {
+        const mime = mimeMatch[1].toLowerCase();
+        let ext = 'pdf';
+        if (mime.includes('png')) ext = 'png';
+        else if (mime.includes('jpeg') || mime.includes('jpg')) ext = 'jpg';
+        else if (mime.includes('wordprocessingml') || mime.includes('msword')) ext = 'docx';
+        else if (mime.includes('spreadsheetml') || mime.includes('ms-excel')) ext = 'xlsx';
+        else if (mime.includes('text/plain')) ext = 'txt';
+        
+        if (finalName.endsWith('.pdf') && ext !== 'pdf') {
+          finalName = finalName.replace(/\.pdf$/i, '.' + ext);
+        }
+      }
+    }
+
     const link = document.createElement("a");
     link.href = doc.data;
-    link.download = doc.name;
+    link.download = finalName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

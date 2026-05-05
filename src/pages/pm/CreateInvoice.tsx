@@ -53,7 +53,10 @@ export default function CreateInvoice() {
         address: "",
         advance: 0,
         invoiceType: "Credit" as "Credit" | "Cash",
-        projectName: ""
+        projectName: "",
+        owner: "",
+        location: "",
+        pinNo: ""
     });
 
     const allowedSectors = useMemo(() => {
@@ -96,7 +99,10 @@ export default function CreateInvoice() {
                 address: dataObj.address || "",
                 advance: Number(dataObj.amount_paid) || dataObj.advance || dataObj.advancePaid || 0,
                 invoiceType: dataObj.invoiceType || "Credit",
-                clientId: String(dataObj.client_id || dataObj.clientId || "")
+                clientId: String(dataObj.client_id || dataObj.clientId || ""),
+                owner: dataObj.owner || "",
+                location: dataObj.location || "",
+                pinNo: dataObj.pinNo || dataObj.pin_no || ""
             });
 
             const mappedItems = itemsArr.map((item: any, index: number) => ({
@@ -242,6 +248,9 @@ export default function CreateInvoice() {
             ref_type: form.refType,
             ref_no: form.refNo,
             project_name: form.projectName,
+            owner: form.owner,
+            location: form.location,
+            pinNo: form.pinNo,
             notes: form.notes,
             payment_terms: form.paymentTerms,
             items: items.map(item => ({
@@ -334,38 +343,8 @@ export default function CreateInvoice() {
                             )}
                         </div>
 
-                        <FormInput
-                            label="Customer Code"
-                            name="customerCode"
-                            value={form.customerCode!}
-                            disabled
-                            placeholder="Auto-generated"
-                        />
-
-                        <div className="flex flex-col gap-1">
-                            <label className="text-xs font-semibold text-slate-500 uppercase">Ref Type</label>
-                            <input
-                                name="refType"
-                                value={form.refType}
-                                onChange={handleFormChange}
-                                className="border p-2 rounded-lg"
-                                placeholder="e.g. General, Proposal, Project"
-                            />
-                        </div>
-
-                        <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
-
                         <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} />
-
-                        <FormInput
-                            label="Credit Terms (Days)"
-                            name="creditTerms"
-                            type="number"
-                            value={form.creditTerms}
-                            onChange={handleFormChange}
-                        />
-
-                        <FormInput label="Due Date" name="dueDate" type="date" value={form.dueDate} disabled />
+                        <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Invoice Type</label>
@@ -380,10 +359,9 @@ export default function CreateInvoice() {
                             </select>
                         </div>
 
-                        <FormInput label="LPO No." name="lpoNo" value={form.lpoNo} onChange={handleFormChange} placeholder="e.g. PO1031" />
-                        <FormInput label="Salesman" name="salesman" value={form.salesman} onChange={handleFormChange} placeholder="Salesperson name" />
-                        <FormInput label="QID" name="qid" value={form.qid} onChange={handleFormChange} placeholder="QID Number" />
                         <FormInput label="Project Name" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" />
+                        <FormInput label="Location" name="location" value={form.location} onChange={handleFormChange} placeholder="e.g. Birkat Al Awamer" />
+                        <FormInput label="Pin No" name="pinNo" value={form.pinNo} onChange={handleFormChange} placeholder="e.g. 91210828" />
 
                         <div className="md:col-span-2 flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Address</label>

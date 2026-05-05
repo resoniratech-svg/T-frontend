@@ -13,30 +13,30 @@ export default function ApprovalBadge({ status = "pending", showIcon = true }: P
   const configs: any = {
     pending: {
       label: "Pending",
-      bg: "bg-amber-50",
-      text: "text-amber-700",
-      border: "border-amber-200",
+      bg: "bg-gray-50",
+      text: "text-gray-600",
+      border: "border-gray-200",
       icon: Clock
     },
     approved: {
       label: "Approved",
-      bg: "bg-emerald-50",
-      text: "text-emerald-700",
-      border: "border-emerald-200",
+      bg: "bg-gray-900",
+      text: "text-white",
+      border: "border-gray-900",
       icon: CheckCircle2
     },
     rejected: {
       label: "Rejected",
-      bg: "bg-rose-50",
-      text: "text-rose-700",
-      border: "border-rose-200",
+      bg: "bg-gray-200",
+      text: "text-gray-900",
+      border: "border-gray-300",
       icon: XCircle
     },
     submitted: {
       label: "Submitted",
-      bg: "bg-indigo-50",
-      text: "text-indigo-700",
-      border: "border-indigo-200",
+      bg: "bg-gray-50",
+      text: "text-gray-500",
+      border: "border-gray-200",
       icon: Clock
     }
   };

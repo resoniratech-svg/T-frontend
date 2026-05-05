@@ -34,14 +34,18 @@ function Sidebar({ onClose }: SidebarProps) {
       <div className="px-6 py-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 flex items-center justify-center">
-            <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain drop-shadow-md" />
+            {localStorage.getItem("selectedCompanyId") === "mep" ? (
+              <img src="/logo_mep.png" alt="Al Maha MEP Logo" className="w-full h-full object-contain drop-shadow-md bg-slate-900 rounded-md p-1" />
+            ) : (
+              <img src="/logo.png" alt="Al Maha Logo" className="w-full h-full object-contain drop-shadow-md" />
+            )}
           </div>
           <div>
             <h1 className="text-sm font-semibold text-white tracking-wide">
-              TrekGroup
+              Al Maha
             </h1>
-            <p className="text-[10px] text-slate-500 font-medium">
-              ERP System
+            <p className="text-[9px] text-white/40 font-bold leading-tight mt-0.5 max-w-[160px]">
+              {(localStorage.getItem("selectedCompany") || "ERP System").replace("Al Maha ", "")}
             </p>
           </div>
         </div>
@@ -108,7 +112,7 @@ function Sidebar({ onClose }: SidebarProps) {
       {/* ─── Footer ────────────────────────────────────── */}
       <div className="px-5 py-4 border-t border-sidebar-border">
         <p className="text-[10px] text-slate-600 text-center">
-          © 2026 TrekGroup
+          © 2026 Al Maha
         </p>
       </div>
     </aside>

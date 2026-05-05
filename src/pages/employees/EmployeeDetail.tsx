@@ -159,7 +159,7 @@ export default function EmployeeDetail() {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Company</p>
-                                <p className="text-gray-800 font-medium">{employee.company || "Trek Group"}</p>
+                                <p className="text-gray-800 font-medium">{employee.company || "Al Maha"}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Joining Date</p>

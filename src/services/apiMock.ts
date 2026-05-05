@@ -199,9 +199,9 @@ export const attachMockInterceptor = (instance: AxiosInstance) => {
 
         if (url === "/client/profile" && method === "get") {
             return respond(config, {
-                companyName: "Trek Group Services LLC",
+                companyName: "Al Maha Services LLC",
                 contactPerson: "Ahmed Ali",
-                email: "contact@trekgroup.qa",
+                email: "contact@Al Maha.qa",
                 phone: "+974 4455 6677",
                 address: "Office 402, Al-Reem Tower, West Bay, Doha, Qatar"
             });

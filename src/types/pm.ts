@@ -3,6 +3,8 @@ import type { ApprovalStatus } from "./approvals";
 
 export interface QuotationItem {
   description: string;
+  brandName?: string;
+  madeIn?: string;
   quantity: number;
   unitPrice: number;
   amount: number;
