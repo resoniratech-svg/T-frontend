@@ -63,41 +63,23 @@ function CreateClient() {
     }
   }, [activeDivision]);
 
-  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     let { name, value } = e.target;
-    let error = "";
     
     // Validation for letters only (Contact Person, Company)
     if (name === "name" || name === "company") {
-      if (/[0-9]/.test(value)) {
-        error = "Only alphabets are allowed";
-        value = value.replace(/[0-9]/g, "");
-      }
+      value = value.replace(/[^a-zA-Z\s]/g, "");
     }
     
     // Validation for digits only (QID, CR, Computer Card)
     if (name === "qid" || name === "crNumber" || name === "computerCard") {
-      if (/[^0-9]/.test(value)) {
-        error = "Only digits are allowed";
-        value = value.replace(/[^0-9]/g, "");
-      }
+      value = value.replace(/[^0-9]/g, "");
     }
-
-    setValidationErrors(prev => ({ ...prev, [name]: error }));
 
     setForm({
       ...form,
       [name]: value
     });
-
-    // Clear error after 3 seconds if it was a typing error
-    if (error) {
-      setTimeout(() => {
-        setValidationErrors(prev => ({ ...prev, [name]: "" }));
-      }, 3000);
-    }
   };
 
   const handleLicenseChange = (index: number, field: keyof License, value: any) => {
@@ -233,10 +215,9 @@ function CreateClient() {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${validationErrors.name ? "border-red-500 ring-1 ring-red-500" : "border-slate-200"}`}
+                    className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
                     placeholder="Full Name"
                   />
-                  {validationErrors.name && <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse">{validationErrors.name}</p>}
                 </div>
 
                 <div>
@@ -246,10 +227,9 @@ function CreateClient() {
                     name="company"
                     value={form.company}
                     onChange={handleChange}
-                    className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${validationErrors.company ? "border-red-500 ring-1 ring-red-500" : "border-slate-200"}`}
+                    className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
                     placeholder="Company Name"
                   />
-                  {validationErrors.company && <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse">{validationErrors.company}</p>}
                 </div>
 
                 <div>
@@ -314,10 +294,9 @@ function CreateClient() {
                       name="qid"
                       value={form.qid}
                       onChange={handleChange}
-                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${validationErrors.qid ? "border-red-500 ring-1 ring-red-500" : "border-slate-200"}`}
+                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
                       placeholder="Enter QID Number"
                     />
-                    {validationErrors.qid && <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse">{validationErrors.qid}</p>}
                   </div>
                   <MiniFileUpload 
                     label="QID Document" 
@@ -334,10 +313,9 @@ function CreateClient() {
                       name="crNumber"
                       value={form.crNumber}
                       onChange={handleChange}
-                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${validationErrors.crNumber ? "border-red-500 ring-1 ring-red-500" : "border-slate-200"}`}
+                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
                       placeholder="Commercial Registration No."
                     />
-                    {validationErrors.crNumber && <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse">{validationErrors.crNumber}</p>}
                   </div>
                   <MiniFileUpload 
                     label="CR Document" 
@@ -354,10 +332,9 @@ function CreateClient() {
                       name="computerCard"
                       value={form.computerCard}
                       onChange={handleChange}
-                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white ${validationErrors.computerCard ? "border-red-500 ring-1 ring-red-500" : "border-slate-200"}`}
+                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white"
                       placeholder="Enter Computer Card Number"
                     />
-                    {validationErrors.computerCard && <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse">{validationErrors.computerCard}</p>}
                   </div>
                   <MiniFileUpload 
                     label="Computer Card Doc" 
