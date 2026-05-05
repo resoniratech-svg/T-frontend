@@ -50,11 +50,6 @@ function BOQ() {
     mutationFn: boqService.deleteBOQ,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["boqs"] });
-      alert("BOQ deleted successfully from database");
-    },
-    onError: (err: any) => {
-      console.error("[BOQ_DELETE_ERROR]", err);
-      alert("Failed to delete BOQ: " + (err.response?.data?.message || err.message));
     }
   });
 
