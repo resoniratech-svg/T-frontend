@@ -238,8 +238,8 @@ export default function AdminPROTracking() {
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-brand-500/20 transition-all"
             >
               <option value="All">All Clients</option>
-              {sectorFilteredClients.map(client => (
-                <option key={client.id} value={client.id}>{client.name} ({client.contactPerson || 'No Contact'})</option>
+              {safeClients.map(client => (
+                <option key={client.id} value={client.id}>{client.name} ({client.division || 'No Sector'})</option>
               ))}
             </select>
           </div>
