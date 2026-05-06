@@ -24,6 +24,9 @@ const AddEditLead: React.FC = () => {
     division: '' as any
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   // 1. Fetch lead if editing
   const { data: lead, isLoading: isFetching } = useQuery<Lead>({
@@ -49,6 +52,27 @@ const AddEditLead: React.FC = () => {
       });
     }
   }, [lead]);
+
+  // Input Restrictions
+  const handleLetterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (value === '' || /^[a-zA-Z\s.'-]+$/.test(value)) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFieldErrors(prev => ({ ...prev, [name]: 'Only letters are allowed' }));
+    }
+  };
+
+  const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (value === '' || /^[0-9+ ]*$/.test(value)) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+      setFormData({ ...formData, [name]: value });
+    } else {
+      setFieldErrors(prev => ({ ...prev, [name]: 'Only numbers are allowed' }));
+    }
+  };
 
   // 2. Mutation for create/update
   const mutation = useMutation({
@@ -124,9 +148,11 @@ const AddEditLead: React.FC = () => {
                     placeholder="John Doe"
                     className={`w-full pl-10 pr-4 py-2.5 border rounded-xl outline-none focus:ring-2 transition-all ${errors.name ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-200 focus:ring-blue-100 focus:border-blue-400'}`}
                     value={formData.name || ''}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    name="name"
+                    onChange={handleLetterChange}
                   />
                 </div>
+                {fieldErrors.name && <p className="text-xs text-red-500 font-medium mt-1">{fieldErrors.name}</p>}
                 {errors.name && <p className="text-xs text-red-500 flex items-center gap-1 mt-1"><AlertCircle size={10} /> {errors.name}</p>}
               </div>
 
@@ -154,9 +180,11 @@ const AddEditLead: React.FC = () => {
                     placeholder="+1 234 567 890"
                     className={`w-full pl-10 pr-4 py-2.5 border rounded-xl outline-none focus:ring-2 transition-all ${errors.phone ? 'border-red-300 bg-red-50 focus:ring-red-200' : 'border-gray-200 focus:ring-blue-100 focus:border-blue-400'}`}
                     value={formData.phone || ''}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    name="phone"
+                    onChange={handleNumericChange}
                   />
                 </div>
+                {fieldErrors.phone && <p className="text-xs text-red-500 font-medium mt-1">{fieldErrors.phone}</p>}
                 {errors.phone && <p className="text-xs text-red-500 flex items-center gap-1 mt-1"><AlertCircle size={10} /> {errors.phone}</p>}
               </div>
 
@@ -250,7 +278,7 @@ const AddEditLead: React.FC = () => {
                 <div className="space-y-3">
                   <select 
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-100 transition-all"
-                    value={['Admin User', 'Sales Team', 'Marketing Team', 'Direct Manager'].includes(formData.assignedTo || '') ? formData.assignedTo : 'Other'}
+                    value={['Sales Team', 'Marketing Team', 'Direct Manager'].includes(formData.assignedTo || '') ? formData.assignedTo : 'Other'}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === 'Other') {
@@ -260,7 +288,6 @@ const AddEditLead: React.FC = () => {
                       }
                     }}
                   >
-                    <option value="Admin User">S. Deep (Admin)</option>
                     <option value="Sales Team">Sales Department</option>
                     <option value="Marketing Team">Marketing Lead</option>
                     <option value="Direct Manager">General Manager</option>
@@ -286,6 +313,7 @@ const AddEditLead: React.FC = () => {
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Next Follow-up</label>
                 <input 
                   type="date"
+                  min={todayStr}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                   value={formData.nextFollowUpDate || ''}
                   onChange={(e) => setFormData({...formData, nextFollowUpDate: e.target.value})}
