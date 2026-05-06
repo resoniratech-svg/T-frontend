@@ -55,7 +55,23 @@ function Projects() {
   const downloadFile = (doc: any) => {
     const link = document.createElement("a");
     link.href = doc.data;
-    link.download = doc.name;
+    
+    let fileName = doc.name;
+    // Auto-detect extension from Data URL
+    if (doc.data?.startsWith("data:")) {
+      const mime = doc.data.split(";")[0].split(":")[1];
+      let ext = ".pdf";
+      if (mime.includes("wordprocessingml") || mime.includes("msword")) ext = ".docx";
+      else if (mime.includes("spreadsheetml") || mime.includes("ms-excel")) ext = ".xlsx";
+      else if (mime.includes("png")) ext = ".png";
+      else if (mime.includes("jpeg")) ext = ".jpg";
+      
+      if (!fileName.toLowerCase().endsWith(ext)) {
+        fileName = fileName.replace(/\.[^/.]+$/, "") + ext;
+      }
+    }
+
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -72,10 +88,19 @@ function Projects() {
       <div className="flex flex-wrap gap-1">
         {item.uploadedDocument && (
           <button
-            onClick={() => downloadFile({ 
-              name: `${item.name || item.projectName || 'project'}_document.pdf`, 
-              data: item.uploadedDocument 
-            })}
+            onClick={() => {
+              // Determine extension for the name
+              let ext = ".pdf";
+              if (item.uploadedDocument?.includes("wordprocessingml") || item.uploadedDocument?.includes("msword")) ext = ".docx";
+              else if (item.uploadedDocument?.includes("spreadsheetml") || item.uploadedDocument?.includes("ms-excel")) ext = ".xlsx";
+              else if (item.uploadedDocument?.includes("png")) ext = ".png";
+              else if (item.uploadedDocument?.includes("jpeg")) ext = ".jpg";
+
+              downloadFile({ 
+                name: `${item.name || item.projectName || 'project'}_document${ext}`, 
+                data: item.uploadedDocument 
+              });
+            }}
             className="p-1.5 bg-blue-50 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded border border-blue-100 transition-all flex items-center justify-center"
             title="Download Project Document"
           >
