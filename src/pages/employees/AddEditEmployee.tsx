@@ -20,6 +20,8 @@ export default function AddEditEmployee() {
   const isEdit = !!id;
   const { user } = useAuth();
   const isClient = user?.role === "CLIENT";
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const todayStr = new Date().toLocaleDateString('en-CA');
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<Partial<Employee>>({
@@ -72,10 +74,37 @@ export default function AddEditEmployee() {
   }, [employee, isEdit, searchParams]);
 
   const handleBasicChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+
+    // Letters only: Full Name
+    if (name === 'name') {
+      if (value !== '' && !/^[a-zA-Z\s.'-]+$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, name: 'Only letters are allowed' }));
+        return;
+      }
+      setFieldErrors(prev => ({ ...prev, name: '' }));
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDocChange = <K extends keyof EmployeeDocument>(index: number, field: K, value: EmployeeDocument[K]) => {
+    // Numbers only for document number fields (QID, Passport, Contract)
+    if (field === 'number') {
+      const strVal = String(value);
+      if (strVal !== '' && !/^\d+$/.test(strVal)) {
+        setFieldErrors(prev => ({ ...prev, [`doc_${index}`]: 'Only numbers are allowed' }));
+        return;
+      }
+      setFieldErrors(prev => ({ ...prev, [`doc_${index}`]: '' }));
+    }
+
+    // Block past dates for issue/expiry
+    if ((field === 'issueDate' || field === 'expiryDate') && value) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (new Date(String(value)) < today) return;
+    }
+
     setFormData((prev) => {
         const newDocs = [...(prev.documents || [])];
         if (newDocs[index]) {
@@ -182,8 +211,9 @@ export default function AddEditEmployee() {
                   value={formData.name || ""}
                   onChange={handleBasicChange}
                   placeholder="e.g. John Doe"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none transition-all"
+                  className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none transition-all ${fieldErrors.name ? 'border-red-300' : 'border-gray-200'}`}
                 />
+                {fieldErrors.name && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.name}</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase">Employee ID *</label>
@@ -324,15 +354,17 @@ export default function AddEditEmployee() {
                         <input 
                             value={doc.number}
                             onChange={(e) => handleDocChange(idx, 'number', e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500/10"
+                            className={`w-full px-3 py-2 bg-white border rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500/10 ${fieldErrors[`doc_${idx}`] ? 'border-red-300' : 'border-gray-200'}`}
                             placeholder="Enter number"
                         />
+                        {fieldErrors[`doc_${idx}`] && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors[`doc_${idx}`]}</p>}
                     </div>
                     <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Issue Date</label>
                         <input 
                             type="date"
                             value={doc.issueDate}
+                            min={todayStr}
                             onChange={(e) => handleDocChange(idx, 'issueDate', e.target.value)}
                             className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500/10"
                         />
@@ -342,6 +374,7 @@ export default function AddEditEmployee() {
                         <input 
                             type="date"
                             value={doc.expiryDate}
+                            min={todayStr}
                             onChange={(e) => handleDocChange(idx, 'expiryDate', e.target.value)}
                             className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500/10"
                         />
