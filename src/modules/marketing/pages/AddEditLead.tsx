@@ -86,6 +86,7 @@ const AddEditLead: React.FC = () => {
     const payload = {
       ...formData,
       assigned_to: formData.assignedTo, 
+      next_follow_up_date: formData.nextFollowUpDate
     };
     
     mutation.mutate(payload);
