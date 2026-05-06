@@ -117,6 +117,19 @@ const CreateProject = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    // Senior Logic: Manually block past dates even if the browser picker allows selection
+    if (name === 'startDate' && value) {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to start of day
+      
+      if (selectedDate < today) {
+        setFormData(prev => ({ ...prev, [name]: new Date().toLocaleDateString('en-CA') }));
+        return;
+      }
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
