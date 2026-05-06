@@ -39,11 +39,13 @@ function CreditRequest() {
     clientId: "",
     clientName: "",
     requestedLimit: "",
+    requestDate: new Date().toLocaleDateString('en-CA'),
     reason: "",
     notes: "",
     approvalStatus: "pending",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [limitError, setLimitError] = useState('');
 
   // Load existing credit request when editing
   useEffect(() => {
@@ -86,10 +88,25 @@ function CreditRequest() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm({
-        ...form,
-        [name]: value,
-    });
+
+    // Numbers only for credit limit
+    if (name === 'requestedLimit') {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setLimitError('');
+        setForm({ ...form, [name]: value });
+      } else {
+        setLimitError('Only numbers are allowed');
+      }
+      return;
+    }
+
+    // Block past dates
+    if (name === 'requestDate' && value) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (new Date(value) < today) return;
+    }
+
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,6 +119,7 @@ function CreditRequest() {
       const payload = {
         clientId: parseInt(form.clientId),
         amount: parseFloat(form.requestedLimit) || 0,
+        request_date: form.requestDate || null,
         reason: form.reason,
         notes: form.notes,
         approvalStatus: form.approvalStatus
@@ -166,6 +184,7 @@ function CreditRequest() {
         clientId: "",
         clientName: "",
         requestedLimit: "",
+        requestDate: new Date().toLocaleDateString('en-CA'),
         reason: "",
         notes: "",
         approvalStatus: "pending",
@@ -230,13 +249,26 @@ function CreditRequest() {
                 </select>
               </div>
 
+              <div>
+                <FormInput
+                  label="Requested Credit Limit (QAR) *"
+                  type="text"
+                  name="requestedLimit"
+                  value={form.requestedLimit}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  required
+                />
+                {limitError && <p className="text-red-500 text-xs mt-1 font-medium">{limitError}</p>}
+              </div>
+
               <FormInput
-                label="Requested Credit Limit (QAR) *"
-                type="number"
-                name="requestedLimit"
-                value={form.requestedLimit}
+                label="Request Date *"
+                type="date"
+                name="requestDate"
+                value={form.requestDate}
                 onChange={handleChange}
-                placeholder="0.00"
+                min={new Date().toLocaleDateString('en-CA')}
                 required
               />
 
