@@ -50,6 +50,9 @@ function CreateProduct() {
     division: activeDivision !== 'all' ? activeDivision : 'SERVICE'
   });
 
+  const [numericError, setNumericError] = useState<Record<string, string>>({});
+  const numericFields = ['purchasePrice', 'sellingPrice', 'stockQuantity', 'minStock'];
+
   // 1. Fetch product if editing
   const { data: product, isLoading: isFetching } = useQuery<InventoryProduct>({
     queryKey: ["product", id],
@@ -88,10 +91,25 @@ function CreateProduct() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+
+    // Numeric-only validation for price/stock fields
+    if (numericFields.includes(name)) {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setNumericError(prev => ({ ...prev, [name]: '' }));
+        setForm({
+          ...form,
+          [name]: value === '' ? 0 : Number(value)
+        });
+      } else {
+        setNumericError(prev => ({ ...prev, [name]: 'Only numbers are allowed' }));
+      }
+      return;
+    }
+
     setForm({
       ...form,
-      [name]: type === 'number' ? Number(value) || 0 : value
+      [name]: value
     });
   };
 
@@ -180,42 +198,54 @@ function CreateProduct() {
           </div>
         </div>
 
-        <FormInput
-          label="Purchase Price (QAR)"
-          type="number"
-          name="purchasePrice"
-          value={form.purchasePrice || 0}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <FormInput
+            label="Purchase Price (QAR)"
+            type="text"
+            name="purchasePrice"
+            value={form.purchasePrice || 0}
+            onChange={handleChange}
+            required
+          />
+          {numericError.purchasePrice && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.purchasePrice}</p>}
+        </div>
 
-        <FormInput
-          label="Selling Price (QAR)"
-          type="number"
-          name="sellingPrice"
-          value={form.sellingPrice || 0}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <FormInput
+            label="Selling Price (QAR)"
+            type="text"
+            name="sellingPrice"
+            value={form.sellingPrice || 0}
+            onChange={handleChange}
+            required
+          />
+          {numericError.sellingPrice && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.sellingPrice}</p>}
+        </div>
 
-        <FormInput
-          label="Initial Stock Quantity"
-          type="number"
-          name="stockQuantity"
-          value={form.stockQuantity || 0}
-          onChange={handleChange}
-          required
-          disabled={isEdit} // Use movements for stock changes in edit mode
-        />
+        <div>
+          <FormInput
+            label="Initial Stock Quantity"
+            type="text"
+            name="stockQuantity"
+            value={form.stockQuantity || 0}
+            onChange={handleChange}
+            required
+            disabled={isEdit}
+          />
+          {numericError.stockQuantity && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.stockQuantity}</p>}
+        </div>
 
-        <FormInput
-          label="Minimum Stock Level (Alert Threshold)"
-          type="number"
-          name="minStock"
-          value={form.minStock || 0}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <FormInput
+            label="Minimum Stock Level (Alert Threshold)"
+            type="text"
+            name="minStock"
+            value={form.minStock || 0}
+            onChange={handleChange}
+            required
+          />
+          {numericError.minStock && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.minStock}</p>}
+        </div>
 
         <div className="col-span-1 md:col-span-2">
           <FormTextarea
