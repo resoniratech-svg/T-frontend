@@ -55,7 +55,7 @@ export default function AdminPROTracking() {
     queryKey: ["pro-all-documents"],
     queryFn: () => proService.getAllDocuments()
   });
-  
+
   // 2. Mutations
   const deleteMutation = useMutation({
     mutationFn: (id: string) => employeeService.deleteEmployee(id),
@@ -84,13 +84,13 @@ export default function AdminPROTracking() {
 
   // Clients filtered by sector for the dropdown
   const sectorFilteredClients = useMemo(() => {
-    let base = !activeDivision || activeDivision === "all" 
-      ? safeClients 
-      : safeClients.filter(c => 
-          c.division?.toUpperCase() === activeDivision.toUpperCase() || 
-          c.sector?.toUpperCase() === activeDivision.toUpperCase()
-        );
-    
+    let base = !activeDivision || activeDivision === "all"
+      ? safeClients
+      : safeClients.filter(c =>
+        c.division?.toUpperCase() === activeDivision.toUpperCase() ||
+        c.sector?.toUpperCase() === activeDivision.toUpperCase()
+      );
+
     // Sort alphabetically by name
     return [...base].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }, [safeClients, activeDivision]);
@@ -108,13 +108,13 @@ export default function AdminPROTracking() {
         c.division?.toString().trim().toUpperCase() === activeDivision.toUpperCase()
       );
     }
-    
+
     if (selectedClient !== "All") {
-      base = base.filter((c: any) => 
+      base = base.filter((c: any) =>
         c.clientId?.toString() === selectedClient.toString()
       );
     }
-    
+
     return base;
   }, [safeContracts, activeDivision, selectedClient]);
 
@@ -140,13 +140,13 @@ export default function AdminPROTracking() {
   const expiringSoonDocs = useMemo(() => {
     let base = safeDocuments.filter((d: any) => d && d.status === "Expiring Soon");
     if (activeDivision && activeDivision !== "all") {
-      base = base.filter((d: any) => 
+      base = base.filter((d: any) =>
         d.sector?.toString().trim().toUpperCase() === activeDivision.toUpperCase() ||
         d.division?.toString().trim().toUpperCase() === activeDivision.toUpperCase()
       );
     }
     if (selectedClient !== "All") {
-      base = base.filter((d: any) => 
+      base = base.filter((d: any) =>
         d.clientId?.toString() === selectedClient.toString()
       );
     }
@@ -156,13 +156,13 @@ export default function AdminPROTracking() {
   const expiredDocs = useMemo(() => {
     let base = safeDocuments.filter((d: any) => d && d.status === "Expired");
     if (activeDivision && activeDivision !== "all") {
-      base = base.filter((d: any) => 
+      base = base.filter((d: any) =>
         d.sector?.toString().trim().toUpperCase() === activeDivision.toUpperCase() ||
         d.division?.toString().trim().toUpperCase() === activeDivision.toUpperCase()
       );
     }
     if (selectedClient !== "All") {
-      base = base.filter((d: any) => 
+      base = base.filter((d: any) =>
         d.clientId?.toString() === selectedClient.toString()
       );
     }
@@ -239,7 +239,7 @@ export default function AdminPROTracking() {
         <div className="flex items-center gap-4 flex-1">
           <div className="flex flex-col gap-1 flex-1 max-w-xs">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Filter by Client</label>
-            <select 
+            <select
               value={selectedClient}
               onChange={(e) => setSelectedClient(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-brand-500/20 transition-all"
@@ -250,7 +250,7 @@ export default function AdminPROTracking() {
               ))}
             </select>
           </div>
-          
+
           <div className="flex flex-col gap-1 flex-1 max-w-xs">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Active Company</label>
             <div className="w-full bg-slate-100 border border-slate-200 rounded-lg px-4 py-2 text-sm font-bold text-slate-500 min-h-[38px] flex items-center italic">
@@ -260,20 +260,20 @@ export default function AdminPROTracking() {
         </div>
 
         {selectedClient !== "All" && (
-          <button 
+          <button
             onClick={() => {
               const params = new URLSearchParams();
               const client = safeClients.find(c => c.id.toString() === selectedClient.toString());
               params.append("company", client?.name || selectedClient);
               params.append("from", "pro-tracking"); // Tracking source for return redirect
-              
+
               // Find the client's division to pre-fill
               if (client?.division) {
                 params.append("division", client.division);
               } else if (activeDivision !== "all") {
                 params.append("division", activeDivision);
               }
-              
+
               navigate(`/employees/create?${params.toString()}`);
             }}
             className="px-6 py-2 bg-brand-600 text-white rounded-lg text-xs font-black uppercase tracking-widest hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20 shrink-0 flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300"
@@ -332,21 +332,21 @@ export default function AdminPROTracking() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button 
+                            <button
                               onClick={() => navigate(`/employees/edit/${contract.id}`)}
                               className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
                               title="Edit"
                             >
                               <Edit2 size={16} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleDelete(contract.id, contract.title)}
                               className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
                               title="Delete"
                             >
                               <Trash2 size={16} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => navigate(`/employees/details/${contract.id}`)}
                               className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
                               title="View Details"
@@ -361,11 +361,11 @@ export default function AdminPROTracking() {
                     <tr>
                       <td colSpan={4} className="px-6 py-20 text-center">
                         <div className="flex flex-col items-center gap-2">
-                           <Users className="text-slate-200" size={48} />
-                           <p className="text-slate-400 font-bold">No staff records found for {selectedClient === "All" ? "any client" : selectedClient}</p>
-                           {selectedClient !== "All" && (
-                             <p className="text-xs text-slate-400">Click 'Add Employee' above to register new staff for this company.</p>
-                           )}
+                          <Users className="text-slate-200" size={48} />
+                          <p className="text-slate-400 font-bold">No staff records found for {selectedClient === "All" ? "any client" : selectedClient}</p>
+                          {selectedClient !== "All" && (
+                            <p className="text-xs text-slate-400">Click 'Add Employee' above to register new staff for this company.</p>
+                          )}
                         </div>
                       </td>
                     </tr>

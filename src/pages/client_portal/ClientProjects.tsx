@@ -35,17 +35,29 @@ export default function ClientProjects() {
 
 
   const getDuration = (project: any) => {
-    if (!project.startDate || !project.endDate) return "N/A";
-    const start = new Date(project.startDate).getTime();
-    const end = new Date(project.endDate).getTime();
-    const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
-    return `${days} Days`;
+    const startStr = project.startDate || project.start_date;
+    const endStr = project.endDate || project.end_date || project.deadline;
+    if (!startStr || !endStr) return "N/A";
+    try {
+      const start = new Date(startStr).getTime();
+      const end = new Date(endStr).getTime();
+      if (isNaN(start) || isNaN(end)) return "N/A";
+      const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
+      return `${days > 0 ? days : 0} Days`;
+    } catch (e) {
+      return "N/A";
+    }
   };
 
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return "Not Set";
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "Not Set";
+      return d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+    } catch (e) {
+      return "Not Set";
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -172,7 +184,7 @@ export default function ClientProjects() {
                              <Calendar size={12} />
                              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Start Date</span>
                           </div>
-                          <p className="text-xs font-black text-slate-800">{formatDate(selectedProject.startDate)}</p>
+                          <p className="text-xs font-black text-slate-800">{formatDate(selectedProject.startDate || selectedProject.start_date)}</p>
                        </div>
                        <div className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl">
                           <div className="flex items-center gap-1.5 text-slate-400 mb-1">
@@ -197,10 +209,10 @@ export default function ClientProjects() {
                            <p>Your project is currently in the <strong>{selectedProject.status || "Pending"}</strong> phase.</p>
                          )}
                          <div className="pt-4 mt-4 border-t border-brand-100/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                           {selectedProject.budget && (
+                           {(selectedProject.budget || selectedProject.contract_value) && (
                              <div className="flex items-center gap-2 p-2 bg-white/50 rounded-lg">
                                <span className="text-[10px] font-bold text-brand-400 uppercase">Budget</span>
-                               <span className="text-xs font-black text-brand-700">{selectedProject.budget}</span>
+                               <span className="text-xs font-black text-brand-700">QAR {Number(selectedProject.budget || selectedProject.contract_value).toLocaleString()}</span>
                              </div>
                            )}
                            {selectedProject.manager && (

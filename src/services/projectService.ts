@@ -1,6 +1,18 @@
 import api from "./api";
 import type { Project } from "../types/project";
 
+// Helper to ensure date is YYYY-MM-DD for inputs
+function formatDateForInput(dateStr: any) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().split('T')[0];
+  } catch (e) {
+    return "";
+  }
+}
+
 // Map a PostgreSQL row (snake_case) to the frontend Project shape (camelCase)
 function mapProject(row: any): Project {
   return {
@@ -12,9 +24,9 @@ function mapProject(row: any): Project {
     division: row.division || row.branch || "service",
     branch: row.division || row.branch || "",
     status: row.status || "Pending",
-    startDate: row.start_date || row.startDate || "",
-    endDate: row.end_date || row.endDate || "",
-    deadline: row.end_date || row.deadline || "",
+    startDate: formatDateForInput(row.start_date || row.startDate),
+    endDate: formatDateForInput(row.end_date || row.endDate || row.deadline),
+    deadline: formatDateForInput(row.end_date || row.deadline || row.endDate),
     budget: row.contract_value || row.budget || "",
     value: Number(row.contract_value) || row.value || 0,
     manager: row.manager || "",

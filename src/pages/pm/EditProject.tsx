@@ -34,7 +34,7 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
         status: project.status || "CREATED",
         description: project.description || "",
         startDate: project.startDate || "",
-        endDate: project.endDate || project.deadline || "",
+        endDate: project.endDate || "",
         division: project.division || project.branch || "service",
     });
 
