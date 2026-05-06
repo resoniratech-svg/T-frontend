@@ -69,7 +69,24 @@ export default function ClientProjects() {
   const downloadFile = (doc: any) => {
     const link = document.createElement("a");
     link.href = doc.data;
-    link.download = doc.name;
+    
+    // Auto-detect extension if it's the main project doc
+    let fileName = doc.name;
+    if (doc.id === "main-project-doc" && doc.data.startsWith("data:")) {
+      const mime = doc.data.split(";")[0].split(":")[1];
+      let ext = ".pdf"; // default
+      if (mime.includes("wordprocessingml") || mime.includes("msword")) ext = ".docx";
+      else if (mime.includes("spreadsheetml") || mime.includes("ms-excel")) ext = ".xlsx";
+      else if (mime.includes("png")) ext = ".png";
+      else if (mime.includes("jpeg")) ext = ".jpg";
+      else if (mime.includes("text/plain")) ext = ".txt";
+      
+      if (!fileName.toLowerCase().endsWith(ext)) {
+        fileName = fileName.replace(/\.[^/.]+$/, "") + ext;
+      }
+    }
+    
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -232,11 +249,18 @@ export default function ClientProjects() {
                     {(() => {
                       const allDocs = [...(selectedProject.documents || [])];
                       if (selectedProject.uploadedDocument) {
+                        // Determine extension for the name
+                        let ext = ".pdf";
+                        if (selectedProject.uploadedDocument.includes("wordprocessingml") || selectedProject.uploadedDocument.includes("msword")) ext = ".docx";
+                        else if (selectedProject.uploadedDocument.includes("spreadsheetml") || selectedProject.uploadedDocument.includes("ms-excel")) ext = ".xlsx";
+                        else if (selectedProject.uploadedDocument.includes("png")) ext = ".png";
+                        else if (selectedProject.uploadedDocument.includes("jpeg")) ext = ".jpg";
+
                         allDocs.unshift({
                           id: "main-project-doc",
-                          name: `${selectedProject.project_name || selectedProject.projectName || selectedProject.name || 'Project'}_Document.pdf`,
+                          name: `${selectedProject.project_name || selectedProject.projectName || selectedProject.name || 'Project'}_Document${ext}`,
                           data: selectedProject.uploadedDocument,
-                          size: selectedProject.uploadedDocument.length * 0.75 // Rough estimate for Base64 to bytes
+                          size: selectedProject.uploadedDocument.length * 0.75
                         });
                       }
 

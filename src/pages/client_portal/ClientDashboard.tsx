@@ -144,12 +144,21 @@ export default function ClientDashboard() {
           {(() => {
             const sharedDocs = safeProjects
               .filter((p: any) => p.uploaded_document || p.uploadedDocument)
-              .map((p: any) => ({
-                id: `sd-${p.id}`,
-                name: `${p.project_name || p.name || 'Project'}_Document.pdf`,
-                data: p.uploaded_document || p.uploadedDocument,
-                projectName: p.project_name || p.name || 'Project'
-              }));
+              .map((p: any) => {
+                const docData = p.uploaded_document || p.uploadedDocument || "";
+                let ext = ".pdf";
+                if (docData.includes("wordprocessingml") || docData.includes("msword")) ext = ".docx";
+                else if (docData.includes("spreadsheetml") || docData.includes("ms-excel")) ext = ".xlsx";
+                else if (docData.includes("png")) ext = ".png";
+                else if (docData.includes("jpeg")) ext = ".jpg";
+
+                return {
+                  id: `sd-${p.id}`,
+                  name: `${p.project_name || p.name || 'Project'}_Document${ext}`,
+                  data: docData,
+                  projectName: p.project_name || p.name || 'Project'
+                };
+              });
 
             return sharedDocs.length > 0 && (
               <div className="bg-white p-6 rounded-xl border border-brand-100 shadow-sm shadow-brand-50 relative overflow-hidden">
@@ -178,14 +187,28 @@ export default function ClientDashboard() {
                         </div>
                       </div>
                       <button 
-                         onClick={() => {
-                           const link = document.createElement("a");
-                           link.href = doc.data;
-                           link.download = doc.name;
-                           document.body.appendChild(link);
-                           link.click();
-                           document.body.removeChild(link);
-                         }}
+                       onClick={() => {
+                         const link = document.createElement("a");
+                         link.href = doc.data;
+                         
+                         let fileName = doc.name;
+                         // Final extension check based on data
+                         if (doc.data.startsWith("data:")) {
+                           const mime = doc.data.split(";")[0].split(":")[1];
+                           let ext = ".pdf";
+                           if (mime.includes("wordprocessingml") || mime.includes("msword")) ext = ".docx";
+                           else if (mime.includes("spreadsheetml") || mime.includes("ms-excel")) ext = ".xlsx";
+                           
+                           if (!fileName.toLowerCase().endsWith(ext)) {
+                             fileName = fileName.replace(/\.[^/.]+$/, "") + ext;
+                           }
+                         }
+
+                         link.download = fileName;
+                         document.body.appendChild(link);
+                         link.click();
+                         document.body.removeChild(link);
+                       }}
                          className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
                        >
                          <Download size={16} />
