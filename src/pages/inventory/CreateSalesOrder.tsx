@@ -47,6 +47,8 @@ function CreateSalesOrder() {
     unitPrice: 0,
     status: "Processing" as const
   });
+  const [numericError, setNumericError] = useState<Record<string, string>>({});
+  const numericFields = ['quantity', 'unitPrice'];
 
   if (productsLoading || clientsLoading) {
     return (
@@ -58,10 +60,25 @@ function CreateSalesOrder() {
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+
+    // Numeric-only validation
+    if (numericFields.includes(name)) {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setNumericError(prev => ({ ...prev, [name]: '' }));
+        setForm({
+          ...form,
+          [name]: value === '' ? 0 : parseFloat(value)
+        });
+      } else {
+        setNumericError(prev => ({ ...prev, [name]: 'Only numbers are allowed' }));
+      }
+      return;
+    }
+
     setForm({
       ...form,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
+      [name]: value
     });
   };
 
@@ -115,23 +132,29 @@ function CreateSalesOrder() {
           required
         />
 
-        <FormInput
-            label="Quantity"
-            type="number"
-            name="quantity"
-            value={form.quantity}
-            onChange={handleChange}
-            required
-        />
+        <div>
+            <FormInput
+                label="Quantity"
+                type="text"
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                required
+            />
+            {numericError.quantity && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.quantity}</p>}
+        </div>
 
-        <FormInput
-            label="Unit Selling Price (QAR)"
-            type="number"
-            name="unitPrice"
-            value={form.unitPrice}
-            onChange={handleChange}
-            required
-        />
+        <div>
+            <FormInput
+                label="Unit Selling Price (QAR)"
+                type="text"
+                name="unitPrice"
+                value={form.unitPrice}
+                onChange={handleChange}
+                required
+            />
+            {numericError.unitPrice && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.unitPrice}</p>}
+        </div>
 
         <FormSelect
             label="Delivery Status"

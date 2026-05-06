@@ -36,6 +36,7 @@ function CreateStockMovement() {
     quantity: 0,
     reason: ""
   });
+  const [numericError, setNumericError] = useState('');
 
   if (productsLoading) {
     return (
@@ -47,10 +48,25 @@ function CreateStockMovement() {
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+
+    // Numeric validation for quantity
+    if (name === 'quantity') {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setNumericError('');
+        setForm({
+          ...form,
+          [name]: value === '' ? 0 : parseFloat(value)
+        });
+      } else {
+        setNumericError('Only numbers are allowed');
+      }
+      return;
+    }
+
     setForm({
       ...form,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
+      [name]: value
     });
   };
 
@@ -99,14 +115,17 @@ function CreateStockMovement() {
           required
         />
 
-        <FormInput
-          label={form.type === 'ADJUSTMENT' ? "New Total Count" : "Quantity"}
-          type="number"
-          name="quantity"
-          value={form.quantity}
-          onChange={handleChange}
-          required
-        />
+        <div>
+          <FormInput
+            label={form.type === 'ADJUSTMENT' ? "New Total Count" : "Quantity"}
+            type="text"
+            name="quantity"
+            value={form.quantity}
+            onChange={handleChange}
+            required
+          />
+          {numericError && <p className="text-red-500 text-xs mt-1 font-medium">{numericError}</p>}
+        </div>
 
         <FormInput
           label="Reason / Reference"
