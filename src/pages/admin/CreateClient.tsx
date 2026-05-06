@@ -78,9 +78,9 @@ function CreateClient() {
       setFieldErrors(prev => ({ ...prev, [name]: '' }));
     }
 
-    // Numbers only: QID, CR Number, Computer Card
-    if (name === 'qid' || name === 'crNumber' || name === 'computerCard') {
-      if (value !== '' && !/^\d+$/.test(value)) {
+    // Numbers only: QID, CR Number, Computer Card, Phone
+    if (name === 'qid' || name === 'crNumber' || name === 'computerCard' || name === 'phone') {
+      if (value !== '' && !/^[\d+\s]+$/.test(value)) {
         setFieldErrors(prev => ({ ...prev, [name]: 'Only numbers are allowed' }));
         return;
       }
@@ -271,9 +271,10 @@ function CreateClient() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                    className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${fieldErrors.phone ? 'border-red-300' : 'border-slate-200'}`}
                     placeholder="+974 XXXX XXXX"
                   />
+                  {fieldErrors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.phone}</p>}
                 </div>
 
                 <div className="col-span-1 md:col-span-2">

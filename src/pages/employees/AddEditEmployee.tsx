@@ -85,6 +85,15 @@ export default function AddEditEmployee() {
       setFieldErrors(prev => ({ ...prev, name: '' }));
     }
 
+    // Numbers only: Phone
+    if (name === 'phone') {
+      if (value !== '' && !/^[\d+\s]+$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, phone: 'Only numbers are allowed' }));
+        return;
+      }
+      setFieldErrors(prev => ({ ...prev, phone: '' }));
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -232,8 +241,9 @@ export default function AddEditEmployee() {
                   value={formData.phone || ""}
                   onChange={handleBasicChange}
                   placeholder="+974 XXXX XXXX"
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none"
+                  className={`w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-sm focus:ring-2 focus:ring-brand-500/20 outline-none ${fieldErrors.phone ? 'border-red-300' : 'border-gray-200'}`}
                 />
+                {fieldErrors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.phone}</p>}
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase">Email Address</label>
