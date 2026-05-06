@@ -107,6 +107,8 @@ function CreateExpense() {
     },
     approvalStatus: "pending"
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const { data: dbExpense, isLoading: isFetching } = useQuery({
     queryKey: ["expense", id],
@@ -181,9 +183,22 @@ function CreateExpense() {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
+    const { name, value } = e.target;
+
+    // Numeric validation for Amount and Tax Rate
+    if (name === "amount" || name === "taxRate") {
+      if (value === "" || /^\d*\.?\d*$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, [name]: "" }));
+        setForm({ ...form, [name]: value === "" ? 0 : Number(value) });
+      } else {
+        setFieldErrors(prev => ({ ...prev, [name]: "Only numbers allowed" }));
+      }
+      return;
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -323,15 +338,19 @@ function CreateExpense() {
                 </select>
               </div>
 
-              <FormInput
-                label="Amount (QAR) *"
-                type="number"
-                name="amount"
-                value={form.amount}
-                onChange={handleChange}
-                placeholder="0.00"
-                required
-              />
+              <div>
+                <FormInput
+                  label="Amount (QAR) *"
+                  type="text"
+                  name="amount"
+                  value={form.amount || ''}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  required
+                  className={fieldErrors.amount ? "border-red-400 bg-red-50" : ""}
+                />
+                {fieldErrors.amount && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.amount}</p>}
+              </div>
 
               {isEditing && user?.role === "SUPER_ADMIN" && (
                 <div className="flex flex-col gap-1">
@@ -356,16 +375,21 @@ function CreateExpense() {
                 value={form.date}
                 onChange={handleChange}
                 required
+                min={todayStr}
               />
 
-              <FormInput
-                label="Tax Rate (%)"
-                type="number"
-                name="taxRate"
-                value={form.taxRate}
-                onChange={handleChange}
-                placeholder="0"
-              />
+              <div>
+                <FormInput
+                  label="Tax Rate (%)"
+                  type="text"
+                  name="taxRate"
+                  value={form.taxRate || ''}
+                  onChange={handleChange}
+                  placeholder="0"
+                  className={fieldErrors.taxRate ? "border-red-400 bg-red-50" : ""}
+                />
+                {fieldErrors.taxRate && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.taxRate}</p>}
+              </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm text-gray-400">Calculated Tax Amount</label>
