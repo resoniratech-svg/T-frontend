@@ -74,7 +74,7 @@ function CreateStockMovement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const product = products.find((p) => p.id === form.productId);
+    const product = products.find((p) => String(p.id) === String(form.productId));
     if (!product) return alert("Please select a product");
 
     mutation.mutate({
