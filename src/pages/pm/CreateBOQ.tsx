@@ -37,6 +37,7 @@ export default function CreateBOQ() {
     }, [isPM, user]);
 
     const [items, setItems] = useState<BOQItem[]>([]);
+    const [amountError, setAmountError] = useState<string | null>(null);
 
     const [form, setForm] = useState({
         project: "",
@@ -97,6 +98,17 @@ export default function CreateBOQ() {
                 client_id: value,
                 client_name: selectedClient ? selectedClient.name : ""
             }));
+        } else if (name === 'totalAmount') {
+            // Only allow numbers and decimal point
+            if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setAmountError(null);
+                setForm(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            } else {
+                setAmountError('Only numbers are allowed');
+            }
         } else {
             setForm(prev => ({
                 ...prev,
@@ -206,11 +218,15 @@ export default function CreateBOQ() {
                         <FormInput
                             label="Total Amount (QAR)"
                             name="totalAmount"
-                            type="number"
+                            type="text"
                             value={form.totalAmount}
                             placeholder="0.00"
                             onChange={handleChange}
+                            className="[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
                         />
+                        {amountError && (
+                            <p className="text-red-500 text-xs mt-1 font-medium">{amountError}</p>
+                        )}
                     </div>
 
                     <div className="col-span-2 md:col-span-1">
