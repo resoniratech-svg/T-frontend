@@ -33,7 +33,7 @@ function CreateProject() {
     budget: "",
     manager: isPM ? user?.name : "",
     manager_id: isPM ? user?.id : null,
-    startDate: "",
+    startDate: new Date().toLocaleDateString('en-CA'),
     endDate: "",
     description: "",
     status: "Pending",
@@ -66,9 +66,23 @@ function CreateProject() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+
+    // Block past dates for startDate
+    if (name === 'startDate' && value) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (new Date(value) < today) return; // silently reject past dates
+    }
+
+    // Block endDate before startDate
+    if (name === 'endDate' && value && form.startDate) {
+      if (new Date(value) < new Date(form.startDate)) return;
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -225,6 +239,7 @@ function CreateProject() {
               name="startDate"
               value={form.startDate}
               onChange={handleChange}
+              min={new Date().toLocaleDateString('en-CA')}
             />
 
             <FormInput
@@ -233,6 +248,7 @@ function CreateProject() {
               name="endDate"
               value={form.endDate}
               onChange={handleChange}
+              min={form.startDate || new Date().toLocaleDateString('en-CA')}
             />
 
             <div>

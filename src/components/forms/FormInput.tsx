@@ -8,9 +8,11 @@ interface Props {
   required?: boolean
   className?: string
   disabled?: boolean
+  min?: string
+  max?: string
 }
 
-function FormInput({ label, placeholder, type = "text", name, value, onChange, required, className, disabled }: Props) {
+function FormInput({ label, placeholder, type = "text", name, value, onChange, required, className, disabled, min, max }: Props) {
 
   return (
     <div className="flex flex-col gap-1">
@@ -27,6 +29,8 @@ function FormInput({ label, placeholder, type = "text", name, value, onChange, r
         placeholder={placeholder}
         required={required}
         disabled={disabled}
+        min={min}
+        max={max}
         className={`border rounded-lg px-3 py-2 w-full outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 transition-shadow ${className || ""}`}
       />
 
