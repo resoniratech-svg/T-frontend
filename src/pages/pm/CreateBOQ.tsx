@@ -38,6 +38,7 @@ export default function CreateBOQ() {
 
     const [items, setItems] = useState<BOQItem[]>([]);
     const [amountError, setAmountError] = useState<string | null>(null);
+    const todayStr = new Date().toISOString().split('T')[0];
 
     const [form, setForm] = useState({
         project: "",
@@ -117,9 +118,17 @@ export default function CreateBOQ() {
         }
     };
 
-    const updateItem = (index: number, field: keyof BOQItem, value: string | number) => {
+    const updateItem = (index: number, field: keyof BOQItem, value: string) => {
         const newItems = [...items];
-        const item = { ...newItems[index], [field]: value };
+
+        // Block non-numeric for Qty and Rate
+        if (field === "quantity" || field === "rate") {
+            if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+        }
+
+        const numValue = value === "" ? 0 : Number(value);
+        const item = { ...newItems[index], [field]: field === "description" || field === "unit" ? value : numValue };
+        
         if (field === "quantity" || field === "rate") {
             item.amount = Number(item.quantity) * Number(item.rate);
         }
@@ -250,6 +259,7 @@ export default function CreateBOQ() {
                             name="date"
                             value={form.date}
                             onChange={handleChange}
+                            min={todayStr}
                         />
                     </div>
 
@@ -291,25 +301,25 @@ export default function CreateBOQ() {
                                             </td>
                                             <td className="p-2">
                                                 <input 
-                                                    type="number"
-                                                    className="w-full border-none focus:ring-0 text-center text-sm bg-transparent"
-                                                    value={item.quantity}
-                                                    onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value))}
+                                                    type="text"
+                                                    className="w-full border border-slate-200 rounded px-1 text-center text-sm focus:ring-1 focus:ring-brand-500 outline-none"
+                                                    value={item.quantity || ''}
+                                                    onChange={(e) => updateItem(index, "quantity", e.target.value)}
                                                 />
                                             </td>
                                             <td className="p-2">
                                                 <input 
-                                                    className="w-full border-none focus:ring-0 text-center text-sm bg-transparent"
+                                                    className="w-full border border-slate-200 rounded px-1 text-center text-sm focus:ring-1 focus:ring-brand-500 outline-none"
                                                     value={item.unit}
                                                     onChange={(e) => updateItem(index, "unit", e.target.value)}
                                                 />
                                             </td>
                                             <td className="p-2">
                                                 <input 
-                                                    type="number"
-                                                    className="w-full border-none focus:ring-0 text-right text-sm bg-transparent"
-                                                    value={item.rate}
-                                                    onChange={(e) => updateItem(index, "rate", parseFloat(e.target.value))}
+                                                    type="text"
+                                                    className="w-full border border-slate-200 rounded px-1 text-right text-sm focus:ring-1 focus:ring-brand-500 outline-none"
+                                                    value={item.rate || ''}
+                                                    onChange={(e) => updateItem(index, "rate", e.target.value)}
                                                 />
                                             </td>
                                             <td className="p-2 text-right font-bold text-slate-800">

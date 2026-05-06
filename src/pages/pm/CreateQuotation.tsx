@@ -61,6 +61,8 @@ export default function CreateQuotation() {
         discount: 0,
         ...initialDefaults
     });
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const todayStr = new Date().toISOString().split('T')[0];
 
     const allowedSectors = useMemo(() => {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
@@ -141,15 +143,35 @@ export default function CreateQuotation() {
     }, [isEditing, existingQuotation]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+
+        // Discount validation
+        if (name === "discount") {
+            if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                setFieldErrors(prev => ({ ...prev, discount: "" }));
+                setForm({ ...form, [name]: value === "" ? 0 : Number(value) });
+            } else {
+                setFieldErrors(prev => ({ ...prev, discount: "Only numbers allowed" }));
+            }
+            return;
+        }
+
         setForm({
             ...form,
-            [e.target.name]: e.target.value
+            [name]: value
         });
     };
 
-    const handleItemChange = (index: number, field: keyof QuotationItem, value: string | number) => {
+    const handleItemChange = (index: number, field: keyof QuotationItem, value: string) => {
         const newItems = [...items];
-        const updatedItem = { ...newItems[index], [field]: value };
+        
+        // Block non-numeric for Qty and Price
+        if (field === "quantity" || field === "unitPrice") {
+            if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+        }
+
+        const numValue = value === "" ? 0 : Number(value);
+        const updatedItem = { ...newItems[index], [field]: field === "description" ? value : numValue };
         
         // Recalculate item amount
         if (field === 'quantity' || field === 'unitPrice') {
@@ -262,7 +284,7 @@ export default function CreateQuotation() {
                                 disabled 
                                 className={!form.quoteId ? "text-emerald-600 font-bold italic" : ""} 
                             />
-                            <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required />
+                            <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required min={todayStr} />
                             
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection *</label>
@@ -314,22 +336,20 @@ export default function CreateQuotation() {
                                     <div className="w-24">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">QTY</label>
                                         <input
-                                            type="number"
-                                            min="1"
-                                            value={item.quantity}
-                                            onChange={(e) => handleItemChange(index, "quantity", parseFloat(e.target.value) || 0)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md"
+                                            type="text"
+                                            value={item.quantity || ''}
+                                            onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-brand-500"
                                             required
                                         />
                                     </div>
                                     <div className="w-32">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Price</label>
                                         <input
-                                            type="number"
-                                            min="0"
-                                            value={item.unitPrice}
-                                            onChange={(e) => handleItemChange(index, "unitPrice", parseFloat(e.target.value) || 0)}
-                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md"
+                                            type="text"
+                                            value={item.unitPrice || ''}
+                                            onChange={(e) => handleItemChange(index, "unitPrice", e.target.value)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-brand-500 text-right"
                                             required
                                         />
                                     </div>
@@ -360,16 +380,19 @@ export default function CreateQuotation() {
                                 <span>Subtotal</span>
                                 <span>{items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0).toLocaleString()}</span>
                             </div>
-                            <div className="flex justify-between items-center text-sm font-medium text-slate-600">
-                                <span>Discount (Flat)</span>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={form.discount}
-                                    onChange={(e) => setForm({ ...form, discount: parseFloat(e.target.value) || 0 })}
-                                    className="w-24 px-2 py-1 text-right bg-slate-50 border border-slate-200 rounded-md"
-                                />
-                            </div>
+                             <div className="flex justify-between items-center text-sm font-medium text-slate-600">
+                                 <span>Discount (Flat)</span>
+                                 <div className="flex flex-col items-end">
+                                    <input
+                                        type="text"
+                                        name="discount"
+                                        value={form.discount || ''}
+                                        onChange={handleChange}
+                                        className={`w-24 px-2 py-1 text-right bg-slate-50 border rounded-md outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.discount ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
+                                    />
+                                    {fieldErrors.discount && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.discount}</span>}
+                                 </div>
+                             </div>
                             <div className="flex justify-between items-center text-lg font-black text-slate-900 pt-2 border-t">
                                 <span>Net Total</span>
                                 <span>{(items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) - form.discount).toLocaleString()} QAR</span>
