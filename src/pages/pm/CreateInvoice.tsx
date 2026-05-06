@@ -55,6 +55,7 @@ export default function CreateInvoice() {
         invoiceType: "Credit" as "Credit" | "Cash",
         projectName: ""
     });
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     const allowedSectors = useMemo(() => {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
@@ -163,8 +164,21 @@ export default function CreateInvoice() {
     });
 
     const handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const value = e.target.type === "number" ? Number(e.target.value) : e.target.value;
-        setForm({ ...form, [e.target.name]: value });
+        const { name, value, type } = e.target;
+
+        // QID Validation (Numbers only)
+        if (name === "qid") {
+            if (value === "" || /^\d*$/.test(value)) {
+                setFieldErrors(prev => ({ ...prev, qid: "" }));
+                setForm({ ...form, qid: value });
+            } else {
+                setFieldErrors(prev => ({ ...prev, qid: "Only numbers are allowed" }));
+            }
+            return;
+        }
+
+        const val = type === "number" ? Number(value) : value;
+        setForm({ ...form, [name]: val });
     };
 
     const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
@@ -382,7 +396,17 @@ export default function CreateInvoice() {
 
                         <FormInput label="LPO No." name="lpoNo" value={form.lpoNo} onChange={handleFormChange} placeholder="e.g. PO1031" />
                         <FormInput label="Salesman" name="salesman" value={form.salesman} onChange={handleFormChange} placeholder="Salesperson name" />
-                        <FormInput label="QID" name="qid" value={form.qid} onChange={handleFormChange} placeholder="QID Number" />
+                        <div>
+                            <FormInput 
+                                label="QID" 
+                                name="qid" 
+                                value={form.qid} 
+                                onChange={handleFormChange} 
+                                placeholder="QID Number" 
+                                className={fieldErrors.qid ? "border-red-400 bg-red-50" : ""}
+                            />
+                            {fieldErrors.qid && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.qid}</p>}
+                        </div>
                         <FormInput label="Project Name" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" />
 
                         <div className="md:col-span-2 flex flex-col gap-1">

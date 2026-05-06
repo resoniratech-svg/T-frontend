@@ -89,7 +89,6 @@ function Invoices() {
         "Ref No": invoice.ref_no || invoice.refNo || "-",
         "Amount": `QAR ${Number(invoice.total_amount || invoice.total || invoice.amount || 0).toLocaleString()}`,
         "Status": <StatusBadge status={invoice.status} />,
-        "Approval": <ApprovalBadge status={invoice.approval_status || invoice.approvalStatus || "approved"} />,
         "Date": invoice.invoice_date || invoice.date || invoice.createdAt || "-",
         "Actions": (
             <div className="flex gap-2 items-center">
@@ -121,7 +120,7 @@ function Invoices() {
         )
     }));
 
-    const columns = ["Invoice No", "Client", "Sector", "Ref Type", "Ref No", "Amount", "Status", "Approval", "Date", "Actions"];
+    const columns = ["Invoice No", "Client", "Sector", "Ref Type", "Ref No", "Amount", "Status", "Date", "Actions"];
 
     const currentDivision = DIVISIONS.find(d => d.id === activeDivision);
     const pageTitle = activeDivision === "all" ? "All Sales Invoices" : `${currentDivision?.label} Invoices`;
