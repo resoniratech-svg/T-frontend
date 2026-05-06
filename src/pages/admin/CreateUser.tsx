@@ -19,6 +19,7 @@ function CreateUser() {
     division: "service",
     status: "Active"
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -40,11 +41,35 @@ function CreateUser() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
     setErrorMsg(null);
     setSuccessMsg(null);
+
+    // 1. Validation for Full Name (Letters only)
+    if (name === "name") {
+      if (value === "" || /^[a-zA-Z\s.'-]+$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, name: "" }));
+        setForm({ ...form, name: value });
+      } else {
+        setFieldErrors(prev => ({ ...prev, name: "Only letters are allowed" }));
+      }
+      return;
+    }
+
+    // 2. Validation for Phone Number (Numbers only)
+    if (name === "phone") {
+      if (value === "" || /^[0-9+ ]*$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, phone: "" }));
+        setForm({ ...form, phone: value });
+      } else {
+        setFieldErrors(prev => ({ ...prev, phone: "Only numbers are allowed" }));
+      }
+      return;
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -84,10 +109,11 @@ function CreateUser() {
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 ${fieldErrors.name ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
               placeholder="Enter name"
               required
             />
+            {fieldErrors.name && <p className="text-xs text-red-500 mt-1 font-medium">{fieldErrors.name}</p>}
           </div>
 
           <div>
@@ -113,9 +139,10 @@ function CreateUser() {
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 ${fieldErrors.phone ? 'border-red-400 bg-red-50' : 'border-gray-200'}`}
               placeholder="Enter phone number"
             />
+            {fieldErrors.phone && <p className="text-xs text-red-500 mt-1 font-medium">{fieldErrors.phone}</p>}
           </div>
 
           <div>
