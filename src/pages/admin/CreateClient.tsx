@@ -41,6 +41,9 @@ function CreateClient() {
   const [compCardFile, setCompCardFile] = useState<File | null>(null);
   const [contractFile, setContractFile] = useState<File | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const todayStr = new Date().toLocaleDateString('en-CA');
 
   const createMutation = useMutation({
     mutationFn: (data: any) => userService.createUser(data),
@@ -64,9 +67,35 @@ function CreateClient() {
   }, [activeDivision]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+
+    // Letters only: Contact Person, Company
+    if (name === 'name' || name === 'company') {
+      if (value !== '' && !/^[a-zA-Z\s.'-]+$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, [name]: 'Only letters are allowed' }));
+        return;
+      }
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
+
+    // Numbers only: QID, CR Number, Computer Card
+    if (name === 'qid' || name === 'crNumber' || name === 'computerCard') {
+      if (value !== '' && !/^\d+$/.test(value)) {
+        setFieldErrors(prev => ({ ...prev, [name]: 'Only numbers are allowed' }));
+        return;
+      }
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
+
+    // Block past dates
+    if ((name === 'startDate' || name === 'renewalDate') && value) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (new Date(value) < today) return;
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -203,9 +232,10 @@ function CreateClient() {
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                    className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${fieldErrors.name ? 'border-red-300' : 'border-slate-200'}`}
                     placeholder="Full Name"
                   />
+                  {fieldErrors.name && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.name}</p>}
                 </div>
 
                 <div>
@@ -215,9 +245,10 @@ function CreateClient() {
                     name="company"
                     value={form.company}
                     onChange={handleChange}
-                    className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                    className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${fieldErrors.company ? 'border-red-300' : 'border-slate-200'}`}
                     placeholder="Company Name"
                   />
+                  {fieldErrors.company && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.company}</p>}
                 </div>
 
                 <div>
@@ -282,9 +313,10 @@ function CreateClient() {
                       name="qid"
                       value={form.qid}
                       onChange={handleChange}
-                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${fieldErrors.qid ? 'border-red-300' : 'border-slate-200'}`}
                       placeholder="Enter QID Number"
                     />
+                    {fieldErrors.qid && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.qid}</p>}
                   </div>
                   <MiniFileUpload 
                     label="QID Document" 
@@ -301,9 +333,10 @@ function CreateClient() {
                       name="crNumber"
                       value={form.crNumber}
                       onChange={handleChange}
-                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${fieldErrors.crNumber ? 'border-red-300' : 'border-slate-200'}`}
                       placeholder="Commercial Registration No."
                     />
+                    {fieldErrors.crNumber && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.crNumber}</p>}
                   </div>
                   <MiniFileUpload 
                     label="CR Document" 
@@ -320,9 +353,10 @@ function CreateClient() {
                       name="computerCard"
                       value={form.computerCard}
                       onChange={handleChange}
-                      className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white"
+                      className={`w-full border p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white ${fieldErrors.computerCard ? 'border-red-300' : 'border-slate-200'}`}
                       placeholder="Enter Computer Card Number"
                     />
+                    {fieldErrors.computerCard && <p className="text-red-500 text-xs mt-1 font-medium">{fieldErrors.computerCard}</p>}
                   </div>
                   <MiniFileUpload 
                     label="Computer Card Doc" 
@@ -376,6 +410,7 @@ function CreateClient() {
                         <input
                           type="date"
                           value={license.expiryDate}
+                          min={todayStr}
                           onChange={(e) => handleLicenseChange(index, "expiryDate", e.target.value)}
                           className="w-full border border-slate-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500"
                         />
@@ -419,6 +454,7 @@ function CreateClient() {
                         type="date"
                         name="startDate"
                         value={form.startDate}
+                        min={todayStr}
                         onChange={handleChange}
                         className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white"
                       />
@@ -429,6 +465,7 @@ function CreateClient() {
                         type="date"
                         name="renewalDate"
                         value={form.renewalDate}
+                        min={form.startDate || todayStr}
                         onChange={handleChange}
                         className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white"
                       />
