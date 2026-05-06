@@ -138,6 +138,62 @@ export default function ClientDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Projects & BOQs */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Shared Documents Highlight */}
+          {(() => {
+            const sharedDocs = safeProjects
+              .filter((p: any) => p.uploaded_document || p.uploadedDocument)
+              .map((p: any) => ({
+                id: `sd-${p.id}`,
+                name: `${p.project_name || p.name || 'Project'}_Document.pdf`,
+                data: p.uploaded_document || p.uploadedDocument,
+                projectName: p.project_name || p.name || 'Project'
+              }));
+
+            return sharedDocs.length > 0 && (
+              <div className="bg-white p-6 rounded-xl border border-brand-100 shadow-sm shadow-brand-50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-full -mr-16 -mt-16 opacity-50" />
+                <div className="flex items-center justify-between mb-5 relative">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-200">
+                      <Paperclip size={18} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-wide">Shared Project Documents</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Files uploaded by admins for your reference</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 relative">
+                  {sharedDocs.slice(0, 4).map((doc: any) => (
+                    <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl hover:border-brand-300 hover:bg-white transition-all group">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-white text-brand-600 flex items-center justify-center shadow-sm border border-slate-50">
+                          <FileText size={16} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-800 truncate" title={doc.name}>{doc.name}</p>
+                          <p className="text-[9px] text-brand-500 font-black uppercase tracking-tighter">{doc.projectName}</p>
+                        </div>
+                      </div>
+                      <button 
+                         onClick={() => {
+                           const link = document.createElement("a");
+                           link.href = doc.data;
+                           link.download = doc.name;
+                           document.body.appendChild(link);
+                           link.click();
+                           document.body.removeChild(link);
+                         }}
+                         className="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                       >
+                         <Download size={16} />
+                       </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Active Projects List */}
           <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">

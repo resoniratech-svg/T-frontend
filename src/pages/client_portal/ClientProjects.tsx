@@ -243,19 +243,32 @@ export default function ClientProjects() {
                       return allDocs.length > 0 && (
                         <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                           <div className="absolute top-0 left-0 w-1 h-full bg-brand-500/20" />
-                          <h4 className="text-sm font-black text-slate-800 mb-5 flex items-center gap-2">
-                            <Paperclip size={16} className="text-brand-500" />
-                            Project Resources & Documents
-                          </h4>
+                          <div className="flex items-center justify-between mb-5">
+                            <h4 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                              <Paperclip size={16} className="text-brand-500" />
+                              Project Resources & Documents
+                            </h4>
+                            <span className="text-[10px] font-black text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                              {allDocs.length} Total
+                            </span>
+                          </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {allDocs.map((doc: any) => (
                               <div key={doc.id} className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-xl hover:border-brand-200 hover:bg-white hover:shadow-md transition-all group">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-10 h-10 rounded-xl bg-white text-brand-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-50">
+                                  <div className="w-10 h-10 rounded-xl bg-white text-brand-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-50 relative">
                                     <FileText size={20} />
+                                    {doc.id === "main-project-doc" && (
+                                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand-500 rounded-full border-2 border-white" title="Main Project Document" />
+                                    )}
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="text-xs font-bold text-slate-800 truncate" title={doc.name}>{doc.name}</p>
+                                    <div className="flex items-center gap-1.5">
+                                      <p className="text-xs font-bold text-slate-800 truncate max-w-[120px]" title={doc.name}>{doc.name}</p>
+                                      {doc.id === "main-project-doc" && (
+                                        <span className="text-[8px] font-black bg-brand-100 text-brand-600 px-1 rounded uppercase tracking-tighter">Admin Shared</span>
+                                      )}
+                                    </div>
                                     <p className="text-[10px] text-slate-400 font-medium">{formatFileSize(doc.size || 0)}</p>
                                   </div>
                                 </div>
