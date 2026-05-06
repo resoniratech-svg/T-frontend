@@ -10,7 +10,9 @@ import {
   ArrowRight, 
   MessageSquare,
   ShieldCheck,
-  Users
+  Users,
+  Download,
+  Paperclip
 } from "lucide-react";
 import PageLoader from "../../components/PageLoader";
 import { Link } from "react-router-dom";
