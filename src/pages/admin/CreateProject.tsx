@@ -60,7 +60,7 @@ const CreateProject = () => {
     manager: '',
     manager_id: '',
     budget: '',
-    startDate: '',
+    startDate: new Date().toLocaleDateString('en-CA'),
     endDate: '',
     status: 'Active'
   });
