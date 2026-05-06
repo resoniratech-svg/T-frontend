@@ -27,6 +27,9 @@ function CreateStockMovement() {
       queryClient.invalidateQueries({ queryKey: ["inventory-movements"] });
       queryClient.invalidateQueries({ queryKey: ["inventory-products"] });
       navigate("/inventory-movements");
+    },
+    onError: (error: any) => {
+        alert(`Failed to save movement: ${error?.response?.data?.message || error.message || 'Unknown error'}`);
     }
   });
 
