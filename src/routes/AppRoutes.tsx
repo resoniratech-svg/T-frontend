@@ -174,8 +174,6 @@ function AppRoutes() {
           <Route path="/edit-boq/:id" element={<CreateBOQ />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/quotations/:division" element={<Quotations />} />
-          <Route path="/invoices" element={<Quotations />} />
-          <Route path="/invoices/:division" element={<Quotations />} />
           <Route path="/create-quotation" element={<CreateQuotation />} />
           <Route path="/create-quotation/:division" element={<CreateQuotation />} />
           <Route path="/edit-quotation/:id" element={<CreateQuotation />} />

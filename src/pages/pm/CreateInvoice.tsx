@@ -56,6 +56,8 @@ export default function CreateInvoice() {
         projectName: ""
     });
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    
+    const todayStr = new Date().toISOString().split('T')[0];
 
     const allowedSectors = useMemo(() => {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
@@ -177,13 +179,32 @@ export default function CreateInvoice() {
             return;
         }
 
+        // Financial Fields Validation (Numbers only)
+        if (["taxRate", "discount", "advance", "creditTerms"].includes(name)) {
+            if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                setFieldErrors(prev => ({ ...prev, [name]: "" }));
+                setForm({ ...form, [name]: value === "" ? 0 : Number(value) });
+            } else {
+                setFieldErrors(prev => ({ ...prev, [name]: "Only numbers allowed" }));
+            }
+            return;
+        }
+
         const val = type === "number" ? Number(value) : value;
         setForm({ ...form, [name]: val });
     };
 
-    const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
+    const handleItemChange = (index: number, field: keyof InvoiceItem, value: string) => {
         const newItems = [...items];
-        const item = { ...newItems[index], [field]: value };
+        
+        // Block non-numeric for Qty and Price
+        if (field === "quantity" || field === "unitPrice") {
+            if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+        }
+
+        const numValue = value === "" ? 0 : Number(value);
+        const item = { ...newItems[index], [field]: field === "description" ? value : numValue };
+        
         if (field === "quantity" || field === "unitPrice") {
             item.amount = (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0);
         }
@@ -368,8 +389,10 @@ export default function CreateInvoice() {
                         </div>
 
                         <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
-
-                        <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} />
+                        
+                        <div>
+                            <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} min={todayStr} />
+                        </div>
 
                         <FormInput
                             label="Credit Terms (Days)"
@@ -445,11 +468,11 @@ export default function CreateInvoice() {
                                     <td className="p-2">
                                         <input className="w-full border-none focus:ring-0" placeholder="Item description" value={item.description} onChange={e => handleItemChange(idx, "description", e.target.value)} />
                                     </td>
-                                    <td className="p-2">
-                                        <input type="number" className="w-full border-none text-center focus:ring-0" value={item.quantity} onChange={e => handleItemChange(idx, "quantity", parseInt(e.target.value))} />
+                                    <td className="p-2 text-center">
+                                        <input type="text" className="w-full border border-slate-200 rounded px-1 text-center focus:ring-1 focus:ring-brand-500 outline-none" value={item.quantity || ''} onChange={e => handleItemChange(idx, "quantity", e.target.value)} />
                                     </td>
-                                    <td className="p-2">
-                                        <input type="number" className="w-full border-none text-right focus:ring-0" value={item.unitPrice} onChange={e => handleItemChange(idx, "unitPrice", parseFloat(e.target.value))} />
+                                    <td className="p-2 text-right">
+                                        <input type="text" className="w-full border border-slate-200 rounded px-1 text-right focus:ring-1 focus:ring-brand-500 outline-none" value={item.unitPrice || ''} onChange={e => handleItemChange(idx, "unitPrice", e.target.value)} />
                                     </td>
                                     <td className="p-2 text-right font-medium">QAR {item.amount.toLocaleString()}</td>
                                     <td className="p-2">
@@ -471,11 +494,17 @@ export default function CreateInvoice() {
                             </div>
                             <div className="flex justify-between items-center gap-4 text-slate-600">
                                 <span>Tax (%)</span>
-                                <input type="number" name="taxRate" value={form.taxRate} onChange={handleFormChange} className="w-20 text-right border rounded p-1" />
+                                <div className="flex flex-col items-end">
+                                    <input type="text" name="taxRate" value={form.taxRate ?? ''} onChange={handleFormChange} className={`w-20 text-right border rounded p-1 outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.taxRate ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
+                                    {fieldErrors.taxRate && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.taxRate}</span>}
+                                </div>
                             </div>
                             <div className="flex justify-between items-center gap-4 text-slate-600 border-b pb-2">
                                 <span>Discount</span>
-                                <input type="number" name="discount" value={form.discount} onChange={handleFormChange} className="w-20 text-right border rounded p-1" />
+                                <div className="flex flex-col items-end">
+                                    <input type="text" name="discount" value={form.discount ?? ''} onChange={handleFormChange} className={`w-20 text-right border rounded p-1 outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.discount ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
+                                    {fieldErrors.discount && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.discount}</span>}
+                                </div>
                             </div>
                             <div className="flex justify-between text-lg font-bold text-brand-700">
                                 <span>Total</span>
@@ -483,7 +512,10 @@ export default function CreateInvoice() {
                             </div>
                             <div className="flex justify-between items-center gap-4 text-slate-600 border-t pt-2">
                                 <span>Advance Paid</span>
-                                <input type="number" name="advance" value={form.advance} onChange={handleFormChange} className="w-24 text-right border rounded p-1 font-bold text-brand-600" />
+                                <div className="flex flex-col items-end">
+                                    <input type="text" name="advance" value={form.advance ?? ''} onChange={handleFormChange} className={`w-24 text-right border rounded p-1 font-bold text-brand-600 outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.advance ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
+                                    {fieldErrors.advance && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.advance}</span>}
+                                </div>
                             </div>
                             <div className="flex justify-between text-xl font-bold text-brand-800 border-t pt-2">
                                 <span>Balance Payable</span>
