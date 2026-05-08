@@ -265,6 +265,7 @@ export default function AdminPROTracking() {
               const params = new URLSearchParams();
               const client = safeClients.find(c => c.id.toString() === selectedClient.toString());
               params.append("company", client?.name || selectedClient);
+              params.append("clientId", selectedClient);
               params.append("from", "pro-tracking"); // Tracking source for return redirect
 
               // Find the client's division to pre-fill

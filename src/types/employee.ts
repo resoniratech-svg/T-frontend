@@ -21,6 +21,7 @@ export interface Employee {
   division: DivisionId;
   status: EmployeeStatus;
   company?: string;
+  clientId?: string | number;
   joinDate: string;
   joinedDate?: string; // Compatibility
   department?: string;

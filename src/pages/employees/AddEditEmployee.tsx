@@ -59,12 +59,14 @@ export default function AddEditEmployee() {
         // Read pre-fill values from URL
         const preFillCompany = searchParams.get("company");
         const preFillDivision = searchParams.get("division");
+        const preFillClientId = searchParams.get("clientId");
         
         setFormData((prev) => ({ 
           ...prev, 
           id: newId,
           company: preFillCompany || prev.company,
-          division: (preFillDivision as DivisionId) || prev.division
+          division: (preFillDivision as DivisionId) || prev.division,
+          clientId: preFillClientId || prev.clientId
         }));
     }
 
@@ -464,4 +466,3 @@ export default function AddEditEmployee() {
     </div>
   );
 }
-
