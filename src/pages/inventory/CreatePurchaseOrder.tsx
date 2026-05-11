@@ -84,6 +84,9 @@ function CreatePurchaseOrder() {
     } as any);
   };
 
+  const selectedProductData = products.find(p => String(p.id) === String(form.productId));
+  const currentStock = selectedProductData ? Number(selectedProductData.stockQuantity) || 0 : 0;
+
   return (
     <div className="p-6">
       <PageHeader showBack title="Create Purchase Order" subtitle="Initiate a new stock procurement" />
@@ -103,11 +106,21 @@ function CreatePurchaseOrder() {
                 label="Quantity"
                 type="text"
                 name="quantity"
-                value={form.quantity}
+                value={form.quantity || ''}
                 onChange={handleChange}
                 required
             />
             {numericError.quantity && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.quantity}</p>}
+            {selectedProductData && (
+                <p className="text-[11px] mt-1.5 font-bold text-slate-500">
+                    Current Stock: {currentStock}
+                    {Number(form.quantity) > 0 && (
+                        <span className="text-emerald-600 ml-1">
+                            → New Stock Total: {currentStock + Number(form.quantity)}
+                        </span>
+                    )}
+                </p>
+            )}
         </div>
 
         <div>
@@ -115,7 +128,7 @@ function CreatePurchaseOrder() {
                 label="Unit Price (QAR)"
                 type="text"
                 name="unitPrice"
-                value={form.unitPrice}
+                value={form.unitPrice || ''}
                 onChange={handleChange}
                 required
             />

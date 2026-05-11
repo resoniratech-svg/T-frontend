@@ -34,8 +34,6 @@ function StatusBadge({ status }: Props) {
   ).join(' ');
 
   let displayStatus = normalizedStatus;
-  if (normalizedStatus.toUpperCase() === "PENDING") displayStatus = "Unpaid";
-  if (normalizedStatus.toUpperCase() === "PARTIAL") displayStatus = "Due";
 
   const style = statusStyles[displayStatus] || statusStyles[normalizedStatus] || statusStyles[status] || "bg-gray-100 text-gray-600 ring-gray-200";
 

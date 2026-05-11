@@ -17,10 +17,12 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { supportService, type SupportChannel } from "../../services/supportService";
 import PageLoader from "../../components/PageLoader";
+import { useDivision } from "../../context/DivisionContext";
 
 export default function ClientSupport() {
   const { user } = useAuth();
-  const [activeSector, setActiveSector] = useState(user?.division?.toUpperCase() || "SERVICE");
+  const { activeDivision } = useDivision();
+  const activeSector = activeDivision.toUpperCase();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newChannel, setNewChannel] = useState({
@@ -140,38 +142,10 @@ export default function ClientSupport() {
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Sector Header Toggle (Premium Style) - ONLY FOR ADMIN */}
-      {user?.role === 'SUPER_ADMIN' && (
-        <div className="flex flex-col items-center gap-6 mb-4">
-          <div className="bg-white p-1 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-1">
-            {['ALL', 'SERVICE', 'TRADING', 'CONTRACTING'].map((s) => (
-              <button
-                key={s}
-                onClick={() => setActiveSector(s)}
-                className={`px-6 py-2.5 rounded-xl text-[11px] font-black tracking-widest uppercase transition-all ${
-                  activeSector === s 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 translate-y-[-1px]' 
-                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">How can we help you?</h1>
-            <p className="text-slate-500">Our {activeSector === 'ALL' ? 'entire' : activeSector.toLowerCase()} team is here to assist you with any queries.</p>
-          </div>
-        </div>
-      )}
-
-      {/* Default Header for Clients */}
-      {user?.role !== 'SUPER_ADMIN' && (
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">How can we help you?</h1>
-          <p className="text-slate-500">Our team is here to assist you with any project or billing queries.</p>
-        </div>
-      )}
+      <div className="text-center space-y-2 mb-8">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">How can we help you?</h1>
+        <p className="text-slate-500">Our team is here to assist you with any project or billing queries.</p>
+      </div>
         {user?.role === 'SUPER_ADMIN' && (
           <button 
             onClick={() => setIsModalOpen(true)}

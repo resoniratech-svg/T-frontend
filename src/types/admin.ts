@@ -7,6 +7,7 @@ export interface DashboardStats {
   activeProjects: number;
   inactiveProjects: number;
   completedProjects: number;
+  cancelledProjects: number;
   totalLeads: number;
   convertedLeads: number;
   conversionRate: number;

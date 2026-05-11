@@ -118,12 +118,14 @@ function Users() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Link
-                          to={`/edit-user/${user.id}`}
-                          className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                        >
-                          <Edit size={16} />
-                        </Link>
+                        {user.role !== "CLIENT" && (
+                          <Link
+                            to={`/edit-user/${user.id}`}
+                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                          >
+                            <Edit size={16} />
+                          </Link>
+                        )}
 
                         <button
                           type="button"

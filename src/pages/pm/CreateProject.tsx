@@ -36,7 +36,7 @@ function CreateProject() {
     startDate: new Date().toLocaleDateString('en-CA'),
     endDate: "",
     description: "",
-    status: "Pending",
+    status: "Active",
     division: isPM ? userDivision : (activeDivision === "all" ? "SERVICE" : activeDivision.toUpperCase())
   });
 

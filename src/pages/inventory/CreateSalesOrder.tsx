@@ -109,6 +109,10 @@ function CreateSalesOrder() {
     } as any);
   };
 
+  const selectedProductData = products.find((p) => String(p.id) === String(form.productId));
+  const purchasePrice = selectedProductData ? Number(selectedProductData.purchasePrice) || 0 : 0;
+  const currentStock = selectedProductData ? Number(selectedProductData.stockQuantity) || 0 : 0;
+
   return (
     <div className="p-6">
       <PageHeader showBack title="Create Sales Order" subtitle="Record a new customer sale" />
@@ -137,11 +141,17 @@ function CreateSalesOrder() {
                 label="Quantity"
                 type="text"
                 name="quantity"
-                value={form.quantity}
+                value={form.quantity || ''}
                 onChange={handleChange}
                 required
             />
             {numericError.quantity && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.quantity}</p>}
+            {selectedProductData && (
+                <p className={`text-[11px] mt-1.5 font-bold ${Number(form.quantity) > currentStock ? 'text-rose-600' : 'text-slate-500'}`}>
+                    Available Stock: {currentStock}
+                    {Number(form.quantity) > currentStock && " (Warning: Exceeds available stock!)"}
+                </p>
+            )}
         </div>
 
         <div>
@@ -149,11 +159,19 @@ function CreateSalesOrder() {
                 label="Unit Selling Price (QAR)"
                 type="text"
                 name="unitPrice"
-                value={form.unitPrice}
+                value={form.unitPrice || ''}
                 onChange={handleChange}
                 required
             />
             {numericError.unitPrice && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.unitPrice}</p>}
+            {(purchasePrice > 0 && Number(form.unitPrice) > 0) && (
+               <p className={`text-[11px] font-bold mt-1.5 ${Number(form.unitPrice) - purchasePrice >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {Number(form.unitPrice) - purchasePrice >= 0 ? 'Unit Profit' : 'Unit Loss'}: QAR {Math.abs(Number(form.unitPrice) - purchasePrice).toLocaleString()} 
+                  <span className="text-slate-400 font-medium ml-1">
+                    ({(((Number(form.unitPrice) - purchasePrice) / Number(form.unitPrice)) * 100).toFixed(1)}% margin)
+                  </span>
+               </p>
+            )}
         </div>
 
         <FormSelect

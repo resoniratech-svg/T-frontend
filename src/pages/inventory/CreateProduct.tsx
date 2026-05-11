@@ -203,7 +203,7 @@ function CreateProduct() {
             label="Purchase Price (QAR)"
             type="text"
             name="purchasePrice"
-            value={form.purchasePrice || 0}
+            value={form.purchasePrice || ''}
             onChange={handleChange}
             required
           />
@@ -215,11 +215,19 @@ function CreateProduct() {
             label="Selling Price (QAR)"
             type="text"
             name="sellingPrice"
-            value={form.sellingPrice || 0}
+            value={form.sellingPrice || ''}
             onChange={handleChange}
             required
           />
           {numericError.sellingPrice && <p className="text-red-500 text-xs mt-1 font-medium">{numericError.sellingPrice}</p>}
+          {(Number(form.purchasePrice) > 0 && Number(form.sellingPrice) > 0) && (
+             <p className={`text-[11px] font-bold mt-1.5 ${Number(form.sellingPrice) - Number(form.purchasePrice) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {Number(form.sellingPrice) - Number(form.purchasePrice) >= 0 ? 'Profit' : 'Loss'}: QAR {Math.abs(Number(form.sellingPrice) - Number(form.purchasePrice)).toLocaleString()} 
+                <span className="text-slate-400 font-medium ml-1">
+                  ({(((Number(form.sellingPrice) - Number(form.purchasePrice)) / Number(form.sellingPrice)) * 100).toFixed(1)}% margin)
+                </span>
+             </p>
+          )}
         </div>
 
         <div>

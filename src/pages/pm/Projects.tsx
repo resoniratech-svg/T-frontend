@@ -37,6 +37,7 @@ function Projects() {
     const dataForExport = projects.map((p) => ({
       "Project Name": p.name || p.projectName,
       "Client": p.client,
+      "Sector": p.division,
       "Budget": p.budget,
       "Manager": p.manager,
       "Status": p.status,
@@ -81,6 +82,15 @@ function Projects() {
     ...item,
     "Project": item.name || item.projectName,
     "Client": item.client,
+    "Sector": (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+          DIVISIONS.find(d => d.id === (item.division || "CONTRACTING"))?.bg || 'bg-gray-100'
+      } ${
+          DIVISIONS.find(d => d.id === (item.division || "CONTRACTING"))?.text || 'text-gray-600'
+      }`}>
+          {DIVISIONS.find(d => d.id === (item.division || "CONTRACTING"))?.label?.replace(' Sector', '') || item.division}
+      </span>
+    ),
     "Budget": item.budget,
     "Manager": item.manager,
     "Status": <StatusBadge status={item.status || "Pending"} />,
@@ -143,7 +153,7 @@ function Projects() {
     )
   }));
 
-  const columns = ["Project", "Client", "Budget", "Manager", "Status", "Docs", "Actions"];
+  const columns = ["Project", "Client", "Sector", "Budget", "Manager", "Status", "Docs", "Actions"];
 
   const currentDivision = DIVISIONS.find(d => d.id === activeDivision);
 

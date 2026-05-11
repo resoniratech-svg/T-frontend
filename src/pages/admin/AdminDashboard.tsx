@@ -182,10 +182,10 @@ export default function AdminDashboard() {
                     className="hover:shadow-lg hover:shadow-brand-500/5 transition-all duration-300"
                 />
                 <StatCard
-                    title="Inactive Projects"
-                    value={stats.inactiveProjects.toString()}
+                    title="Cancelled Projects"
+                    value={stats.cancelledProjects.toString()}
                     icon={<Briefcase size={20} className="text-gray-500" />}
-                    trend={{ value: "Completed/Cancelled", positive: false }}
+                    trend={{ value: "Total cancelled", positive: false }}
                     path="/projects"
                     className="hover:shadow-lg hover:shadow-gray-500/5 transition-all duration-300"
                 />
@@ -419,7 +419,6 @@ export default function AdminDashboard() {
                                     <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Project</th>
                                     <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
                                     <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                                    <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Jobs</th>
                                     <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
                                 </tr>
                             </thead>
@@ -438,10 +437,6 @@ export default function AdminDashboard() {
                                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${divMeta?.bg || 'bg-gray-100'} ${divMeta?.text || 'text-gray-600'}`}>
                                                     {divMeta?.label?.replace(' Sector', '') || proj.division}
                                                 </span>
-                                            </td>
-                                            <td className="px-5 py-3 hidden lg:table-cell">
-                                                <span className="text-xs font-bold text-gray-700">{proj.jobCount}</span>
-                                                <span className="text-[10px] text-gray-400 ml-1">assigned</span>
                                             </td>
                                             <td className="px-5 py-3">
                                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
