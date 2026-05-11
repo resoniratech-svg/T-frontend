@@ -19,8 +19,9 @@ function DayWiseInventory() {
       if (!groups[date]) {
         groups[date] = { date, incoming: 0, outgoing: 0, adjustments: 0, total: 0 };
       }
-      if (m.type === "IN") groups[date].incoming += m.quantity;
-      else if (m.type === "OUT") groups[date].outgoing += m.quantity;
+      const qty = parseFloat(m.quantity as any) || 0;
+      if (m.type === "IN") groups[date].incoming += qty;
+      else if (m.type === "OUT") groups[date].outgoing += qty;
       else if (m.type === "ADJUSTMENT") groups[date].adjustments += 1;
       groups[date].total += 1;
     });

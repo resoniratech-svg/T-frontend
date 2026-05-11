@@ -44,6 +44,69 @@ export const sidebarMenu: SidebarSection[] = [
     ],
   },
 
+  //  Client Portal (Portal Management)
+  {
+    section: "Client Portal",
+    roles: ["PROJECT_MANAGER", "CLIENT"],
+    items: [
+      {
+        label: "Client List",
+        path: "/clients",
+        icon: Users,
+        roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"]
+      },
+      {
+        label: "Create Client",
+        path: "/create-client",
+        icon: CheckSquare,
+        roles: ["SUPER_ADMIN"]
+      },
+      {
+        label: "My Projects",
+        path: "/client/projects",
+        icon: Briefcase,
+        roles: ["CLIENT"]
+      },
+      {
+        label: "BOQ",
+        path: "/client/boq",
+        icon: ClipboardList,
+        roles: ["CLIENT"]
+      },
+      {
+        label: "Quotations",
+        path: "/client/quotations",
+        icon: FileText,
+        roles: ["CLIENT"]
+      },
+      {
+        label: "Billing&Payments",
+        path: "/client/billing",
+        icon: Receipt,
+        roles: ["CLIENT"]
+      },
+      {
+        label: "PRO Services",
+        path: "/client/pro-services",
+        icon: ShieldCheck,
+        roles: ["CLIENT"]
+      },
+      {
+        label: "Credit Requests",
+        path: "/client/credit-requests",
+        icon: CreditCard,
+        roles: ["CLIENT"]
+      },
+
+      {
+        label: "Support",
+        path: "/client/support",
+        icon: MessageSquare,
+        roles: ["CLIENT", "SUPER_ADMIN"]
+      },
+    ],
+  },
+
   //  Projects (Core Operations)
   {
     section: "Projects",
@@ -115,68 +178,7 @@ export const sidebarMenu: SidebarSection[] = [
     ],
   },
 
-  //  Client Portal (Portal Management)
-  {
-    section: "Client Portal",
-    roles: ["PROJECT_MANAGER", "CLIENT"],
-    items: [
-      {
-        label: "Client List",
-        path: "/clients",
-        icon: Users,
-        roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"]
-      },
-      {
-        label: "Create Client",
-        path: "/create-client",
-        icon: CheckSquare,
-        roles: ["SUPER_ADMIN"]
-      },
-      {
-        label: "My Projects",
-        path: "/client/projects",
-        icon: Briefcase,
-        roles: ["CLIENT"]
-      },
-      {
-        label: "BOQ",
-        path: "/client/boq",
-        icon: ClipboardList,
-        roles: ["CLIENT"]
-      },
-      {
-        label: "Quotations",
-        path: "/client/quotations",
-        icon: FileText,
-        roles: ["CLIENT"]
-      },
-      {
-        label: "Billing&Payments",
-        path: "/client/billing",
-        icon: Receipt,
-        roles: ["CLIENT"]
-      },
-      {
-        label: "PRO Services",
-        path: "/client/pro-services",
-        icon: ShieldCheck,
-        roles: ["CLIENT"]
-      },
-      {
-        label: "Credit Requests",
-        path: "/client/credit-requests",
-        icon: CreditCard,
-        roles: ["CLIENT"]
-      },
 
-      {
-        label: "Support",
-        path: "/client/support",
-        icon: MessageSquare,
-        roles: ["CLIENT", "SUPER_ADMIN"]
-      },
-    ],
-  },
 
   //  Marketing & Lead Management
   {

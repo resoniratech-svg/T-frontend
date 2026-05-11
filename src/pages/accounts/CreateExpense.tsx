@@ -375,7 +375,6 @@ function CreateExpense() {
                 value={form.date}
                 onChange={handleChange}
                 required
-                min={todayStr}
               />
 
               <div>

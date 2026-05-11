@@ -25,10 +25,11 @@ function Invoices() {
                 ? data 
                 : data.filter((item) => {
                     const branchLower = (item.division || item.branch || "Contracting").toLowerCase();
-                    if (activeDivision === "service") {
+                    const activeLower = activeDivision.toLowerCase();
+                    if (activeLower === "service") {
                         return branchLower === "service" || branchLower === "business";
                     }
-                    return branchLower === activeDivision;
+                    return branchLower === activeLower;
                 });
 
             return filteredByGlobal.sort((a, b) => {

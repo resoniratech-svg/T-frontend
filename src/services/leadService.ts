@@ -33,8 +33,9 @@ export const leadService = {
     return resData.data || resData;
   },
 
-  getDashboardStats: async (): Promise<MarketingStats> => {
-    const { data } = await api.get("/marketing/dashboard-stats");
+  getDashboardStats: async (divisionId?: string): Promise<MarketingStats> => {
+    const url = divisionId && divisionId !== 'all' ? `/marketing/dashboard-stats?division=${divisionId}` : "/marketing/dashboard-stats";
+    const { data } = await api.get(url);
     return data.data || data;
   }
 };

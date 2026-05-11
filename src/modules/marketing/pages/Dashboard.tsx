@@ -18,25 +18,26 @@ import StatusBadge from '../components/StatusBadge';
 import { useNavigate } from 'react-router-dom';
 import { useLeadStore } from '../store/leadStore';
 import PageLoader from '../../../components/PageLoader';
-
+import { useDivision } from '../../../context/DivisionContext';
 import { useQuery } from '@tanstack/react-query';
 import { leadService } from '../../../services/leadService';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { setFilters } = useLeadStore();
+  const { activeDivision } = useDivision();
 
   // 1. Fetch Dashboard Stats
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['marketing-stats'],
-    queryFn: leadService.getDashboardStats,
+    queryKey: ['marketing-stats', activeDivision],
+    queryFn: () => leadService.getDashboardStats(activeDivision),
     refetchInterval: 30000,
   });
 
   // 2. Fetch Recent Leads
   const { data: leads = [], isLoading: leadsLoading } = useQuery({
-    queryKey: ['leads'],
-    queryFn: leadService.getLeads
+    queryKey: ['leads', activeDivision],
+    queryFn: () => leadService.getLeads(activeDivision)
   });
 
   const recentLeads = leads.slice(0, 5);

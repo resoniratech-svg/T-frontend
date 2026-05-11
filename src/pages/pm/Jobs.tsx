@@ -20,12 +20,13 @@ function Jobs() {
     queryKey: ["jobs", activeDivision],
     queryFn: jobService.getJobs,
     select: (data: Job[]) => {
-      const mappedDivision = activeDivision === "service" ? "business" : activeDivision;
+      const activeLower = activeDivision.toLowerCase();
+      const mappedDivision = activeLower === "service" ? "business" : activeLower;
       return activeDivision === "all" 
         ? data 
         : data.filter((j: Job) => {
             const jDiv = (j.division || j.branch || "").toLowerCase();
-            return jDiv === mappedDivision || jDiv === activeDivision;
+            return jDiv === mappedDivision || jDiv === activeLower;
           });
     }
   });

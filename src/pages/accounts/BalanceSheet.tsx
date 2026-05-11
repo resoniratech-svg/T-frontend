@@ -19,25 +19,26 @@ function BalanceSheet() {
     setExpenses(JSON.parse(localStorage.getItem("trek_expenses") || "[]"));
   }, []);
 
-  const mappedDivision = activeDivision === "service" ? "business" : activeDivision;
+  const activeLower = activeDivision.toLowerCase();
+  const mappedDivision = activeLower === "service" ? "business" : activeLower;
 
   const filteredInvoices = useMemo(() => {
     return activeDivision === "all" 
       ? invoices 
       : invoices.filter((i) => {
           const iDiv = (i.branch || i.division || "").toLowerCase();
-          return iDiv === mappedDivision || iDiv === activeDivision;
+          return iDiv === mappedDivision || iDiv === activeLower;
         });
-  }, [invoices, activeDivision, mappedDivision]);
+  }, [invoices, activeDivision, activeLower, mappedDivision]);
 
   const filteredExpenses = useMemo(() => {
     return activeDivision === "all" 
       ? expenses 
       : expenses.filter((e) => {
           const eDiv = (e.division || "general").toLowerCase();
-          return eDiv === mappedDivision || eDiv === activeDivision;
+          return eDiv === mappedDivision || eDiv === activeLower;
         });
-  }, [expenses, activeDivision, mappedDivision]);
+  }, [expenses, activeDivision, activeLower, mappedDivision]);
 
   const receivables = useMemo(() => filteredInvoices
     .filter(inv => inv.status !== "Paid")

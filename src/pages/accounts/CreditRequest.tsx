@@ -363,7 +363,7 @@ function CreditRequest() {
                 {recentRequests.map((req: any, i: number) => (
                   <tr key={req.id || i} className="hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-4 text-slate-600">
-                      {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : ""}
+                      {req.created_at || req.createdAt ? new Date(req.created_at || req.createdAt).toLocaleDateString() : "N/A"}
                     </td>
                     <td className="py-3 px-4 font-medium text-slate-800">
                       {req.client_name || req.clientName}

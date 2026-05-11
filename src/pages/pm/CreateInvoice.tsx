@@ -391,7 +391,7 @@ export default function CreateInvoice() {
                         <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
                         
                         <div>
-                            <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} min={todayStr} />
+                            <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} />
                         </div>
 
                         <FormInput

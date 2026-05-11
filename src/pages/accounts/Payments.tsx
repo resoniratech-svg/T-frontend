@@ -23,7 +23,11 @@ function Payments() {
   const filteredPayments = useMemo(() => {
     let result = activeDivision === "all" 
       ? payments 
-      : payments.filter((p: any) => p.division === activeDivision || (activeDivision === "service" && p.division === "business"));
+      : payments.filter((p: any) => {
+          const pDiv = (p.division || "").toLowerCase();
+          const activeLower = activeDivision.toLowerCase();
+          return pDiv === activeLower || (activeLower === "service" && pDiv === "business");
+      });
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();

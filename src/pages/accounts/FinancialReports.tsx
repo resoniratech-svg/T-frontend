@@ -80,7 +80,7 @@ function FinancialReports() {
     // Filtered data helpers
     const filterByDate = (items: any[], dateField: string) => {
         return items.filter((item) => {
-            const itemDate = item[dateField] || item.created_at || item.date;
+            const itemDate = item[dateField] || item.invoice_date || item.created_at || item.date;
             const d = new Date(itemDate);
             if (isNaN(d.getTime())) return false;
             if (d.getFullYear() !== filterYear) return false;
@@ -89,8 +89,9 @@ function FinancialReports() {
             // Global Division Filter
             if (activeDivision !== "all") {
                 const branch = (item.branch || item.referenceType || item.division || "general").toLowerCase();
-                const mappedDivision = activeDivision === "service" ? "business" : activeDivision;
-                if (branch !== mappedDivision && branch !== activeDivision) return false;
+                const activeLower = activeDivision.toLowerCase();
+                const mappedDivision = activeLower === "service" ? "business" : activeLower;
+                if (branch !== mappedDivision && branch !== activeLower) return false;
             }
             
             if (filterDateFrom && d < new Date(filterDateFrom)) return false;
@@ -102,26 +103,29 @@ function FinancialReports() {
     const filteredInvoices = useMemo(() => filterByDate(invoices, "date")
         .filter(inv => {
             const stat = (inv.approval_status || inv.approvalStatus || inv.status || "").toLowerCase();
-            return stat === "approved" || stat === "paid" || !stat;
+            return stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
         }), 
     [invoices, filterYear, filterMonth, activeDivision, filterDateFrom, filterDateTo]);
 
     const pendingInvoices = useMemo(() => filterByDate(invoices, "date")
         .filter(inv => {
             const stat = (inv.approval_status || inv.approvalStatus || inv.status || "").toLowerCase();
-            return stat === "pending" || stat === "unpaid";
+            return stat === "pending" || stat === "pending_approval";
         }),
     [invoices, filterYear, filterMonth, activeDivision, filterDateFrom, filterDateTo]);
 
     const filteredExpenses = useMemo(() => filterByDate(expenses, "date")
         .filter(exp => {
             const stat = (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase();
-            return stat === "approved" || !stat;
+            return stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
         }), 
     [expenses, filterYear, filterMonth, activeDivision, filterDateFrom, filterDateTo]);
 
     const pendingExpenses = useMemo(() => filterByDate(expenses, "date")
-        .filter(exp => (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase() === "pending"),
+        .filter(exp => {
+            const stat = (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase();
+            return stat === "pending" || stat === "pending_approval";
+        }),
     [expenses, filterYear, filterMonth, activeDivision, filterDateFrom, filterDateTo]);
 
     const totalIncome = filteredInvoices.reduce((s, i) => s + parseFloat(i.total_amount || i.total || i.amount || 0), 0);
@@ -133,28 +137,29 @@ function FinancialReports() {
 
     // Monthly breakdown for charts
     const monthlyData = useMemo(() => {
-        const mappedDivision = activeDivision === "service" ? "business" : activeDivision;
+        const activeLower = activeDivision.toLowerCase();
+        const mappedDivision = activeLower === "service" ? "business" : activeLower;
         return MONTHS.map((name, idx) => {
             const mIncome = invoices
                 .filter((i) => {
-                    const itemDate = i.date || i.created_at;
+                    const itemDate = i.invoice_date || i.date || i.created_at;
                     const d = new Date(itemDate);
                     const iBranch = (i.branch || i.division || "").toLowerCase();
                     const stat = (i.approval_status || i.approvalStatus || i.status || "").toLowerCase();
                     return d.getFullYear() === filterYear && d.getMonth() === idx &&
-                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeDivision) &&
-                        (stat === "approved" || stat === "paid" || !stat);
+                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower) &&
+                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
                 })
                 .reduce((s, i) => s + parseFloat(i.total_amount || i.total || i.amount || 0), 0);
             const mExpense = expenses
                 .filter((e) => {
                     const itemDate = e.date || e.created_at;
                     const d = new Date(itemDate);
-                    const eBranch = (e.referenceType || e.division || "general").toLowerCase();
+                    const eBranch = (e.branch || e.division || "general").toLowerCase();
                     const stat = (e.approval_status || e.approvalStatus || e.status || "").toLowerCase();
                     return d.getFullYear() === filterYear && d.getMonth() === idx &&
-                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeDivision) &&
-                        (stat === "approved" || !stat);
+                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower) &&
+                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
                 })
                 .reduce((s, e) => s + parseFloat(e.amount || 0), 0);
             return { name, Income: mIncome, Expenses: mExpense, Profit: mIncome - mExpense };
@@ -176,7 +181,7 @@ function FinancialReports() {
                     .reduce((s, i) => s + parseFloat(i.total_amount || i.total || i.amount || 0), 0);
                 const expense = (activeDivision === "all" ? expenses : filteredExpenses)
                     .filter((e) => {
-                        const eBranch = (e.referenceType || e.division || "general").toLowerCase();
+                        const eBranch = (e.branch || e.division || "general").toLowerCase();
                         return eBranch === legacyDiv || eBranch === div;
                     })
                     .reduce((s, e) => s + parseFloat(e.amount || 0), 0);
@@ -194,30 +199,31 @@ function FinancialReports() {
     const dayWiseData = useMemo(() => {
         const targetMonth = filterMonth !== "all" ? filterMonth : new Date().getMonth();
         const daysInMonth = new Date(filterYear, targetMonth + 1, 0).getDate();
-        const mappedDivision = activeDivision === "service" ? "business" : activeDivision;
+        const activeLower = activeDivision.toLowerCase();
+        const mappedDivision = activeLower === "service" ? "business" : activeLower;
         return Array.from({ length: daysInMonth }, (_, i) => {
             const day = i + 1;
             const dayStr = `${day}`;
             const dayIncome = invoices
                 .filter((inv) => {
-                    const itemDate = inv.date || inv.created_at;
+                    const itemDate = inv.invoice_date || inv.date || inv.created_at;
                     const d = new Date(itemDate);
                     const iBranch = (inv.branch || inv.division || "").toLowerCase();
                     const stat = (inv.approval_status || inv.approvalStatus || inv.status || "").toLowerCase();
                     return d.getFullYear() === filterYear && d.getMonth() === targetMonth && d.getDate() === day &&
-                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeDivision) &&
-                        (stat === "approved" || stat === "paid" || !stat);
+                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower) &&
+                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
                 })
                 .reduce((s, inv) => s + parseFloat(inv.total_amount || inv.total || inv.amount || 0), 0);
             const dayExpense = expenses
                 .filter((exp) => {
                     const itemDate = exp.date || exp.created_at;
                     const d = new Date(itemDate);
-                    const eBranch = (exp.referenceType || exp.division || "general").toLowerCase();
+                    const eBranch = (exp.branch || exp.division || "general").toLowerCase();
                     const stat = (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase();
                     return d.getFullYear() === filterYear && d.getMonth() === targetMonth && d.getDate() === day &&
-                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeDivision) &&
-                        (stat === "approved" || !stat);
+                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower) &&
+                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
                 })
                 .reduce((s, exp) => s + parseFloat(exp.amount || 0), 0);
             return { name: dayStr, Income: dayIncome, Expenses: dayExpense };
@@ -566,7 +572,7 @@ function FinancialReports() {
                                         .filter(inv => (inv.branch || inv.division || "").toLowerCase() === mappedDiv || (inv.branch || inv.division || "").toLowerCase() === div.id)
                                         .reduce((s, inv) => s + parseFloat(inv.taxAmount || 0), 0);
                                     const inp = filteredExpenses
-                                        .filter(exp => (exp.referenceType || exp.division || "").toLowerCase() === mappedDiv || (exp.referenceType || exp.division || "").toLowerCase() === div.id)
+                                        .filter(exp => (exp.branch || exp.division || "").toLowerCase() === mappedDiv || (exp.branch || exp.division || "").toLowerCase() === div.id)
                                         .reduce((s, exp) => s + parseFloat(exp.taxAmount || 0), 0);
                                     
                                     return (
@@ -665,8 +671,8 @@ function FinancialReports() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
                                     {[
-                                        ...filteredInvoices.map((i) => ({ date: i.date || i.created_at, type: "Income", desc: `Invoice ${i.invoice_number || i.invoiceNo} - ${i.client_name || i.client}`, amount: parseFloat(i.total_amount || i.total || i.amount || 0), status: (i.approval_status || i.approvalStatus || i.status || "").toLowerCase() })),
-                                        ...pendingInvoices.map((i) => ({ date: i.date || i.created_at, type: "Income", desc: `[PENDING] Invoice ${i.invoice_number || i.invoiceNo} - ${i.client_name || i.client}`, amount: parseFloat(i.total_amount || i.total || i.amount || 0), status: "pending" })),
+                                        ...filteredInvoices.map((i) => ({ date: i.invoice_date || i.date || i.created_at, type: "Income", desc: `Invoice ${i.invoice_number || i.invoiceNo} - ${i.client_name || i.client}`, amount: parseFloat(i.total_amount || i.total || i.amount || 0), status: (i.approval_status || i.approvalStatus || i.status || "").toLowerCase() })),
+                                        ...pendingInvoices.map((i) => ({ date: i.invoice_date || i.date || i.created_at, type: "Income", desc: `[PENDING] Invoice ${i.invoice_number || i.invoiceNo} - ${i.client_name || i.client}`, amount: parseFloat(i.total_amount || i.total || i.amount || 0), status: "pending" })),
                                         ...filteredExpenses.map((e) => ({ date: e.date || e.created_at, type: "Expense", desc: e.expense_name || e.expenseName || e.description || e.category, amount: -parseFloat(e.amount || 0), status: (e.approval_status || e.approvalStatus || e.status || "").toLowerCase() })),
                                         ...pendingExpenses.map((e) => ({ date: e.date || e.created_at, type: "Expense", desc: `[PENDING] ${e.expense_name || e.expenseName || e.description || e.category}`, amount: -parseFloat(e.amount || 0), status: "pending" })),
                                     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((t, i) => (
