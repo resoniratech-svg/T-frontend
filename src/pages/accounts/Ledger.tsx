@@ -52,18 +52,27 @@ export default function Ledger() {
     }, [invoicesData, expensesData]);
 
     const filteredInvoices = useMemo(() => {
-        return invoices.filter((i) => {
-            if (activeDivision === "all") return true;
-            const iDiv = String(i.division || i.branch || "").toUpperCase();
-            return iDiv === activeDivision.toUpperCase();
+        return invoices.filter((i: any) => {
+            // Sector filtering
+            if (activeDivision !== "all") {
+                const iDiv = String(i.division || i.branch || "").toUpperCase();
+                if (iDiv !== activeDivision.toUpperCase()) return false;
+            }
+
+            // Robust categorization check
+            // If total_amount is negative or ref_type suggests it's an expense, it shouldn't be in the Inflow list normally
+            // but we'll handle categorization in the ledger builder.
+            return true;
         });
     }, [invoices, activeDivision]);
 
     const filteredExpenses = useMemo(() => {
-        if (activeDivision === "all") return expenses;
-        return expenses.filter((e) => {
-            const eDiv = String(e.division || "GENERAL").toUpperCase();
-            return eDiv === activeDivision.toUpperCase();
+        return expenses.filter((e: any) => {
+            if (activeDivision === "all") return true;
+            
+            // Check allocations for the active division
+            const allocations = e.allocations || [];
+            return allocations.some((a: any) => String(a.division).toUpperCase() === activeDivision.toUpperCase());
         });
     }, [expenses, activeDivision]);
 
@@ -78,15 +87,21 @@ export default function Ledger() {
         // Add Invoices
         filteredInvoices.forEach((inv: any) => {
             const approvalStatus = (inv.approval_status || inv.approvalStatus || "").toLowerCase();
-            if (approvalStatus === "approved" || !approvalStatus) {
+            const isApproved = approvalStatus === "approved" || !approvalStatus;
+            
+            if (isApproved) {
+                const total = Number(inv.total_amount || inv.total || inv.amount || 0);
+                // Categorize as Income if total is positive, otherwise Outflow
+                const isExpense = total < 0 || (inv.ref_type || "").toUpperCase() === "EXPENSE";
+                
                 entries.push({
                     id: inv.id,
                     date: formatDate(inv.invoice_date || inv.date || inv.created_at),
-                    type: "Income",
+                    type: isExpense ? "Expense" : "Income",
                     description: `Invoice for ${inv.client_name || inv.client || 'Client'}`,
                     reference: inv.invoice_number || inv.invoiceNo,
-                    amountIn: Number(inv.total_amount || inv.total || inv.amount || 0),
-                    amountOut: 0,
+                    amountIn: isExpense ? 0 : total,
+                    amountOut: isExpense ? Math.abs(total) : 0,
                     balance: 0,
                     status: inv.status
                 });
@@ -96,7 +111,21 @@ export default function Ledger() {
         // Add Expenses
         filteredExpenses.forEach((exp: any) => {
             const approvalStatus = (exp.approval_status || exp.approvalStatus || "").toLowerCase();
-            if (approvalStatus === "approved" || !approvalStatus) {
+            const isApproved = approvalStatus === "approved" || !approvalStatus;
+
+            if (isApproved) {
+                let amount = Number(exp.total_amount || exp.amount || 0);
+                
+                // If specific sector selected, show allocated amount
+                if (activeDivision !== "all") {
+                    const allocation = exp.allocations?.find((a: any) => 
+                        String(a.division).toUpperCase() === activeDivision.toUpperCase()
+                    );
+                    if (allocation) {
+                        amount = Number(allocation.amount);
+                    }
+                }
+
                 entries.push({
                     id: exp.id,
                     date: formatDate(exp.date || exp.created_at),
@@ -104,7 +133,7 @@ export default function Ledger() {
                     description: exp.description || exp.expenseName || exp.category,
                     reference: exp.reference_id || exp.id,
                     amountIn: 0,
-                    amountOut: Number(exp.total_amount || exp.amount || 0),
+                    amountOut: amount,
                     balance: 0,
                     status: "Paid"
                 });
@@ -121,19 +150,22 @@ export default function Ledger() {
             return { ...entry, balance: currentBalance };
         });
 
-        // Add pending items AT THE END (top after reverse) without affecting balance
+        // Add pending items
         filteredInvoices.forEach((inv: any) => {
             const approvalStatus = (inv.approval_status || inv.approvalStatus || "").toLowerCase();
             if (approvalStatus === "pending" || approvalStatus === "pending_approval") {
+                const total = Number(inv.total_amount || inv.total || inv.amount || 0);
+                const isExpense = total < 0 || (inv.ref_type || "").toUpperCase() === "EXPENSE";
+
                 processed.push({
                     id: inv.id,
                     date: formatDate(inv.invoice_date || inv.date || inv.created_at),
-                    type: "Income",
+                    type: isExpense ? "Expense" : "Income",
                     description: `[PENDING] Invoice for ${inv.client_name || inv.client || 'Client'}`,
                     reference: inv.invoice_number || inv.invoiceNo,
-                    amountIn: Number(inv.total_amount || inv.total || inv.amount || 0),
-                    amountOut: 0,
-                    balance: currentBalance, // Stays same
+                    amountIn: isExpense ? 0 : total,
+                    amountOut: isExpense ? Math.abs(total) : 0,
+                    balance: currentBalance,
                     status: "Awaiting Approval"
                 });
             }
@@ -142,6 +174,15 @@ export default function Ledger() {
         filteredExpenses.forEach((exp: any) => {
             const approvalStatus = (exp.approval_status || exp.approvalStatus || "").toLowerCase();
             if (approvalStatus === "pending" || approvalStatus === "pending_approval") {
+                let amount = Number(exp.total_amount || exp.amount || 0);
+                
+                if (activeDivision !== "all") {
+                    const allocation = exp.allocations?.find((a: any) => 
+                        String(a.division).toUpperCase() === activeDivision.toUpperCase()
+                    );
+                    if (allocation) amount = Number(allocation.amount);
+                }
+
                 processed.push({
                     id: exp.id,
                     date: formatDate(exp.date || exp.created_at),
@@ -149,8 +190,8 @@ export default function Ledger() {
                     description: `[PENDING] ${exp.description || exp.expenseName || exp.category}`,
                     reference: exp.reference_id || exp.id,
                     amountIn: 0,
-                    amountOut: Number(exp.total_amount || exp.amount || 0),
-                    balance: currentBalance, // Stays same
+                    amountOut: amount,
+                    balance: currentBalance,
                     status: "Awaiting Approval"
                 });
             }
@@ -188,7 +229,7 @@ export default function Ledger() {
                         }`}
                 >
                     <p className={`text-sm font-semibold uppercase tracking-wider mb-2 ${typeFilter === 'Income' ? 'text-emerald-700' : 'text-slate-500'}`}>Total Inflow</p>
-                    <p className="text-3xl font-bold text-emerald-600">QAR {ledgerData.reduce((s, e) => s + e.amountIn, 0).toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-emerald-600">QAR {ledgerData.filter(e => e.type === 'Income').reduce((s, e) => s + e.amountIn, 0).toLocaleString()}</p>
                 </div>
                 <div
                     onClick={() => setTypeFilter(typeFilter === 'Expense' ? 'All' : 'Expense')}
@@ -196,7 +237,7 @@ export default function Ledger() {
                         }`}
                 >
                     <p className={`text-sm font-semibold uppercase tracking-wider mb-2 ${typeFilter === 'Expense' ? 'text-rose-700' : 'text-slate-500'}`}>Total Outflow</p>
-                    <p className="text-3xl font-bold text-rose-600">QAR {ledgerData.reduce((s, e) => s + e.amountOut, 0).toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-rose-600">QAR {ledgerData.filter(e => e.type === 'Expense').reduce((s, e) => s + e.amountOut, 0).toLocaleString()}</p>
                 </div>
                 <div
                     onClick={() => setTypeFilter('All')}
@@ -204,7 +245,7 @@ export default function Ledger() {
                         }`}
                 >
                     <p className="text-sm font-medium text-slate-400 uppercase tracking-wider mb-2">Net Balance</p>
-                    <p className="text-3xl font-bold text-emerald-400">QAR {(ledgerData.reduce((s, e) => s + e.amountIn, 0) - ledgerData.reduce((s, e) => s + e.amountOut, 0)).toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-emerald-400">QAR {(ledgerData.filter(e => e.type === 'Income').reduce((s, e) => s + e.amountIn, 0) - ledgerData.filter(e => e.type === 'Expense').reduce((s, e) => s + e.amountOut, 0)).toLocaleString()}</p>
                 </div>
             </div>
 

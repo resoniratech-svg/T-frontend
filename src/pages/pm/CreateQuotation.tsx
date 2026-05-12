@@ -199,6 +199,23 @@ export default function CreateQuotation() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // 1. Basic Validation
+        if (!form.project.trim()) {
+            alert("Project Name is required.");
+            return;
+        }
+
+        if (!form.client) {
+            alert("Please select a client.");
+            return;
+        }
+
+        const validItems = items.filter(item => item.description.trim() !== "");
+        if (validItems.length === 0) {
+            alert("At least one product/service with a description is required.");
+            return;
+        }
+
         // Calculate totals
         const calculatedItems = items.map(item => ({
             ...item,
@@ -287,7 +304,7 @@ export default function CreateQuotation() {
                             <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required min={todayStr} />
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection *</label>
+                                <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection <span className="text-slate-400">*</span></label>
                                 <ClientAutocomplete
                                     value={form.client}
                                     onChange={handleClientChange}
@@ -323,7 +340,7 @@ export default function CreateQuotation() {
                             {items.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description (Product Type)</label>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description (Product Type) <span className="text-slate-400">*</span></label>
                                         <input
                                             type="text"
                                             value={item.description}

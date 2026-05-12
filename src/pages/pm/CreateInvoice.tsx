@@ -78,6 +78,18 @@ export default function CreateInvoice() {
             const dataObj: any = (invoice as any).invoice || invoice;
             const itemsArr = (invoice as any).items || invoice.items || [];
 
+            const mappedItems = itemsArr.map((item: any, index: number) => ({
+                id: item.id?.toString() || Date.now().toString() + index,
+                description: item.description || "",
+                quantity: Number(item.quantity) || 1,
+                unitPrice: Number(item.unit_price) || Number(item.unitPrice) || 0,
+                amount: Number(item.total) || Number(item.amount) || 0
+            }));
+
+            const subtotalForCalc = mappedItems.reduce((sum: number, item: any) => sum + item.amount, 0);
+            const discountAmt = Number(dataObj.discount) || 0;
+            const calculatedDiscountRate = subtotalForCalc > 0 ? (discountAmt / subtotalForCalc) * 100 : 0;
+
             setForm({
                 invoiceNo: dataObj.invoice_number || dataObj.invoiceNo || "",
                 client: dataObj.client_name || dataObj.client || "",
@@ -89,7 +101,7 @@ export default function CreateInvoice() {
                 dueDate: dataObj.due_date ? dataObj.due_date.split('T')[0] : (dataObj.dueDate || ""),
                 status: dataObj.status || "Unpaid",
                 taxRate: Number(dataObj.tax_rate) || dataObj.taxRate || 0,
-                discount: Number(dataObj.discount) || 0,
+                discount: Math.round(calculatedDiscountRate * 100) / 100,
                 notes: dataObj.notes || "",
                 paymentTerms: dataObj.payment_terms || dataObj.paymentTerms || "Payable within 15 days",
                 division: (dataObj.division || dataObj.branch) as DivisionId || "contracting",
@@ -101,14 +113,6 @@ export default function CreateInvoice() {
                 invoiceType: dataObj.invoiceType || "Credit",
                 clientId: String(dataObj.client_id || dataObj.clientId || "")
             });
-
-            const mappedItems = itemsArr.map((item: any, index: number) => ({
-                id: item.id?.toString() || Date.now().toString() + index,
-                description: item.description || "",
-                quantity: Number(item.quantity) || 1,
-                unitPrice: Number(item.unit_price) || Number(item.unitPrice) || 0,
-                amount: Number(item.total) || Number(item.amount) || 0
-            }));
 
             setItems(mappedItems);
         }
@@ -140,7 +144,9 @@ export default function CreateInvoice() {
     useEffect(() => {
         const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
         const taxAmount = (subtotal * ((form.taxRate ?? 0) / 100));
-        const total = subtotal + taxAmount - (form.discount ?? 0);
+        const discountRate = form.discount ?? 0;
+        const discountAmount = (subtotal * (discountRate / 100));
+        const total = subtotal + taxAmount - discountAmount;
         const balance = total - (form.advance || 0);
         setTotals({ subtotal, taxAmount, total, balance });
     }, [items, form.taxRate, form.discount, form.advance]);
@@ -248,6 +254,17 @@ export default function CreateInvoice() {
             return;
         }
 
+        if (!form.projectName || !form.projectName.trim()) {
+            alert("Project Name is required.");
+            return;
+        }
+
+        const validItems = items.filter(item => item.description.trim() !== "");
+        if (validItems.length === 0) {
+            alert("At least one invoice item with a description is required.");
+            return;
+        }
+
         const isApproved = user?.role === "SUPER_ADMIN";
         let invoiceStatus: InvoiceStatus = form.status || "Unpaid";
         
@@ -266,7 +283,7 @@ export default function CreateInvoice() {
             subtotal: totals.subtotal,
             tax_rate: form.taxRate,
             tax_amount: totals.taxAmount,
-            discount: form.discount,
+            discount: (totals.subtotal * ((form.discount ?? 0) / 100)),
             total_amount: totals.total,
             status: invoiceStatus,
             approval_status: (isApproved ? "approved" : "pending"),
@@ -430,7 +447,7 @@ export default function CreateInvoice() {
                             />
                             {fieldErrors.qid && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.qid}</p>}
                         </div>
-                        <FormInput label="Project Name" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" />
+                        <FormInput label="Project Name" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" required />
 
                         <div className="md:col-span-2 flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Address</label>
@@ -455,7 +472,7 @@ export default function CreateInvoice() {
                     <table className="w-full">
                         <thead className="text-left bg-slate-50 border-y">
                             <tr>
-                                <th className="p-2">Description</th>
+                                <th className="p-2">Description <span className="text-slate-400">*</span></th>
                                 <th className="p-2 w-20 text-center">Qty</th>
                                 <th className="p-2 w-32 text-right">Rate</th>
                                 <th className="p-2 w-32 text-right">Amount</th>
@@ -500,10 +517,15 @@ export default function CreateInvoice() {
                                 </div>
                             </div>
                             <div className="flex justify-between items-center gap-4 text-slate-600 border-b pb-2">
-                                <span>Discount</span>
+                                <span>Discount (%)</span>
                                 <div className="flex flex-col items-end">
                                     <input type="text" name="discount" value={form.discount ?? ''} onChange={handleFormChange} className={`w-20 text-right border rounded p-1 outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.discount ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
                                     {fieldErrors.discount && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.discount}</span>}
+                                    {totals.subtotal > 0 && form.discount ? (
+                                        <span className="text-[10px] text-slate-400 mt-1">
+                                            - QAR {(totals.subtotal * (Number(form.discount) / 100)).toLocaleString()}
+                                        </span>
+                                    ) : null}
                                 </div>
                             </div>
                             <div className="flex justify-between text-lg font-bold text-brand-700">

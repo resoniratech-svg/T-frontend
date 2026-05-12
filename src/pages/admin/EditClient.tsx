@@ -47,6 +47,7 @@ function EditClient() {
     computerCardDocUrl: "",
     contractDocUrl: "",
   });
+  const [existingAgreements, setExistingAgreements] = useState<{name: string, url: string}[]>([]);
 
   // 1. Fetch Client Data
   const { data: client, isLoading } = useQuery({
@@ -84,6 +85,10 @@ function EditClient() {
         expiryDate: l.expiryDate ? dayjs(l.expiryDate).format("YYYY-MM-DD") : "",
         documentUrl: l.documentUrl || ""
       })) || [{ type: "Trade License", number: "", expiryDate: "" }]);
+      setExistingAgreements(client.agreements?.map((a: any) => ({
+        name: a.title || "Supporting Document",
+        url: a.fileUrl || a.url
+      })) || []);
     }
   }, [client]);
 
@@ -193,7 +198,8 @@ function EditClient() {
           expiryDate: l.expiryDate,
           documentUrl: l.documentUrl
         })),
-        documents: newSupportingDocs // Sent to backend to be added to agreements
+        existingAgreements, // Kept documents
+        documents: newSupportingDocs // New documents to be added
       };
 
       updateMutation.mutate(payload);
@@ -463,7 +469,11 @@ function EditClient() {
 
             <div className="col-span-2 pt-4">
               <label className="block text-sm font-bold text-slate-800 mb-4">Other Agreement Documents</label>
-              <DocumentUpload onChange={setUploadedFiles} />
+              <DocumentUpload 
+                existingFiles={existingAgreements}
+                onRemoveExisting={(url) => setExistingAgreements(prev => prev.filter(a => a.url !== url))}
+                onChange={setUploadedFiles} 
+              />
             </div>
           </div>
 

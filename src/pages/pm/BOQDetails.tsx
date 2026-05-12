@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import PageHeader from "../../components/PageHeader";
 import StatusBadge from "../../components/StatusBadge";
-import { ArrowLeft, Printer, Download, Plus, CheckCircle, XCircle, Play, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Plus, CheckCircle, XCircle, Play, Loader2 } from "lucide-react";
 import { exportToCSV } from "../../utils/exportUtils";
 import { boqService } from "../../services/boqService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -127,11 +127,6 @@ export default function BOQDetails() {
                             </>
                         )}
 
-                        <div className="h-8 w-px bg-slate-200 mx-1" />
-
-                        <button onClick={() => window.print()} className="bg-white border text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2">
-                            <Printer size={16} /> Print
-                        </button>
                         <button 
                             onClick={() => exportToCSV(boq.items?.map((item: any) => ({
                                 desc: item.description,

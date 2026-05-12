@@ -223,20 +223,6 @@ export default function CreateBOQ() {
                         </select>
                     </div>
 
-                    <div className="col-span-2 md:col-span-1">
-                        <FormInput
-                            label="Total Amount (QAR)"
-                            name="totalAmount"
-                            type="text"
-                            value={form.totalAmount}
-                            placeholder="0.00"
-                            onChange={handleChange}
-                            className="[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
-                        />
-                        {amountError && (
-                            <p className="text-red-500 text-xs mt-1 font-medium">{amountError}</p>
-                        )}
-                    </div>
 
                     <div className="col-span-2 md:col-span-1">
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Status</label>
@@ -346,10 +332,27 @@ export default function CreateBOQ() {
                         </div>
                     </div>
 
-                    <div className="col-span-2 mt-4 flex justify-end">
+                    <div className="col-span-2 mt-8 pt-6 border-t flex flex-col items-end gap-4">
+                        <div className="w-full sm:w-64">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 px-1 text-right">Total Amount (QAR)</label>
+                            <div className="relative">
+                                <input
+                                    name="totalAmount"
+                                    type="text"
+                                    value={form.totalAmount}
+                                    placeholder="0.00"
+                                    onChange={handleChange}
+                                    className="w-full border border-brand-200 rounded-xl px-4 py-3 bg-brand-50/30 focus:ring-2 focus:ring-brand-500 outline-none font-bold text-lg text-brand-700 shadow-inner text-right"
+                                />
+                                {amountError && (
+                                    <p className="text-red-500 text-[10px] mt-1 font-medium absolute -bottom-5 right-1">{amountError}</p>
+                                )}
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
-                            className="bg-brand-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all flex items-center gap-2"
+                            className="w-full sm:w-auto bg-brand-600 text-white px-10 py-3.5 rounded-xl font-bold shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all flex items-center justify-center gap-2 active:scale-95"
                         >
                             {isEdit ? "Update BOQ Profile" : "Save BOQ Profile"}
                         </button>

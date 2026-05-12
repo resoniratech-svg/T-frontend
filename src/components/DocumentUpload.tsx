@@ -1,11 +1,14 @@
 import { Upload, FileText, X } from "lucide-react";
 import { useState } from "react";
+import { getUploadUrl } from "../services/api";
 
 interface Props {
   onChange?: (files: File[]) => void;
+  existingFiles?: { name: string; url: string; id?: string }[];
+  onRemoveExisting?: (idOrUrl: string) => void;
 }
 
-function DocumentUpload({ onChange }: Props) {
+function DocumentUpload({ onChange, existingFiles = [], onRemoveExisting }: Props) {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -73,11 +76,50 @@ function DocumentUpload({ onChange }: Props) {
         </p>
       </div>
 
-      {/* File List */}
+      {/* Existing Files List */}
+      {existingFiles.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Existing Documents ({existingFiles.length})
+          </p>
+          {existingFiles.map((file, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50/50 border border-emerald-100 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <FileText size={16} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <a 
+                  href={getUploadUrl(file.url)} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-sm font-medium text-emerald-700 truncate hover:underline"
+                >
+                  {file.name}
+                </a>
+                <p className="text-[11px] text-emerald-400">Stored on Server</p>
+              </div>
+              {onRemoveExisting && (
+                <button
+                  type="button"
+                  onClick={() => onRemoveExisting(file.id || file.url)}
+                  className="p-1 rounded-md text-emerald-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* New File List */}
       {files.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Uploaded Files ({files.length})
+            Newly Added Files ({files.length})
           </p>
           {files.map((file, index) => (
             <div
@@ -96,6 +138,7 @@ function DocumentUpload({ onChange }: Props) {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => removeFile(index)}
                 className="p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
               >
