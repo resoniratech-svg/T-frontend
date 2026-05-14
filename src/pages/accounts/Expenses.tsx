@@ -9,7 +9,6 @@ import ApprovalBadge from "../../components/ApprovalBadge";
 import { Plus, Trash2, Eye, Receipt, Coins, Edit, DollarSign } from "lucide-react";
 import { useDivision } from "../../context/DivisionContext";
 import { DIVISIONS } from "../../constants/divisions";
-import { getUploadUrl } from "../../services/api";
 import type { Expense } from "../../types/finance";
 
 const DIVISION_FILTERS = [
@@ -130,30 +129,9 @@ function Expenses() {
       })}`,
       Status: <ApprovalBadge status={expense.approvalStatus || "approved"} />,
       Attachment: expense.attachment ? (
-        <a 
-          href={getUploadUrl(expense.attachment)} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          download={(() => {
-            const fileName = expense.attachment.split('/').pop() || "";
-            const parts = fileName.split('-');
-            if (parts.length >= 3) {
-              return parts.slice(2).join('-');
-            }
-            return fileName;
-          })()}
-          className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium hover:bg-emerald-100 transition-colors inline-flex items-center gap-1"
-        >
-          📎 {(() => {
-            const fileName = expense.attachment.split('/').pop() || "";
-            // Remove the unique prefix (timestamp-random-)
-            const parts = fileName.split('-');
-            if (parts.length >= 3) {
-              return parts.slice(2).join('-');
-            }
-            return fileName;
-          })()}
-        </a>
+        <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+          📎 {expense.attachment}
+        </span>
       ) : (
         <span className="text-slate-300 text-xs">None</span>
       ),

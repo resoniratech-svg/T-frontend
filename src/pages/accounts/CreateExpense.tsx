@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { File } from "lucide-react";
 import PageHeader from "../../components/PageHeader";
 import FormInput from "../../components/forms/FormInput";
 import FormTextarea from "../../components/forms/FormTextarea";
@@ -17,7 +16,6 @@ import type { Invoice } from "../../types/finance";
 import { financeService } from "../../services/financeService";
 import { projectService } from "../../services/projectService";
 import { quotationService } from "../../services/quotationService";
-import { getUploadUrl } from "../../services/api";
 import type { Project } from "../../types/project";
 import type { Proposal } from "../../types/pm";
 
@@ -91,7 +89,7 @@ function CreateExpense() {
   const [form, setForm] = useState<ExpenseForm>({
     expenseName: "",
     category: "",
-    division: (activeDivision === "all" ? "CONTRACTING" : activeDivision) as DivisionId,
+    division: (activeDivision === "all" ? "contracting" : activeDivision) as DivisionId,
     referenceId: "",
     amount: 0,
     taxRate: 0,
@@ -135,8 +133,8 @@ function CreateExpense() {
         ...prev,
         expenseName: dbExpense.description || "",
         category: dbExpense.category || "",
-        division: (dbExpense.allocation_type === "SMART" ? "all" : (dbExpense.allocations?.[0]?.division?.toUpperCase() || dbExpense.division?.toUpperCase() || "CONTRACTING")) as DivisionId,
-        referenceId: String(dbExpense.reference_id || ""),
+        division: (dbExpense.allocation_type === "SMART" ? "all" : (dbExpense.allocations?.[0]?.division?.toLowerCase() || dbExpense.division?.toLowerCase() || "contracting")) as DivisionId,
+        referenceId: dbExpense.reference_id || "",
         amount: Number(dbExpense.total_amount) || 0,
         taxRate: Number(dbExpense.tax_rate) || 0,
         taxAmount: Number(dbExpense.tax_amount) || 0,
@@ -150,7 +148,7 @@ function CreateExpense() {
           acc[curr.division.toLowerCase()] = Number(curr.percentage) || 0;
           return acc;
         }, { contracting: 0, trading: 0, service: 0 }),
-        approvalStatus: dbExpense.approval_status?.toUpperCase() === "PENDING_APPROVAL" ? "pending" : dbExpense.approval_status?.toLowerCase()
+        approvalStatus: dbExpense.approval_status?.toLowerCase() === "pending_approval" ? "pending" : dbExpense.approval_status?.toLowerCase()
       }));
     }
   }, [dbExpense]);
@@ -563,33 +561,12 @@ function CreateExpense() {
                 Attach Bills / Receipts
               </label>
               <FileUploader 
-                onUpload={(files: any[], urls: string[]) => {
-                  if (urls.length > 0) {
-                    setForm(prev => ({ ...prev, attachment: urls[0] }));
+                onUpload={(files: any[]) => {
+                  if (files.length > 0) {
+                    setForm(prev => ({ ...prev, attachment: files[0].name }));
                   }
                 }}
               />
-              {form.attachment && (
-                <div className="mt-3 p-3 bg-brand-50 border border-brand-100 rounded-lg flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded bg-white flex items-center justify-center text-brand-600 shadow-sm">
-                      <File size={16} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-brand-700 uppercase tracking-wider">Current Attachment</p>
-                      <p className="text-xs font-medium text-slate-600 truncate max-w-[200px]">{form.attachment.split('/').pop()}</p>
-                    </div>
-                  </div>
-                  <a 
-                    href={getUploadUrl(form.attachment)} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[10px] font-bold text-brand-600 hover:underline px-3 py-1 bg-white rounded-md shadow-sm transition-all"
-                  >
-                    View File
-                  </a>
-                </div>
-              )}
             </div>
             <FormTextarea
               label="Notes"

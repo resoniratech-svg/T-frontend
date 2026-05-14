@@ -41,16 +41,8 @@ api.interceptors.response.use(
 export const getUploadUrl = (path?: string) => {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  
   const baseUrl = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace("/api", "");
-  
-  // Ensure the path starts with /uploads/ if it's just a filename
-  let cleanPath = path;
-  if (!cleanPath.startsWith("/uploads/") && !cleanPath.startsWith("uploads/")) {
-    cleanPath = `/uploads/${cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath}`;
-  }
-  
-  return `${baseUrl}${cleanPath.startsWith("/") ? "" : "/"}${cleanPath}`;
+  return `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 };
 
 export default api;

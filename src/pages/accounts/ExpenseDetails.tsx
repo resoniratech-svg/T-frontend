@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Tag, CreditCard, FileText, Paperclip, ExternalLink
 import { downloadMockFile } from "../../utils/exportUtils";
 import { useQuery } from "@tanstack/react-query";
 import { financeService } from "../../services/financeService";
-import { getUploadUrl } from "../../services/api";
+
 import type { Expense } from "../../types/finance";
 
 export default function ExpenseDetails() {
@@ -189,15 +189,9 @@ export default function ExpenseDetails() {
                                     <Paperclip size={18} className="text-brand-600 shrink-0" />
                                     <span className="text-[11px] font-bold text-brand-700 truncate">{expense.attachment}</span>
                                 </div>
-                                <a 
-                                    href={getUploadUrl(expense.attachment)} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    download={expense.attachment.split('/').pop()}
-                                    className="w-full py-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-                                >
+                                <button onClick={() => setShowImage(true)} className="w-full py-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
                                     <ExternalLink size={14} /> Open Document
-                                </a>
+                                </button>
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 rounded-xl opacity-50">
@@ -241,13 +235,9 @@ export default function ExpenseDetails() {
                              <h4 className="text-2xl font-black text-white tracking-tight">{expense.attachment}</h4>
                              <p className="text-white/40 font-medium">Document attached to {expense.id}</p>
                          </div>
-                         <a 
-                             href={getUploadUrl(expense.attachment)} 
-                             download 
-                             className="px-8 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-brand-50 transition-all active:scale-95 text-center"
-                         >
+                         <button onClick={() => downloadMockFile(`${expense.attachment || "receipt"}-mock.txt`, "Mock data: In production, this will download the cloud-hosted AWS S3 file.")} className="px-8 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-brand-50 transition-all active:scale-95">
                              Download Original File
-                         </a>
+                         </button>
                     </div>
                 </div>
             )}
