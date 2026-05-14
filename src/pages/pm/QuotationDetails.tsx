@@ -49,7 +49,9 @@ export default function QuotationDetails() {
         totalAmount: Number(q.total_amount || 0),
         Status: q.status || "Submitted",
         branch: q.division || "Contracting",
-        date: q.created_at || q.date || new Date().toISOString()
+        date: q.created_at || q.date || new Date().toISOString(),
+        discountPercent: Number(q.discount || 0),
+        netTotal: Number(q.total_amount || 0) - (Number(q.total_amount || 0) * Number(q.discount || 0) / 100)
     };
 
     const handlePrint = () => {
@@ -65,9 +67,10 @@ export default function QuotationDetails() {
     // Ensure items exist
     const items = quotation.items || [];
 
-    const totalAmount = quotation.totalAmount || 0;
-    const discount = 0;
-    const netTotal = totalAmount - discount;
+    const subtotal = items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0);
+    const discountPercent = Number(quotation.discountPercent || 0);
+    const discountAmount = (subtotal * discountPercent) / 100;
+    const netTotal = subtotal - discountAmount;
 
     // Format Date
     const qDate = new Date(quotation.date || new Date().toISOString());
@@ -227,13 +230,13 @@ export default function QuotationDetails() {
                                     <td className="border border-black px-4 py-1.5 uppercase">TOTAL</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center">{Number(totalAmount).toLocaleString()}</td>
+                                    <td className="border border-black px-3 py-1.5 text-center">{Number(subtotal).toLocaleString()}</td>
                                 </tr>
                                 <tr className="font-bold">
-                                    <td className="border border-black px-4 py-1.5 uppercase">DISCOUNT</td>
+                                    <td className="border border-black px-4 py-1.5 uppercase">DISCOUNT ({discountPercent}%)</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center">{Number(discount).toLocaleString()}</td>
+                                    <td className="border border-black px-3 py-1.5 text-center">{Number(discountAmount).toLocaleString()}</td>
                                 </tr>
                                 <tr className="font-bold">
                                     <td className="border border-black px-4 py-1.5 uppercase">NET TOTAL</td>

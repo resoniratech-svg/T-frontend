@@ -27,7 +27,7 @@ export const DIVISIONS = [
     bg: "bg-violet-50",
     border: "border-violet-200",
     text: "text-violet-700",
-    taxRate: 5, // Default Qatar VAT 5% (if applicable)
+    taxRate: 0, // Default Qatar VAT 0%
   },
 ] as const;
 

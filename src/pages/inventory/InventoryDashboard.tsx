@@ -91,14 +91,6 @@ function InventoryDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-black text-gray-900">Inventory Dashboard</h1>
-        <div className="relative group">
-            <input 
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="appearance-none bg-white border border-gray-200 px-4 py-2 pr-4 rounded-xl text-sm font-bold text-gray-600 shadow-sm hover:border-brand-500 focus:outline-none transition-all cursor-pointer"
-            />
-        </div>
       </div>
 
       {/* Stats Grid */}
@@ -107,28 +99,24 @@ function InventoryDashboard() {
             title="Total Products"
             value={stats.totalProducts.toLocaleString()}
             icon={<Package size={28} />}
-            badge={{ text: "+15 new this month", color: "bg-emerald-100 text-emerald-700" }}
             path="/products"
         />
         <DashboardStatCard 
             title="Purchase Orders"
             value={stats.purchaseOrdersCount}
             icon={<ShoppingCart size={28} />}
-            badge={{ text: "12 pending", color: "bg-amber-100 text-amber-700" }}
             path="/inventory/purchase-orders"
         />
         <DashboardStatCard 
             title="Sales Orders"
             value={stats.salesOrdersCount}
             icon={<Truck size={28} />}
-            badge={{ text: "24 shipped today", color: "bg-emerald-100 text-emerald-700" }}
             path="/inventory/sales-orders"
         />
         <DashboardStatCard 
             title="Stock Movements"
             value={stats.totalMovements}
             icon={<Activity size={28} />}
-            subtext="Last movement: 5 mins ago"
             path="/inventory-movements"
         />
         <DashboardStatCard 
@@ -198,33 +186,6 @@ function InventoryDashboard() {
 
           {/* Right Sidebar */}
           <div className="space-y-8">
-              {/* Top Selling Chart Placeholder */}
-              <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
-                  <h3 className="text-lg font-black text-gray-900 mb-6">Top Selling Products</h3>
-                  <div className="h-40 flex items-end justify-between gap-1 px-2">
-                       <div className="group relative flex flex-col items-center flex-1">
-                           <div className="w-full bg-brand-500 rounded-t-lg transition-all group-hover:bg-brand-600" style={{height: '80%'}}></div>
-                           <p className="text-[8px] font-bold text-gray-400 mt-2 truncate w-full text-center">PO #102</p>
-                       </div>
-                       <div className="group relative flex flex-col items-center flex-1">
-                           <div className="w-full bg-brand-400 rounded-t-lg transition-all group-hover:bg-brand-600" style={{height: '60%'}}></div>
-                           <p className="text-[8px] font-bold text-gray-400 mt-2 truncate w-full text-center">SO #344</p>
-                       </div>
-                       <div className="group relative flex flex-col items-center flex-1">
-                           <div className="w-full bg-brand-300 rounded-t-lg transition-all group-hover:bg-brand-600" style={{height: '45%'}}></div>
-                           <p className="text-[8px] font-bold text-gray-400 mt-2 truncate w-full text-center">Produc...</p>
-                       </div>
-                       <div className="group relative flex flex-col items-center flex-1">
-                           <div className="w-full bg-brand-400 rounded-t-lg transition-all group-hover:bg-brand-600" style={{height: '55%'}}></div>
-                           <p className="text-[8px] font-bold text-gray-400 mt-2 truncate w-full text-center">SO #344</p>
-                       </div>
-                       <div className="group relative flex flex-col items-center flex-1">
-                           <div className="w-full bg-brand-500 rounded-t-lg transition-all group-hover:bg-brand-600" style={{height: '40%'}}></div>
-                           <p className="text-[8px] font-bold text-gray-400 mt-2 truncate w-full text-center">PO #345</p>
-                       </div>
-                  </div>
-              </div>
-
               {/* Quick Actions */}
               <div className="space-y-4">
                   <h3 className="text-lg font-black text-gray-900 ml-2">Quick Actions</h3>

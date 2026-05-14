@@ -63,7 +63,9 @@ export default function CreateInvoice() {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
     }, [isPM, user]);
 
-    const [items, setItems] = useState<InvoiceItem[]>([]);
+    const [items, setItems] = useState<InvoiceItem[]>([
+        { id: Date.now().toString(), description: "", quantity: 1, unitPrice: 0, amount: 0 }
+    ]);
 
     // 1. Fetch invoice if editing
     const { data: invoice, isLoading: isFetching } = useQuery<Invoice>({
@@ -111,7 +113,8 @@ export default function CreateInvoice() {
                 address: dataObj.address || "",
                 advance: Number(dataObj.amount_paid) || dataObj.advance || dataObj.advancePaid || 0,
                 invoiceType: dataObj.invoiceType || "Credit",
-                clientId: String(dataObj.client_id || dataObj.clientId || "")
+                clientId: String(dataObj.client_id || dataObj.clientId || ""),
+                projectName: dataObj.project_name || dataObj.projectName || ""
             });
 
             setItems(mappedItems);
@@ -259,9 +262,20 @@ export default function CreateInvoice() {
             return;
         }
 
+        if (!form.date) {
+            alert("Invoice Date is required.");
+            return;
+        }
+
         const validItems = items.filter(item => item.description.trim() !== "");
         if (validItems.length === 0) {
             alert("At least one invoice item with a description is required.");
+            return;
+        }
+
+        // Also ensure no items have empty descriptions if they have quantities/prices
+        if (items.some(item => !item.description.trim() && (item.quantity > 0 || item.unitPrice > 0))) {
+            alert("All items with quantity or price must have a description.");
             return;
         }
 
@@ -294,6 +308,7 @@ export default function CreateInvoice() {
             ref_type: form.refType,
             ref_no: form.refNo,
             project_name: form.projectName,
+            advance: form.advance,
             notes: form.notes,
             payment_terms: form.paymentTerms,
             items: items.map(item => ({
@@ -408,13 +423,13 @@ export default function CreateInvoice() {
                         <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
                         
                         <div>
-                            <FormInput label="Invoice Date" name="date" type="date" value={form.date} onChange={handleFormChange} />
+                            <FormInput label="Invoice Date *" name="date" type="date" value={form.date} onChange={handleFormChange} />
                         </div>
 
                         <FormInput
                             label="Credit Terms (Days)"
                             name="creditTerms"
-                            type="number"
+                            type="text"
                             value={form.creditTerms}
                             onChange={handleFormChange}
                         />
@@ -447,7 +462,7 @@ export default function CreateInvoice() {
                             />
                             {fieldErrors.qid && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.qid}</p>}
                         </div>
-                        <FormInput label="Project Name" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" required />
+                        <FormInput label="Project Name *" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" required />
 
                         <div className="md:col-span-2 flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Address</label>

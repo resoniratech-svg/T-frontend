@@ -286,7 +286,7 @@ export default function InvoiceDetails() {
                     <div className="w-[305px] flex flex-col">
                         <div className="flex border-b border-black h-12">
                             <div className="w-[120px] p-2 font-black flex items-center border-r border-black uppercase text-xs">Advance:</div>
-                            <div className="flex-1 p-2 flex items-center justify-end font-bold">{advance > 0 ? Number(advance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""}</div>
+                            <div className="flex-1 p-2 flex items-center justify-end font-bold">{Number(advance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                         </div>
                         <div className="flex border-b border-black h-12">
                             <div className="w-[120px] p-2 font-black flex items-center border-r border-black uppercase text-xs">Discount</div>

@@ -104,6 +104,17 @@ const CreateProject = () => {
         status: formData.status || 'Active',
       };
 
+      if (!formData.name.trim()) {
+        setErrorMsg("Project Name is required.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!formData.client) {
+        setErrorMsg("Client selection is required.");
+        setIsSubmitting(false);
+        return;
+      }
+
       await projectService.createProject(payload);
       setSuccessMsg(`Project "${formData.name}" created successfully! Redirecting...`);
       setTimeout(() => navigate('/admin/projects'), 1500);
@@ -219,7 +230,7 @@ const CreateProject = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Name
+                    Project Name <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -251,7 +262,7 @@ const CreateProject = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Client
+                    Client <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <ClientAutocomplete

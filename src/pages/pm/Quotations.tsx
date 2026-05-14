@@ -122,15 +122,15 @@ function Quotations() {
         "Approval": <ApprovalBadge status={item.status || "pending"} />,
         "Actions": (
           <div className="flex gap-2">
-            <Link to={`/quotation-details/${item["Quote ID"] || item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
+            <Link to={`/quotation-details/${item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
               <Eye size={16} />
             </Link>
-            <Link to={`/edit-quotation/${item["Quote ID"] || item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
+            <Link to={`/edit-quotation/${item.id}`} className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
                 <Edit size={16} />
             </Link>
 
             <button
-              onClick={() => handleDeleteQuote(String(item["Quote ID"] || item.id))}
+              onClick={() => handleDeleteQuote(String(item.id))}
               className="p-1 text-slate-400 hover:text-red-600 transition-colors"
             >
               <Trash2 size={16} />

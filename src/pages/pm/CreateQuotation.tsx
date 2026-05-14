@@ -121,13 +121,13 @@ export default function CreateQuotation() {
             setForm(prev => ({
                 ...prev,
                 division: (found.division || "CONTRACTING") as DivisionId,
-                project: found.project || "",
+                project: found.project_name || found.project || "",
                 client: found.client_name || found.client || "",
                 customerCode: found.client_id?.toString() || "",
                 quoteId: found.qtn_number || "",
                 status: found.status || found.Status || prev.status,
                 date: found.created_at ? new Date(found.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-                discount: found.discount || 0,
+                discount: found.discount != null ? Number(found.discount) : 0,
                 aboutUs: found.aboutUs || prev.aboutUs,
                 whatWeDo: found.whatWeDo || prev.whatWeDo,
                 proposalIntro: found.proposalIntro || prev.proposalIntro,
@@ -210,6 +210,11 @@ export default function CreateQuotation() {
             return;
         }
 
+        if (items.some(item => !item.description?.trim())) {
+            alert("Please provide a description for all line items.");
+            return;
+        }
+
         const validItems = items.filter(item => item.description.trim() !== "");
         if (validItems.length === 0) {
             alert("At least one product/service with a description is required.");
@@ -223,7 +228,8 @@ export default function CreateQuotation() {
         }));
 
         const totalAmount = calculatedItems.reduce((sum, item) => sum + item.amount, 0);
-        const netTotal = totalAmount - Number(form.discount);
+        const discountAmount = totalAmount * (Number(form.discount) / 100);
+        const netTotal = totalAmount - discountAmount;
         const isApproved = user?.role === "SUPER_ADMIN";
 
         const submissionData: any = {
@@ -235,6 +241,7 @@ export default function CreateQuotation() {
             items: calculatedItems,
             client_name: form.client,
             project_name: form.project,
+            discount: Number(form.discount),
             valid_until: new Date(new Date(form.date).getTime() + 15 * 24 * 60 * 60 * 1000).toISOString(),
             terms: form.financialTerms + "\n" + form.paymentTerms
         };
@@ -304,7 +311,7 @@ export default function CreateQuotation() {
                             <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required min={todayStr} />
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection <span className="text-slate-400">*</span></label>
+                                <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection <span className="text-rose-500">*</span></label>
                                 <ClientAutocomplete
                                     value={form.client}
                                     onChange={handleClientChange}
@@ -340,7 +347,7 @@ export default function CreateQuotation() {
                             {items.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                                     <div className="flex-1">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description (Product Type) <span className="text-slate-400">*</span></label>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Description (Product Type) <span className="text-rose-500">*</span></label>
                                         <input
                                             type="text"
                                             value={item.description}
@@ -398,12 +405,12 @@ export default function CreateQuotation() {
                                 <span>{items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0).toLocaleString()}</span>
                             </div>
                              <div className="flex justify-between items-center text-sm font-medium text-slate-600">
-                                 <span>Discount (Flat)</span>
+                                 <span>Discount (%)</span>
                                  <div className="flex flex-col items-end">
                                     <input
                                         type="text"
                                         name="discount"
-                                        value={form.discount || ''}
+                                        value={form.discount ?? 0}
                                         onChange={handleChange}
                                         className={`w-24 px-2 py-1 text-right bg-slate-50 border rounded-md outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.discount ? 'border-red-400 bg-red-50' : 'border-slate-200'}`}
                                     />
@@ -412,7 +419,7 @@ export default function CreateQuotation() {
                              </div>
                             <div className="flex justify-between items-center text-lg font-black text-slate-900 pt-2 border-t">
                                 <span>Net Total</span>
-                                <span>{(items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) - form.discount).toLocaleString()} QAR</span>
+                                <span>{(items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) * (1 - (form.discount / 100))).toLocaleString()} QAR</span>
                             </div>
                         </div>
                     </div>

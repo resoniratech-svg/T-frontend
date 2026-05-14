@@ -36,7 +36,9 @@ export default function CreateBOQ() {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
     }, [isPM, user]);
 
-    const [items, setItems] = useState<BOQItem[]>([]);
+    const [items, setItems] = useState<BOQItem[]>(
+        isEdit ? [] : [{ description: "", quantity: 1, unit: "pcs", rate: 0, amount: 0 }]
+    );
     const [amountError, setAmountError] = useState<string | null>(null);
     const todayStr = new Date().toISOString().split('T')[0];
 
@@ -143,6 +145,26 @@ export default function CreateBOQ() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!form.project.trim()) {
+            alert("Project Name is required.");
+            return;
+        }
+
+        if (!form.client_name) {
+            alert("Please select a client.");
+            return;
+        }
+
+        if (items.length === 0) {
+            alert("Please add at least one line item.");
+            return;
+        }
+
+        if (items.some(item => !item.description?.trim())) {
+            alert("Please provide a description for all line items.");
+            return;
+        }
+
         const payload = {
             project_name: form.project,
             client_name: form.client_name,
@@ -198,6 +220,7 @@ export default function CreateBOQ() {
                             value={form.project}
                             placeholder="e.g. Al Rayyan Mall Fit-out"
                             onChange={handleChange}
+                            required
                         />
                     </div>
 
@@ -266,7 +289,7 @@ export default function CreateBOQ() {
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="bg-slate-100/50 border-b">
-                                        <th className="px-4 py-3 text-left font-bold text-slate-600 uppercase tracking-widest text-[10px]">Description</th>
+                                        <th className="px-4 py-3 text-left font-bold text-slate-600 uppercase tracking-widest text-[10px]">Description <span className="text-rose-500">*</span></th>
                                         <th className="px-4 py-3 text-center font-bold text-slate-600 uppercase tracking-widest text-[10px] w-24">Qty</th>
                                         <th className="px-4 py-3 text-center font-bold text-slate-600 uppercase tracking-widest text-[10px] w-24">Unit</th>
                                         <th className="px-4 py-3 text-right font-bold text-slate-600 uppercase tracking-widest text-[10px] w-32">Rate</th>

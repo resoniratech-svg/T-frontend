@@ -81,7 +81,6 @@ const Dashboard: React.FC = () => {
           title="Potential Leads" 
           value={stats.totalLeads} 
           icon={Target} 
-          trend={{ value: 12, isPositive: true }}
           color="blue"
           onClick={() => {
             setFilters({ status: 'All' });
@@ -92,7 +91,6 @@ const Dashboard: React.FC = () => {
           title="Active Follow-ups" 
           value={stats.followedUpLeads} 
           icon={Clock} 
-          trend={{ value: 5, isPositive: true }}
           color="yellow"
           onClick={() => {
             setFilters({ status: 'Follow-up' });
@@ -103,7 +101,6 @@ const Dashboard: React.FC = () => {
           title="Successful Conversions" 
           value={stats.convertedLeads} 
           icon={UserCheck} 
-          trend={{ value: 8, isPositive: true }}
           color="green"
           onClick={() => {
             setFilters({ status: 'Converted' });
@@ -114,7 +111,6 @@ const Dashboard: React.FC = () => {
           title="New Arrivals" 
           value={stats.pendingLeads} 
           icon={Zap} 
-          trend={{ value: 2, isPositive: false }}
           color="purple"
           onClick={() => {
             setFilters({ status: 'New' });

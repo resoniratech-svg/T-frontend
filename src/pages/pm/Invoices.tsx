@@ -88,7 +88,8 @@ function Invoices() {
         ),
         "Ref Type": invoice.ref_type || invoice.refType || "General",
         "Ref No": invoice.ref_no || invoice.refNo || "-",
-        "Amount": `QAR ${Number(invoice.total_amount || invoice.total || invoice.amount || 0).toLocaleString()}`,
+        "Total": `QAR ${Number(invoice.total_amount || 0).toLocaleString()}`,
+        "Balance": `QAR ${Number(invoice.balance_amount || 0).toLocaleString()}`,
         "Status": <StatusBadge status={invoice.status} />,
         "Date": invoice.invoice_date || invoice.date || invoice.createdAt || "-",
         "Actions": (
@@ -99,13 +100,6 @@ function Invoices() {
                 <Link to={`/edit-invoice/${invoice.id}`} title="Edit" className="p-1 text-slate-400 hover:text-brand-600 transition-colors">
                     <Edit size={16} />
                 </Link>
-                <button
-                    onClick={() => toggleStatus(invoice.id!, invoice.status!, invoice.invoiceNo!)}
-                    className="p-1 px-2 text-xs font-semibold bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors disabled:opacity-50"
-                    disabled={updateStatusMutation.isPending}
-                >
-                    {updateStatusMutation.isPending && updateStatusMutation.variables?.id === invoice.id ? "..." : `Mark ${invoice.status?.toUpperCase() === "PAID" ? "Unpaid" : "Paid"}`}
-                </button>
                 <button
                     onClick={() => handleDelete(invoice.id!, invoice.invoiceNo!)}
                     className="p-1 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-50"
@@ -121,7 +115,7 @@ function Invoices() {
         )
     }));
 
-    const columns = ["Invoice No", "Client", "Sector", "Ref Type", "Ref No", "Amount", "Status", "Date", "Actions"];
+    const columns = ["Invoice No", "Client", "Sector", "Total", "Balance", "Status", "Date", "Actions"];
 
     const currentDivision = DIVISIONS.find(d => d.id === activeDivision);
     const pageTitle = activeDivision === "all" ? "All Sales Invoices" : `${currentDivision?.label} Invoices`;

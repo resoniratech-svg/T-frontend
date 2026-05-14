@@ -61,8 +61,10 @@ function Navbar({ onToggleSidebar }: NavbarProps) {
                      isUserManagementPage ||
                      isClientsPage ||
                      isDocumentsPage ||
-                     isSupportPage ||
-                     isSettingsPage;
+                     isSettingsPage ||
+                     location.pathname === "/admin/dashboard" ||
+                     location.pathname.startsWith("/quotations") ||
+                     location.pathname.startsWith("/invoices");
 
 
 

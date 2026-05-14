@@ -135,47 +135,11 @@ export default function InvoiceDetailDrawer({ isOpen, onClose, invoice, onAddPay
                 </div>
               </section>
 
-              {/* Payment History */}
-              <section className="space-y-3 pb-6">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    Payment History
-                </h3>
-                {invoice.paymentHistory?.length > 0 ? (
-                    <div className="space-y-3">
-                        {invoice.paymentHistory.map((pay: any) => (
-                            <div key={pay.id} className="p-3 rounded-xl border border-slate-50 bg-slate-50/30 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                                        <CreditCard size={14} />
-                                    </div>
-                                    <div>
-                                        <p className="text-[11px] font-bold text-slate-800">QAR {pay.amount.toLocaleString()}</p>
-                                        <p className="text-[10px] text-slate-400">{pay.method} • {pay.date}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-[9px] text-slate-400 italic font-medium">{pay.notes || 'No notes'}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="p-6 text-center border-2 border-dashed border-slate-100 rounded-lg text-slate-400 text-xs italic">
-                        No payments recorded yet.
-                    </div>
-                )}
-              </section>
+
             </div>
 
-            {/* Footer Actions */}
-            <div className="p-6 border-t border-slate-100 bg-white grid grid-cols-2 gap-3">
-
-              <button className="flex items-center justify-center gap-2 border border-slate-200 py-3 rounded-xl text-slate-700 font-bold text-sm hover:bg-slate-50 active:scale-95 transition-all shadow-sm">
-                <Send size={16} /> Send Reminder
-              </button>
-              <button onClick={printDocument} className="col-span-2 flex items-center justify-center gap-2 border border-slate-200 py-2.5 rounded-xl text-slate-600 font-semibold text-xs hover:bg-slate-50 transition-all">
-                <Download size={14} /> Download PDF
-              </button>
+            <div className="p-6 border-t border-slate-100 bg-white">
+              {/* Empty footer or could add other actions if needed */}
             </div>
           </motion.div>
         </>

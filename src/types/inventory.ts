@@ -74,4 +74,6 @@ export interface ProfitStats {
   totalCosts: number;
   totalProfit: number;
   profitMargin: number;
+  categoryBreakdown?: Array<{ name: string; revenue: number; profit: number }>;
+  monthlyProfit?: Array<{ month: string; revenue: number; costs: number }>;
 }

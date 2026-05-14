@@ -18,7 +18,7 @@ function FormInput({ label, placeholder, type = "text", name, value, onChange, r
     <div className="flex flex-col gap-1">
 
       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 px-1">
-        {label} {required && <span className="text-slate-400">*</span>}
+        {label} {required && <span className="text-rose-500">*</span>}
       </label>
 
       <input

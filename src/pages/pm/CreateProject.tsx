@@ -123,6 +123,15 @@ function CreateProject() {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
+    
+    if (!form.name.trim()) {
+      setErrorMsg("Project Name is required.");
+      return;
+    }
+    if (!form.client) {
+      setErrorMsg("Client selection is required.");
+      return;
+    }
 
     // Map frontend form fields to PostgreSQL column names
     const payload: any = {

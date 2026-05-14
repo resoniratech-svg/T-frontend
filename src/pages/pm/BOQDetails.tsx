@@ -81,12 +81,7 @@ export default function BOQDetails() {
 
     return (
         <div className="space-y-6 p-6">
-            <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-gray-500 hover:text-brand-600 mb-2 transition-colors"
-            >
-                <ArrowLeft size={16} /> Back
-            </button>
+
 
             <PageHeader showBack
                 title={`BOQ Details: ${boq.boq_number}`}

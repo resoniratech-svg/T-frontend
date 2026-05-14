@@ -12,8 +12,10 @@ import type { Project } from "../../types/project";
 interface FormState {
     name: string;
     client: string;
+    client_id: string;
     budget: string;
     manager: string;
+    manager_id: string;
     status: string;
     description: string;
     startDate: string;
@@ -29,8 +31,10 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
     const [form, setForm] = useState<FormState>({
         name: project.name || project.projectName || "",
         client: project.client || project.clientName || "",
+        client_id: project.clientId || project.client_id || "",
         budget: String(project.budget || project.value || ""),
         manager: project.manager || "",
+        manager_id: project.managerId || project.manager_id || "",
         status: project.status || "CREATED",
         description: project.description || "",
         startDate: project.startDate || "",
@@ -40,8 +44,8 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
 
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const [uploadedDoc, setUploadedDoc] = useState<string | null>(null);
-    const [docFileName, setDocFileName] = useState<string | null>(null);
+    const [uploadedDoc, setUploadedDoc] = useState<string | null>(project.uploadedDocument || null);
+    const [docFileName, setDocFileName] = useState<string | null>(project.uploadedDocument ? "Existing Document" : null);
 
     const updateMutation = useMutation({
         mutationFn: (data: any) => projectService.updateProject(id, data),
@@ -86,12 +90,23 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
         setErrorMsg(null);
         setSuccessMsg(null);
 
+        if (!form.name.trim()) {
+            setErrorMsg("Project Name is required.");
+            return;
+        }
+        if (!form.client) {
+            setErrorMsg("Client selection is required.");
+            return;
+        }
+
         // Map frontend form fields to PostgreSQL column names
         const payload: any = {
             project_name: form.name,
             client_name: form.client,
+            client_id: form.client_id || null,
             contract_value: parseFloat(String(form.budget).replace(/[^0-9.]/g, "")) || 0,
             manager: form.manager || null,
+            manager_id: form.manager_id || null,
             status: form.status || null,
             description: form.description || null,
             start_date: form.startDate || null,
@@ -99,9 +114,7 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
             division: form.division || null,
         };
 
-        if (uploadedDoc) {
-            payload.uploaded_document = uploadedDoc;
-        }
+        payload.uploaded_document = uploadedDoc || null;
 
         updateMutation.mutate(payload);
     };
@@ -124,7 +137,7 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
-                        <label className="block text-sm font-medium mb-1 text-gray-700">Project Name</label>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">Project Name <span className="text-rose-500">*</span></label>
                         <input
                             name="name"
                             value={form.name}
@@ -134,10 +147,10 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">Client</label>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">Client <span className="text-rose-500">*</span></label>
                         <ClientAutocomplete
                             value={form.client}
-                            onChange={(name) => setForm({ ...form, client: name })}
+                            onChange={(name, id) => setForm({ ...form, client: name, client_id: id || "" })}
                             division={form.division === "service" ? "business" : form.division}
                             placeholder="Search client..."
                         />
@@ -156,7 +169,7 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
                         <label className="block text-sm font-medium mb-1 text-gray-700">Project Manager</label>
                         <ManagerAutocomplete
                             value={form.manager}
-                            onChange={(name) => setForm({ ...form, manager: name })}
+                            onChange={(name, id) => setForm({ ...form, manager: name, manager_id: id || "" })}
                             division={form.division === "service" ? "business" : form.division}
                             placeholder="Search manager..."
                         />
