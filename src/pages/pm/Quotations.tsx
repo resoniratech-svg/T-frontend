@@ -118,6 +118,7 @@ function Quotations() {
             </span>
         ),
         "Amount": `QAR ${Number(item.total_amount || item.netTotal || item.amount || 0).toLocaleString()}`,
+        "Start Date": item.start_date ? item.start_date.split('-').reverse().join('/') : "-",
         "Expiry Date": item.valid_until ? new Date(item.valid_until).toLocaleDateString() : "-",
         "Approval": <ApprovalBadge status={item.status || "pending"} />,
         "Actions": (
@@ -199,7 +200,7 @@ function Quotations() {
   const typeLabel = activeTab === "quotations" ? "Quotations" : "Invoices";
   const currentTitle = activeDivision === "all" ? `All ${typeLabel}` : `${currentDivision?.label} ${typeLabel}`;
 
-  const quoteColumns = ["Quote ID", "Project", "Client", "Sector", "Amount", "Approval", "Expiry Date", "Actions"];
+  const quoteColumns = ["Quote ID", "Project", "Client", "Sector", "Amount", "Approval", "Start Date", "Expiry Date", "Actions"];
   const invoiceColumns = ["Invoice No", "Client", "Sector", "Ref Type", "Ref No", "Amount", "Status", "Approval", "Date", "Actions"];
 
   return (

@@ -126,7 +126,7 @@ export default function CreateQuotation() {
                 customerCode: found.client_id?.toString() || "",
                 quoteId: found.qtn_number || "",
                 status: found.status || found.Status || prev.status,
-                date: found.created_at ? new Date(found.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                date: found.start_date || (found.created_at ? new Date(found.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]),
                 discount: found.discount != null ? Number(found.discount) : 0,
                 aboutUs: found.aboutUs || prev.aboutUs,
                 whatWeDo: found.whatWeDo || prev.whatWeDo,
@@ -242,6 +242,7 @@ export default function CreateQuotation() {
             client_name: form.client,
             project_name: form.project,
             discount: Number(form.discount),
+            start_date: form.date,
             valid_until: new Date(new Date(form.date).getTime() + 15 * 24 * 60 * 60 * 1000).toISOString(),
             terms: form.financialTerms + "\n" + form.paymentTerms
         };
@@ -308,7 +309,7 @@ export default function CreateQuotation() {
                                 disabled 
                                 className={!form.quoteId ? "text-emerald-600 font-bold italic" : ""} 
                             />
-                            <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required min={todayStr} />
+                            <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required />
                             
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection <span className="text-rose-500">*</span></label>

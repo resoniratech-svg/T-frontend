@@ -81,7 +81,16 @@ function BOQ() {
         ),
         "Client": item.client_name,
         "Total Amount": `QAR ${Number(item.total_amount).toLocaleString()}`,
-        "Date": new Date(item.date).toLocaleDateString(),
+        "Date": item.date ? (() => {
+          // If the backend sends YYYY-MM-DD, we just format it to DD/MM/YYYY
+          if (item.date.includes('-') && !item.date.includes('T')) {
+            const [y, m, d] = item.date.split('-');
+            return `${d}/${m}/${y}`;
+          }
+          // Fallback for full timestamps
+          const d = new Date(item.date);
+          return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+        })() : "N/A",
         "Status": <StatusBadge status={item.status} />,
         "Actions": (
           <div className="flex gap-2">

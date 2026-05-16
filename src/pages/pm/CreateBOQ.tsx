@@ -67,7 +67,7 @@ export default function CreateBOQ() {
                 client_id: boq.client_id?.toString() || "",
                 status: boq.status || boq.Status || "UNPAID",
                 totalAmount: boq.total_amount?.toString() || "0",
-                date: boq.date ? new Date(boq.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+                date: boq.date ? boq.date.split('T')[0] : new Date().toISOString().split('T')[0]
             });
             setItems(boq.items || []);
             if (boq.sector) {
