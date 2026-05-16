@@ -268,7 +268,6 @@ export default function CreateBOQ() {
                             name="date"
                             value={form.date}
                             onChange={handleChange}
-                            min={todayStr}
                         />
                     </div>
 
