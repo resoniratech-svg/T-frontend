@@ -99,7 +99,7 @@ export default function CreateInvoice() {
                 refType: dataObj.ref_type || dataObj.refType || "General",
                 refNo: dataObj.ref_no || dataObj.refNo || "",
                 date: dataObj.invoice_date ? dataObj.invoice_date.split('T')[0] : (dataObj.date || new Date().toISOString().split("T")[0]),
-                creditTerms: dataObj.creditTerms || Number(dataObj.payment_terms) || 0,
+                creditTerms: Number(dataObj.credit_terms) || 0,
                 dueDate: dataObj.due_date ? dataObj.due_date.split('T')[0] : (dataObj.dueDate || ""),
                 status: dataObj.status || "Unpaid",
                 taxRate: Number(dataObj.tax_rate) || dataObj.taxRate || 0,
@@ -282,11 +282,6 @@ export default function CreateInvoice() {
         const isApproved = user?.role === "SUPER_ADMIN";
         let invoiceStatus: InvoiceStatus = form.status || "Unpaid";
         
-        // Auto-update if balance is 0 and they didn't explicitly set it
-        if (totals.balance <= 0 && invoiceStatus !== "Paid") {
-            invoiceStatus = "Paid";
-        }
-
         const invoiceData: any = {
             invoice_number: isEditing ? form.invoiceNo : "",
             division: form.division,
@@ -311,6 +306,7 @@ export default function CreateInvoice() {
             advance: form.advance,
             notes: form.notes,
             payment_terms: form.paymentTerms,
+            credit_terms: form.creditTerms,
             items: items.map(item => ({
                 description: item.description,
                 quantity: item.quantity,

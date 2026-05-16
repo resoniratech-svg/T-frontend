@@ -129,6 +129,15 @@ function CreateExpense() {
 
   useEffect(() => {
     if (dbExpense) {
+      console.log("[CreateExpense] Syncing form with dbExpense:", dbExpense);
+      
+      const allocationsMap = (dbExpense.allocations || []).reduce((acc: any, curr: any) => {
+        if (curr && curr.division) {
+          acc[curr.division.toLowerCase()] = Number(curr.percentage) || 0;
+        }
+        return acc;
+      }, { contracting: 0, trading: 0, service: 0 });
+
       setForm(prev => ({
         ...prev,
         expenseName: dbExpense.description || "",
@@ -143,12 +152,9 @@ function CreateExpense() {
         date: dbExpense.date ? new Date(dbExpense.date).toISOString().split('T')[0] : prev.date,
         attachment: dbExpense.attachment || "",
         notes: dbExpense.notes || "",
-        allocationType: dbExpense.allocation_type || "SINGLE",
-        allocations: dbExpense.allocations?.reduce((acc: any, curr: any) => {
-          acc[curr.division.toLowerCase()] = Number(curr.percentage) || 0;
-          return acc;
-        }, { contracting: 0, trading: 0, service: 0 }),
-        approvalStatus: dbExpense.approval_status?.toLowerCase() === "pending_approval" ? "pending" : dbExpense.approval_status?.toLowerCase()
+        allocationType: dbExpense.allocation_type === "SMART" ? "SMART" : "SINGLE",
+        allocations: allocationsMap,
+        approvalStatus: dbExpense.approval_status?.toLowerCase() === "pending_approval" ? "pending" : (dbExpense.approval_status?.toLowerCase() || "pending")
       }));
     }
   }, [dbExpense]);
@@ -561,12 +567,30 @@ function CreateExpense() {
                 Attach Bills / Receipts
               </label>
               <FileUploader 
-                onUpload={(files: any[]) => {
-                  if (files.length > 0) {
-                    setForm(prev => ({ ...prev, attachment: files[0].name }));
+                onUpload={(_files: any[], urls: string[]) => {
+                  if (urls.length > 0) {
+                    setForm(prev => ({ ...prev, attachment: urls[0] }));
                   }
                 }}
               />
+              
+              {form.attachment && (
+                <div className="mt-3 flex items-center justify-between p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-emerald-600">📎</span>
+                    <span className="text-xs font-medium text-emerald-700 truncate max-w-[200px]">
+                      {form.attachment.split('/').pop()}
+                    </span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setForm(prev => ({ ...prev, attachment: "" }))}
+                    className="text-xs font-bold text-rose-500 hover:text-rose-700 uppercase"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
             </div>
             <FormTextarea
               label="Notes"

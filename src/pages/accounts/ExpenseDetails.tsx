@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Tag, CreditCard, FileText, Paperclip, ExternalLink
 import { downloadMockFile } from "../../utils/exportUtils";
 import { useQuery } from "@tanstack/react-query";
 import { financeService } from "../../services/financeService";
+import { getUploadUrl } from "../../services/api";
 
 import type { Expense } from "../../types/finance";
 
@@ -189,8 +190,8 @@ export default function ExpenseDetails() {
                                     <Paperclip size={18} className="text-brand-600 shrink-0" />
                                     <span className="text-[11px] font-bold text-brand-700 truncate">{expense.attachment}</span>
                                 </div>
-                                <button onClick={() => setShowImage(true)} className="w-full py-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
-                                    <ExternalLink size={14} /> Open Document
+                                <button onClick={() => setShowImage(true)} className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-200">
+                                    <FileText size={14} /> View Attachment
                                 </button>
                             </div>
                         ) : (
@@ -232,12 +233,27 @@ export default function ExpenseDetails() {
                     <div className="max-w-4xl max-h-full bg-slate-800 rounded-lg border border-white/10 flex flex-col items-center justify-center p-20 gap-8">
                          <Paperclip size={120} className="text-white/20" />
                          <div className="text-center space-y-2">
-                             <h4 className="text-2xl font-black text-white tracking-tight">{expense.attachment}</h4>
+                             <h4 className="text-2xl font-black text-white tracking-tight">{expense.attachment?.split('/').pop()}</h4>
                              <p className="text-white/40 font-medium">Document attached to {expense.id}</p>
                          </div>
-                         <button onClick={() => downloadMockFile(`${expense.attachment || "receipt"}-mock.txt`, "Mock data: In production, this will download the cloud-hosted AWS S3 file.")} className="px-8 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-brand-50 transition-all active:scale-95">
-                             Download Original File
-                         </button>
+                         {(() => {
+                            const rawPath = expense.attachment || "";
+                            const pathWithUploads = rawPath.startsWith('http') ? rawPath : (rawPath.startsWith('/uploads') ? rawPath : `/uploads/${rawPath}`);
+                            const fileUrl = getUploadUrl(pathWithUploads);
+                            const fileName = rawPath.split('/').pop() || "attachment.docx";
+                            
+                            return (
+                                <a 
+                                    href={fileUrl}
+                                    download={fileName}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-8 py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-all active:scale-95 shadow-xl shadow-brand-500/20 flex items-center gap-2 no-underline"
+                                >
+                                    <FileText size={18} /> Download Original File
+                                </a>
+                            );
+                         })()}
                     </div>
                 </div>
             )}
