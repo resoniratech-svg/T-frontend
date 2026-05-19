@@ -135,12 +135,14 @@ export default function ClientQuotations() {
                   >
                     <Eye size={14} /> Review
                   </Link>
-                  <button 
-                    onClick={() => downloadMockFile(`${prop.qtn_number}.pdf`, `Quotation: ${prop.qtn_number}`)} 
+                  <a 
+                    href={`/quotation-details/${prop.id}?print=true`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 text-[10px] font-bold rounded-xl transition-all"
                   >
                     <Download size={14} /> PDF
-                  </button>
+                  </a>
 
                   {(() => {
                     const s = (prop.status || "").toUpperCase();

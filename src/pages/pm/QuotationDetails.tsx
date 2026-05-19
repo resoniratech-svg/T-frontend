@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer, Edit } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
@@ -19,6 +20,16 @@ export default function QuotationDetails() {
         queryFn: () => quotationService.getQuotation(id!),
         enabled: !!id
     });
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get("print") === "true" && !isLoading && rawQuotation) {
+            const timer = setTimeout(() => {
+                window.print();
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading, rawQuotation]);
 
     if (isLoading) return <div className="p-6 text-center text-slate-500">Loading quotation details...</div>;
     

@@ -69,7 +69,17 @@ function CreditRequests() {
       })}`,
       Reason: cr.reason || "N/A",
       Status: <ApprovalBadge status={cr.approval_status || cr.approvalStatus || "pending"} />,
-      Date: cr.created_at || cr.createdAt ? new Date(cr.created_at || cr.createdAt).toLocaleDateString() : "N/A",
+      Date: cr.request_date || cr.requestDate 
+        ? (() => {
+            const dateVal = cr.request_date || cr.requestDate;
+            if (typeof dateVal === 'string' && dateVal.includes('-') && !dateVal.includes('T')) {
+              const [y, m, d] = dateVal.split('-');
+              return `${d}/${m}/${y}`;
+            }
+            const d = new Date(dateVal);
+            return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+          })()
+        : (cr.created_at || cr.createdAt ? new Date(cr.created_at || cr.createdAt).toLocaleDateString() : "N/A"),
       Notes: cr.notes || "—",
       Actions: (
         <div className="flex gap-2 items-center">
@@ -322,9 +332,17 @@ function CreditRequests() {
                     Date
                   </p>
                   <p className="text-sm text-gray-700 mt-1">
-                    {viewingCR.created_at || viewingCR.createdAt
-                      ? new Date(viewingCR.created_at || viewingCR.createdAt).toLocaleString()
-                      : "N/A"}
+                    {viewingCR.request_date || viewingCR.requestDate 
+                      ? (() => {
+                          const dateVal = viewingCR.request_date || viewingCR.requestDate;
+                          if (typeof dateVal === 'string' && dateVal.includes('-') && !dateVal.includes('T')) {
+                            const [y, m, d] = dateVal.split('-');
+                            return `${d}/${m}/${y}`;
+                          }
+                          const d = new Date(dateVal);
+                          return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+                        })()
+                      : (viewingCR.created_at || viewingCR.createdAt ? new Date(viewingCR.created_at || viewingCR.createdAt).toLocaleDateString() : "N/A")}
                   </p>
                 </div>
               </div>

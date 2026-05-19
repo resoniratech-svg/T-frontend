@@ -58,7 +58,10 @@ function Expenses() {
     // Map backend expense fields array to frontend objects
     const persisted: any[] = dbExpenses.map((dbExp: any) => ({
       id: dbExp.id,
-      date: dbExp.date ? new Date(dbExp.date).toISOString().split('T')[0] : "",
+      date: dbExp.date ? (() => {
+        const d = new Date(dbExp.date);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      })() : "",
       expenseName: dbExp.description,
       category: dbExp.category,
       amount: dbExp.total_amount,

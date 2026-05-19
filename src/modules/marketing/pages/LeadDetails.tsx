@@ -17,47 +17,30 @@ const LeadDetails: React.FC = () => {
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [newNote, setNewNote] = useState('');
 
-  useEffect(() => {
-    const fetchLead = async () => {
-      if (!id) return;
-      try {
-        const data = await leadService.getLead(id);
-        if (data) setLead(data);
-      } catch (error) {
-        console.error("Failed to fetch lead details", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchLead();
+  const fetchLead = React.useCallback(async () => {
+    if (!id) return;
+    try {
+      const data = await leadService.getLead(id);
+      if (data) setLead(data);
+    } catch (error) {
+      console.error("Failed to fetch lead details", error);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
-  const handleUpdateStatus = async (status: LeadStatus) => {
-    if (!lead) return;
-    try {
-      const updated = await leadService.updateLead(lead.id, { status });
-      setLead(updated);
-    } catch (error) {
-      console.error("Failed to update status", error);
-    }
-  };
+  useEffect(() => {
+    fetchLead();
+  }, [fetchLead]);
 
   const handleAddFollowUp = async () => {
     if (!lead || !newNote.trim()) return;
-    const newFollowUp: FollowUp = {
-      id: Math.random().toString(36).substr(2, 9),
-      date: new Date().toISOString().split('T')[0],
-      notes: newNote,
-      type: 'Note'
-    };
     
     try {
-      const updated = await leadService.updateLead(lead.id, { 
-        followUps: [newFollowUp, ...lead.followUps] 
-      });
-      setLead(updated);
+      await leadService.addFollowUp(lead.id, newNote);
       setNewNote('');
       setShowFollowUpForm(false);
+      fetchLead();
     } catch (error) {
       console.error("Failed to add follow-up", error);
     }
@@ -207,37 +190,6 @@ const LeadDetails: React.FC = () => {
                   <p className="text-gray-400 text-sm italic">No interactions recorded yet.</p>
                 </div>
               )}
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-6">Quick Actions</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button 
-                onClick={() => handleUpdateStatus('Follow-up')}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-yellow-100 bg-yellow-50/50 hover:bg-yellow-50 transition-all group"
-              >
-                <Clock className="text-yellow-600 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-yellow-700">Set Follow-up</span>
-              </button>
-              <button 
-                onClick={() => handleUpdateStatus('Converted')}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-green-100 bg-green-50/50 hover:bg-green-50 transition-all group"
-              >
-                <CheckCircle2 className="text-green-600 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-green-700">Mark Converted</span>
-              </button>
-              <button 
-                onClick={() => handleUpdateStatus('Lost')}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-red-100 bg-red-50/50 hover:bg-red-50 transition-all group"
-              >
-                <Trash2 className="text-red-600 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-red-700">Mark Lost</span>
-              </button>
-              <button className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-gray-100 transition-all group opacity-50 cursor-not-allowed">
-                <MoreHorizontal className="text-gray-400" />
-                <span className="text-xs font-semibold text-gray-500">More</span>
-              </button>
             </div>
           </div>
         </div>

@@ -71,6 +71,7 @@ interface ExpenseForm {
     trading: number;
     service: number;
   };
+  approvalStatus?: string;
 }
 
 function CreateExpense() {
@@ -149,7 +150,10 @@ function CreateExpense() {
         taxAmount: Number(dbExpense.tax_amount) || 0,
         vendor: dbExpense.vendor || "",
         paymentMethod: dbExpense.payment_method || "",
-        date: dbExpense.date ? new Date(dbExpense.date).toISOString().split('T')[0] : prev.date,
+        date: dbExpense.date ? (() => {
+          const d = new Date(dbExpense.date);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        })() : prev.date,
         attachment: dbExpense.attachment || "",
         notes: dbExpense.notes || "",
         allocationType: dbExpense.allocation_type === "SMART" ? "SMART" : "SINGLE",

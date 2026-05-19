@@ -23,6 +23,11 @@ export const leadService = {
     return resData.data || resData;
   },
 
+  addFollowUp: async (id: string, note: string, nextFollowUpDate?: string): Promise<any> => {
+    const { data } = await api.post(`/leads/${id}/follow-up`, { note, next_follow_up_date: nextFollowUpDate });
+    return data.data || data;
+  },
+
   deleteLead: async (id: string): Promise<{ success: boolean }> => {
     const { data } = await api.delete(`/leads/${id}`);
     return data.data || data;

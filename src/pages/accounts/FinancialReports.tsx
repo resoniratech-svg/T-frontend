@@ -77,14 +77,35 @@ function FinancialReports() {
         fetchData();
     }, []);
 
+    // Helper to get local date representation timezone-safely
+    const getLocalDateString = (dateVal: any): string => {
+        if (!dateVal) return "";
+        if (typeof dateVal === 'string') {
+            if (dateVal.includes('T')) {
+                return dateVal.split('T')[0];
+            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+                return dateVal;
+            }
+        }
+        const d = new Date(dateVal);
+        if (isNaN(d.getTime())) return "";
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
     // Filtered data helpers
     const filterByDate = (items: any[], dateField: string) => {
         return items.filter((item) => {
             const itemDate = item[dateField] || item.invoice_date || item.created_at || item.date;
-            const d = new Date(itemDate);
-            if (isNaN(d.getTime())) return false;
-            if (d.getFullYear() !== filterYear) return false;
-            if (filterMonth !== "all" && d.getMonth() !== filterMonth) return false;
+            const dString = getLocalDateString(itemDate);
+            if (!dString) return false;
+
+            const [yStr, mStr] = dString.split('-');
+            const yearNum = parseInt(yStr);
+            const monthIdx = parseInt(mStr) - 1;
+
+            if (yearNum !== filterYear) return false;
+            if (filterMonth !== "all" && monthIdx !== filterMonth) return false;
             
             // Global Division Filter
             if (activeDivision !== "all") {
@@ -94,8 +115,8 @@ function FinancialReports() {
                 if (branch !== mappedDivision && branch !== activeLower) return false;
             }
             
-            if (filterDateFrom && d < new Date(filterDateFrom)) return false;
-            if (filterDateTo && d > new Date(filterDateTo + "T23:59:59")) return false;
+            if (filterDateFrom && dString < filterDateFrom) return false;
+            if (filterDateTo && dString > filterDateTo) return false;
             return true;
         });
     };
@@ -143,28 +164,64 @@ function FinancialReports() {
             const mIncome = invoices
                 .filter((i) => {
                     const itemDate = i.invoice_date || i.date || i.created_at;
-                    const d = new Date(itemDate);
+                    const dString = getLocalDateString(itemDate);
+                    if (!dString) return false;
+
+                    const [yStr, mStr] = dString.split('-');
+                    const yearNum = parseInt(yStr);
+                    const monthIdx = parseInt(mStr) - 1;
+
                     const iBranch = (i.branch || i.division || "").toLowerCase();
                     const stat = (i.approval_status || i.approvalStatus || i.status || "").toLowerCase();
-                    return d.getFullYear() === filterYear && d.getMonth() === idx &&
-                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower) &&
-                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
+
+                    const matchesDate = yearNum === filterYear && monthIdx === idx;
+                    if (!matchesDate) return false;
+
+                    const matchesDivision = activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower;
+                    if (!matchesDivision) return false;
+
+                    const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                    if (!matchesStatus) return false;
+
+                    // Apply From/To filters if present
+                    if (filterDateFrom && dString < filterDateFrom) return false;
+                    if (filterDateTo && dString > filterDateTo) return false;
+
+                    return true;
                 })
                 .reduce((s, i) => s + parseFloat(i.total_amount || i.total || i.amount || 0), 0);
             const mExpense = expenses
                 .filter((e) => {
                     const itemDate = e.date || e.created_at;
-                    const d = new Date(itemDate);
+                    const dString = getLocalDateString(itemDate);
+                    if (!dString) return false;
+
+                    const [yStr, mStr] = dString.split('-');
+                    const yearNum = parseInt(yStr);
+                    const monthIdx = parseInt(mStr) - 1;
+
                     const eBranch = (e.branch || e.division || "general").toLowerCase();
                     const stat = (e.approval_status || e.approvalStatus || e.status || "").toLowerCase();
-                    return d.getFullYear() === filterYear && d.getMonth() === idx &&
-                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower) &&
-                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
+
+                    const matchesDate = yearNum === filterYear && monthIdx === idx;
+                    if (!matchesDate) return false;
+
+                    const matchesDivision = activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower;
+                    if (!matchesDivision) return false;
+
+                    const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                    if (!matchesStatus) return false;
+
+                    // Apply From/To filters if present
+                    if (filterDateFrom && dString < filterDateFrom) return false;
+                    if (filterDateTo && dString > filterDateTo) return false;
+
+                    return true;
                 })
                 .reduce((s, e) => s + parseFloat(e.amount || 0), 0);
             return { name, Income: mIncome, Expenses: mExpense, Profit: mIncome - mExpense };
         });
-    }, [invoices, expenses, filterYear, activeDivision]);
+    }, [invoices, expenses, filterYear, activeDivision, filterDateFrom, filterDateTo]);
 
     // Division breakdown
     const divisionData = useMemo(() => {
@@ -207,28 +264,66 @@ function FinancialReports() {
             const dayIncome = invoices
                 .filter((inv) => {
                     const itemDate = inv.invoice_date || inv.date || inv.created_at;
-                    const d = new Date(itemDate);
+                    const dString = getLocalDateString(itemDate);
+                    if (!dString) return false;
+
+                    const [yStr, mStr, dStrPart] = dString.split('-');
+                    const yearNum = parseInt(yStr);
+                    const monthIdx = parseInt(mStr) - 1;
+                    const dayNum = parseInt(dStrPart);
+
                     const iBranch = (inv.branch || inv.division || "").toLowerCase();
                     const stat = (inv.approval_status || inv.approvalStatus || inv.status || "").toLowerCase();
-                    return d.getFullYear() === filterYear && d.getMonth() === targetMonth && d.getDate() === day &&
-                        (activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower) &&
-                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
+                    
+                    const matchesDate = yearNum === filterYear && monthIdx === targetMonth && dayNum === day;
+                    if (!matchesDate) return false;
+
+                    const matchesDivision = activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower;
+                    if (!matchesDivision) return false;
+
+                    const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                    if (!matchesStatus) return false;
+
+                    // Apply From/To filters if present
+                    if (filterDateFrom && dString < filterDateFrom) return false;
+                    if (filterDateTo && dString > filterDateTo) return false;
+
+                    return true;
                 })
                 .reduce((s, inv) => s + parseFloat(inv.total_amount || inv.total || inv.amount || 0), 0);
             const dayExpense = expenses
                 .filter((exp) => {
                     const itemDate = exp.date || exp.created_at;
-                    const d = new Date(itemDate);
+                    const dString = getLocalDateString(itemDate);
+                    if (!dString) return false;
+
+                    const [yStr, mStr, dStrPart] = dString.split('-');
+                    const yearNum = parseInt(yStr);
+                    const monthIdx = parseInt(mStr) - 1;
+                    const dayNum = parseInt(dStrPart);
+
                     const eBranch = (exp.branch || exp.division || "general").toLowerCase();
                     const stat = (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase();
-                    return d.getFullYear() === filterYear && d.getMonth() === targetMonth && d.getDate() === day &&
-                        (activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower) &&
-                        (stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval");
+                    
+                    const matchesDate = yearNum === filterYear && monthIdx === targetMonth && dayNum === day;
+                    if (!matchesDate) return false;
+
+                    const matchesDivision = activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower;
+                    if (!matchesDivision) return false;
+
+                    const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                    if (!matchesStatus) return false;
+
+                    // Apply From/To filters if present
+                    if (filterDateFrom && dString < filterDateFrom) return false;
+                    if (filterDateTo && dString > filterDateTo) return false;
+
+                    return true;
                 })
                 .reduce((s, exp) => s + parseFloat(exp.amount || 0), 0);
             return { name: dayStr, Income: dayIncome, Expenses: dayExpense };
         });
-    }, [invoices, expenses, filterYear, filterMonth, activeDivision]);
+    }, [invoices, expenses, filterYear, filterMonth, activeDivision, filterDateFrom, filterDateTo]);
 
     // Expense category breakdown
     const categoryPieData = useMemo(() => {

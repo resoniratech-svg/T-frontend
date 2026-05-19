@@ -58,6 +58,9 @@ function CreditRequest() {
               clientId: String(existing.client_id),
               clientName: existing.client_name || "",
               requestedLimit: String(existing.amount),
+              requestDate: existing.request_date 
+                ? (typeof existing.request_date === 'string' ? existing.request_date.split('T')[0] : new Date(existing.request_date).toISOString().split('T')[0]) 
+                : new Date().toLocaleDateString('en-CA'),
               reason: existing.reason || "",
               notes: existing.notes || "",
               approvalStatus: existing.approval_status || "pending",
@@ -98,12 +101,6 @@ function CreditRequest() {
         setLimitError('Only numbers are allowed');
       }
       return;
-    }
-
-    // Block past dates
-    if (name === 'requestDate' && value) {
-      const today = new Date(); today.setHours(0,0,0,0);
-      if (new Date(value) < today) return;
     }
 
     setForm({ ...form, [name]: value });
@@ -268,7 +265,6 @@ function CreditRequest() {
                 name="requestDate"
                 value={form.requestDate}
                 onChange={handleChange}
-                min={new Date().toLocaleDateString('en-CA')}
                 required
               />
 
@@ -363,7 +359,17 @@ function CreditRequest() {
                 {recentRequests.map((req: any, i: number) => (
                   <tr key={req.id || i} className="hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-4 text-slate-600">
-                      {req.created_at || req.createdAt ? new Date(req.created_at || req.createdAt).toLocaleDateString() : "N/A"}
+                      {req.request_date || req.requestDate 
+                        ? (() => {
+                            const dateVal = req.request_date || req.requestDate;
+                            if (typeof dateVal === 'string' && dateVal.includes('-') && !dateVal.includes('T')) {
+                              const [y, m, d] = dateVal.split('-');
+                              return `${d}/${m}/${y}`;
+                            }
+                            const d = new Date(dateVal);
+                            return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+                          })()
+                        : (req.created_at || req.createdAt ? new Date(req.created_at || req.createdAt).toLocaleDateString() : "N/A")}
                     </td>
                     <td className="py-3 px-4 font-medium text-slate-800">
                       {req.client_name || req.clientName}
