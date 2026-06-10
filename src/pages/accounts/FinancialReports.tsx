@@ -93,6 +93,27 @@ function FinancialReports() {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     };
 
+    // Helper to get all dates between two date strings timezone-safely
+    const getDatesInRange = (startDateStr: string, endDateStr: string) => {
+        const dates = [];
+        const [sYear, sMonth, sDay] = startDateStr.split('-').map(Number);
+        const [eYear, eMonth, eDay] = endDateStr.split('-').map(Number);
+        
+        const start = new Date(sYear, sMonth - 1, sDay);
+        const end = new Date(eYear, eMonth - 1, eDay);
+        
+        if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
+            return [];
+        }
+
+        const current = new Date(start);
+        while (current <= end && dates.length <= 100) {
+            dates.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+        return dates;
+    };
+
     // Filtered data helpers
     const filterByDate = (items: any[], dateField: string) => {
         return items.filter((item) => {
@@ -104,9 +125,6 @@ function FinancialReports() {
             const yearNum = parseInt(yStr);
             const monthIdx = parseInt(mStr) - 1;
 
-            if (yearNum !== filterYear) return false;
-            if (filterMonth !== "all" && monthIdx !== filterMonth) return false;
-            
             // Global Division Filter
             if (activeDivision !== "all") {
                 const branch = (item.branch || item.referenceType || item.division || "general").toLowerCase();
@@ -114,9 +132,14 @@ function FinancialReports() {
                 const mappedDivision = activeLower === "service" ? "business" : activeLower;
                 if (branch !== mappedDivision && branch !== activeLower) return false;
             }
-            
-            if (filterDateFrom && dString < filterDateFrom) return false;
-            if (filterDateTo && dString > filterDateTo) return false;
+
+            if (filterDateFrom || filterDateTo) {
+                if (filterDateFrom && dString < filterDateFrom) return false;
+                if (filterDateTo && dString > filterDateTo) return false;
+            } else {
+                if (yearNum !== filterYear) return false;
+                if (filterMonth !== "all" && monthIdx !== filterMonth) return false;
+            }
             return true;
         });
     };
@@ -254,10 +277,56 @@ function FinancialReports() {
 
     // Day-wise data for current month
     const dayWiseData = useMemo(() => {
-        const targetMonth = filterMonth !== "all" ? filterMonth : new Date().getMonth();
-        const daysInMonth = new Date(filterYear, targetMonth + 1, 0).getDate();
         const activeLower = activeDivision.toLowerCase();
         const mappedDivision = activeLower === "service" ? "business" : activeLower;
+
+        if (filterDateFrom && filterDateTo) {
+            const dateRange = getDatesInRange(filterDateFrom, filterDateTo);
+            return dateRange.map((dateObj) => {
+                const dString = getLocalDateString(dateObj);
+                const dayStr = dateObj.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                
+                const dayIncome = invoices
+                    .filter((inv) => {
+                        const itemDate = inv.invoice_date || inv.date || inv.created_at;
+                        const invDateString = getLocalDateString(itemDate);
+                        if (invDateString !== dString) return false;
+
+                        const iBranch = (inv.branch || inv.division || "").toLowerCase();
+                        const stat = (inv.approval_status || inv.approvalStatus || inv.status || "").toLowerCase();
+                        
+                        const matchesDivision = activeDivision === "all" || iBranch === mappedDivision || iBranch === activeLower;
+                        if (!matchesDivision) return false;
+
+                        const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                        return matchesStatus;
+                    })
+                    .reduce((s, inv) => s + parseFloat(inv.total_amount || inv.total || inv.amount || 0), 0);
+
+                const dayExpense = expenses
+                    .filter((exp) => {
+                        const itemDate = exp.date || exp.created_at;
+                        const expDateString = getLocalDateString(itemDate);
+                        if (expDateString !== dString) return false;
+
+                        const eBranch = (exp.branch || exp.division || "general").toLowerCase();
+                        const stat = (exp.approval_status || exp.approvalStatus || exp.status || "").toLowerCase();
+
+                        const matchesDivision = activeDivision === "all" || eBranch === mappedDivision || eBranch === activeLower;
+                        if (!matchesDivision) return false;
+
+                        const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
+                        return matchesStatus;
+                    })
+                    .reduce((s, exp) => s + parseFloat(exp.amount || 0), 0);
+
+                return { name: dayStr, Income: dayIncome, Expenses: dayExpense };
+            });
+        }
+
+        const targetMonth = filterMonth !== "all" ? filterMonth : new Date().getMonth();
+        const daysInMonth = new Date(filterYear, targetMonth + 1, 0).getDate();
+        
         return Array.from({ length: daysInMonth }, (_, i) => {
             const day = i + 1;
             const dayStr = `${day}`;
@@ -282,13 +351,7 @@ function FinancialReports() {
                     if (!matchesDivision) return false;
 
                     const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
-                    if (!matchesStatus) return false;
-
-                    // Apply From/To filters if present
-                    if (filterDateFrom && dString < filterDateFrom) return false;
-                    if (filterDateTo && dString > filterDateTo) return false;
-
-                    return true;
+                    return matchesStatus;
                 })
                 .reduce((s, inv) => s + parseFloat(inv.total_amount || inv.total || inv.amount || 0), 0);
             const dayExpense = expenses
@@ -312,13 +375,7 @@ function FinancialReports() {
                     if (!matchesDivision) return false;
 
                     const matchesStatus = stat !== "draft" && stat !== "cancelled" && stat !== "pending" && stat !== "pending_approval";
-                    if (!matchesStatus) return false;
-
-                    // Apply From/To filters if present
-                    if (filterDateFrom && dString < filterDateFrom) return false;
-                    if (filterDateTo && dString > filterDateTo) return false;
-
-                    return true;
+                    return matchesStatus;
                 })
                 .reduce((s, exp) => s + parseFloat(exp.amount || 0), 0);
             return { name: dayStr, Income: dayIncome, Expenses: dayExpense };
@@ -434,7 +491,12 @@ function FinancialReports() {
                 <div className="space-y-6">
                     <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
                         <h3 className="text-lg font-bold text-gray-800 mb-1">Day-wise Report</h3>
-                        <p className="text-sm text-slate-400 mb-6">{filterMonth !== "all" ? MONTHS[filterMonth as number] : MONTHS[new Date().getMonth()]} {filterYear}</p>
+                        <p className="text-sm text-slate-400 mb-6">
+                            {filterDateFrom && filterDateTo 
+                                ? `${new Date(filterDateFrom).toLocaleDateString()} to ${new Date(filterDateTo).toLocaleDateString()}` 
+                                : `${filterMonth !== "all" ? MONTHS[filterMonth as number] : MONTHS[new Date().getMonth()]} ${filterYear}`
+                            }
+                        </p>
                         <div className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={dayWiseData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>

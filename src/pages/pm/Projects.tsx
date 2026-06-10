@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
 import StatusBadge from "../../components/StatusBadge";
-import { Plus, Edit, Trash2, Download, Loader2, Paperclip, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Download, Loader2, Paperclip, FileText, ChevronDown } from "lucide-react";
 import PageLoader from "../../components/PageLoader";
 import { exportToCSV } from "../../utils/exportUtils";
 import { useActivity } from "../../context/ActivityContext";
@@ -16,11 +17,17 @@ function Projects() {
   const queryClient = useQueryClient();
   const { logActivity } = useActivity();
   const { activeDivision } = useDivision();
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // 1. Fetch data using React Query
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["projects", activeDivision],
     queryFn: () => projectService.getProjects(activeDivision),
+  });
+
+  const filteredProjects = projects.filter((p) => {
+    if (statusFilter === "all") return true;
+    return p.status?.toLowerCase() === statusFilter.toLowerCase();
   });
 
   // 2. Delete mutation
@@ -34,7 +41,7 @@ function Projects() {
   });
 
   const handleExport = () => {
-    const dataForExport = projects.map((p) => ({
+    const dataForExport = filteredProjects.map((p) => ({
       "Project Name": p.name || p.projectName,
       "Client": p.client,
       "Sector": p.division,
@@ -78,7 +85,7 @@ function Projects() {
     document.body.removeChild(link);
   };
 
-  const tableData = projects.map((item) => ({
+  const tableData = filteredProjects.map((item) => ({
     ...item,
     "Project": item.name || item.projectName,
     "Client": item.client,
@@ -185,7 +192,27 @@ function Projects() {
         {isLoading ? (
           <PageLoader message="Organizing Project Portfolios..." />
         ) : (
-          <DataTable columns={columns} data={tableData} />
+          <DataTable
+            columns={columns}
+            data={tableData}
+            filters={
+              <div className="relative w-full sm:w-48">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="appearance-none w-full bg-white border border-slate-200 text-slate-600 pl-3 pr-9 py-2 rounded-lg hover:bg-slate-50 transition shadow-sm font-bold text-xs uppercase outline-none cursor-pointer focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                  <ChevronDown size={14} />
+                </div>
+              </div>
+            }
+          />
         )}
       </div>
     </>

@@ -5,9 +5,10 @@ interface Props<T> {
   columns: string[];
   data: T[];
   hideSearch?: boolean;
+  filters?: ReactNode;
   renderActions?: (row: T, index: number) => ReactNode;
 }
-function DataTable<T extends Record<string, any>>({ columns, data, hideSearch, renderActions }: Props<T>) {
+function DataTable<T extends Record<string, any>>({ columns, data, hideSearch, filters, renderActions }: Props<T>) {
   const [search, setSearch] = useState("");
 
   const filteredData = data.filter((row) => {
@@ -26,18 +27,21 @@ function DataTable<T extends Record<string, any>>({ columns, data, hideSearch, r
     <div className="card overflow-hidden">
       {/* Search & Toolbar */}
       <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {!hideSearch && (
-          <div className="flex items-center bg-surface-muted border border-gray-100 px-3 py-2 rounded-lg w-full sm:w-72 focus-within:border-brand-300 focus-within:ring-2 focus-within:ring-brand-50 transition-all">
-            <Search size={15} className="text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search records..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none px-2 text-sm w-full text-gray-700 placeholder:text-gray-400"
-            />
-          </div>
-        )}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
+          {!hideSearch && (
+            <div className="flex items-center bg-surface-muted border border-gray-100 px-3 py-2 rounded-lg w-full sm:w-72 focus-within:border-brand-300 focus-within:ring-2 focus-within:ring-brand-50 transition-all">
+              <Search size={15} className="text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search records..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-transparent outline-none px-2 text-sm w-full text-gray-700 placeholder:text-gray-400"
+              />
+            </div>
+          )}
+          {filters}
+        </div>
         <p className="text-xs text-gray-400 font-medium">
           {filteredData.length} of {data.length} records
         </p>

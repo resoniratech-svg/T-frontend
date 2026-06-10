@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import DataTable from "../../components/DataTable";
 import StatusBadge from "../../components/StatusBadge";
 import ApprovalBadge from "../../components/ApprovalBadge";
-import { Eye, Trash2, Plus, ArrowLeft, Edit, Loader2 } from "lucide-react";
+import { Eye, Trash2, Plus, ArrowLeft, Edit, Loader2, ChevronDown } from "lucide-react";
 import { useActivity } from "../../context/ActivityContext";
 import { useDivision } from "../../context/DivisionContext";
 import { DIVISIONS } from "../../constants/divisions";
@@ -15,6 +16,7 @@ function Invoices() {
     const queryClient = useQueryClient();
     const { logActivity } = useActivity();
     const { activeDivision } = useDivision();
+    const [statusFilter, setStatusFilter] = useState<string>("all");
 
     // 1. Fetch data
     const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
@@ -73,7 +75,12 @@ function Invoices() {
         }
     };
 
-    const tableData = (invoices as any[]).map((invoice) => ({
+    const filteredInvoices = (invoices as any[]).filter((inv) => {
+        if (statusFilter === "all") return true;
+        return inv.status?.toLowerCase() === statusFilter.toLowerCase();
+    });
+
+    const tableData = filteredInvoices.map((invoice) => ({
         ...invoice,
         "Invoice No": invoice.invoice_number || invoice.invoiceNo,
         "Client": invoice.client_name || invoice.company_name || invoice.client || "N/A",
@@ -148,7 +155,27 @@ function Invoices() {
                         <p className="text-sm font-medium">Loading invoices...</p>
                     </div>
                 ) : (
-                    <DataTable columns={columns} data={tableData} />
+                    <DataTable
+                        columns={columns}
+                        data={tableData}
+                        filters={
+                            <div className="relative w-full sm:w-48">
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="appearance-none w-full bg-white border border-slate-200 text-slate-600 pl-3 pr-9 py-2 rounded-lg hover:bg-slate-50 transition shadow-sm font-bold text-xs uppercase outline-none cursor-pointer focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                                >
+                                    <option value="all">All Statuses</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="due">Due</option>
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                                    <ChevronDown size={14} />
+                                </div>
+                            </div>
+                        }
+                    />
                 )}
             </div>
         </div>

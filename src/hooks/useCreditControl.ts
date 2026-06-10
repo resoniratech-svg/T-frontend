@@ -21,6 +21,7 @@ export interface CreditSummary {
   totalCollected: number;
   pendingPayments: number;
   overdueCount: number;
+  dueAmount?: number;
 }
 
 export const useCreditControl = () => {

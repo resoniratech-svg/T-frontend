@@ -10,13 +10,14 @@ import {
   Package,
   BarChart3,
   ClipboardList,
-  Receipt,
   AlertTriangle,
   BarChart2,
   CheckSquare,
   BookOpen,
   ShieldCheck,
-  MessageSquare
+  MessageSquare,
+  Wallet,
+  FileSpreadsheet
 } from "lucide-react";
 import type { Role } from "../types/user";
 import type { LucideIcon } from "lucide-react";
@@ -82,7 +83,7 @@ export const sidebarMenu: SidebarSection[] = [
       {
         label: "Billing&Payments",
         path: "/client/billing",
-        icon: Receipt,
+        icon: CreditCard,
         roles: ["CLIENT"]
       },
       {
@@ -123,7 +124,7 @@ export const sidebarMenu: SidebarSection[] = [
     items: [
       { label: "BOQ", path: "/boq", icon: ClipboardList },
       { label: "Quotations", path: "/quotations", icon: FileText },
-      { label: "Invoices", path: "/invoices", icon: Receipt },
+      { label: "Invoices", path: "/invoices", icon: FileSpreadsheet },
     ],
   },
 
@@ -135,7 +136,7 @@ export const sidebarMenu: SidebarSection[] = [
       { label: "Credit Control", path: "/credit-control", icon: CreditCard },
 
       { label: "Payments", path: "/payments", icon: CreditCard },
-      { label: "Expenses", path: "/expenses", icon: Receipt },
+      { label: "Expenses", path: "/expenses", icon: Wallet },
       { label: "Credit Request", path: "/credit-requests", icon: CreditCard },
       { label: "General Ledger", path: "/ledger", icon: BookOpen },
     ],
@@ -168,6 +169,12 @@ export const sidebarMenu: SidebarSection[] = [
         icon: ShieldCheck,
         roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"]
       },
+      {
+        label: "Admin Employees",
+        path: "/admin-employees",
+        icon: Users,
+        roles: ["SUPER_ADMIN", "ACCOUNTS", "PROJECT_MANAGER"]
+      },
     ],
   },
   {
@@ -198,7 +205,6 @@ export const sidebarMenu: SidebarSection[] = [
       { label: "Users", path: "/users", icon: Users },
 
       { label: "Permissions", path: "/permissions", icon: ShieldCheck },
-      { label: "System Settings", path: "/admin/settings", icon: Settings },
     ],
   },
 ];

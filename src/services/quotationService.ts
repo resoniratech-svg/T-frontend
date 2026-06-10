@@ -3,6 +3,7 @@ import api from "./api";
 export interface QuotationItem {
   description: string;
   quantity: number;
+  unit?: string;
   unitPrice: number;
   amount: number;
 }

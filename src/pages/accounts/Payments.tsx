@@ -5,7 +5,7 @@ import PageHeader from "../../components/PageHeader";
 import StatusBadge from "../../components/StatusBadge";
 import { useDivision } from "../../context/DivisionContext";
 import { DIVISIONS } from "../../constants/divisions";
-import { Receipt, Download, Search, Filter, Eye } from "lucide-react";
+import { Receipt, Download, Search, Filter, Eye, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { financeService } from "../../services/financeService";
 import PageLoader from "../../components/PageLoader";
@@ -14,6 +14,7 @@ import { exportToCSV } from "../../utils/exportUtils";
 function Payments() {
   const { activeDivision } = useDivision();
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["payments"],
@@ -29,6 +30,10 @@ function Payments() {
           return pDiv === activeLower || (activeLower === "service" && pDiv === "business");
       });
 
+    if (statusFilter !== "all") {
+      result = result.filter((p: any) => (p.status || "").toLowerCase() === statusFilter.toLowerCase());
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter((p: any) => 
@@ -38,7 +43,7 @@ function Payments() {
       );
     }
     return result;
-  }, [payments, activeDivision, searchQuery]);
+  }, [payments, activeDivision, statusFilter, searchQuery]);
 
   const handleExport = () => {
     const dataToExport = filteredPayments.map((p: any) => ({
@@ -77,15 +82,32 @@ function Payments() {
 
       {/* Filters & Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search by ID, client or invoice..." 
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search by ID, client or invoice..." 
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="relative w-full sm:w-44">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none w-full bg-white border border-slate-200 text-slate-600 pl-3 pr-9 py-2 rounded-lg hover:bg-slate-50 transition shadow-sm font-bold text-xs uppercase outline-none cursor-pointer focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+            >
+              <option value="all">All Statuses</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+              <option value="due">Due</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+              <ChevronDown size={14} />
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
           <Filter size={16} />

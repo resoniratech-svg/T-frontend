@@ -10,7 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useActivity } from "../../context/ActivityContext";
 import type { DivisionId } from "../../constants/divisions";
 import ClientAutocomplete from "../../components/forms/ClientAutocomplete";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { quotationService } from "../../services/quotationService";
 import type { QuotationItem } from "../../types/pm";
 
@@ -23,6 +23,7 @@ export default function CreateQuotation() {
     const { requestApproval } = useApprovals();
     const { user } = useAuth();
     const { logActivity } = useActivity();
+    const queryClient = useQueryClient();
 
     const isPM = user?.role === "PROJECT_MANAGER";
     const userDivision = (user?.division || "CONTRACTING").toUpperCase() as DivisionId;
@@ -63,6 +64,7 @@ export default function CreateQuotation() {
     });
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const todayStr = new Date().toISOString().split('T')[0];
+    const [isManualClient, setIsManualClient] = useState(false);
 
     const allowedSectors = useMemo(() => {
         return isPM && user?.division ? [user.division.toUpperCase()] : [];
@@ -105,7 +107,7 @@ export default function CreateQuotation() {
     };
 
     const [items, setItems] = useState<QuotationItem[]>([
-        { description: "", quantity: 1, unitPrice: 0, amount: 0 }
+        { description: "", quantity: 1, unit: "pcs", unitPrice: 0, amount: 0 }
     ]);
 
     // Fetch existing quotation from database if editing
@@ -139,6 +141,7 @@ export default function CreateQuotation() {
             if (found.items && found.items.length > 0) {
                 setItems(found.items);
             }
+            setIsManualClient(!found.client_id);
         }
     }, [isEditing, existingQuotation]);
 
@@ -171,7 +174,7 @@ export default function CreateQuotation() {
         }
 
         const numValue = value === "" ? 0 : Number(value);
-        const updatedItem = { ...newItems[index], [field]: field === "description" ? value : numValue };
+        const updatedItem = { ...newItems[index], [field]: (field === "description" || field === "unit") ? value : numValue };
         
         // Recalculate item amount
         if (field === 'quantity' || field === 'unitPrice') {
@@ -183,7 +186,7 @@ export default function CreateQuotation() {
     };
 
     const addItem = () => {
-        setItems([...items, { description: "", quantity: 1, unitPrice: 0, amount: 0 }]);
+        setItems([...items, { description: "", quantity: 1, unit: "pcs", unitPrice: 0, amount: 0 }]);
     };
 
     const removeItem = (index: number) => {
@@ -266,6 +269,10 @@ export default function CreateQuotation() {
                 }
             }
 
+            queryClient.invalidateQueries({ queryKey: ["quotations"] });
+            queryClient.invalidateQueries({ queryKey: ["client-quotations"] });
+            queryClient.invalidateQueries({ queryKey: ["client-quotations-list"] });
+
             const activityMessage = isApproved 
                 ? `${isEditing ? "Updated" : "Created"} Quotation ${form.quoteId}`
                 : `${isEditing ? "Updated" : "Created"} Quotation ${form.quoteId} (Pending Approval)`;
@@ -296,6 +303,7 @@ export default function CreateQuotation() {
                         onChange={handleDivisionChange}
                         allowedIds={allowedSectors}
                         showAll={false}
+                        disabled={isEditing}
                     />
 
                     {/* Header Details */}
@@ -312,13 +320,46 @@ export default function CreateQuotation() {
                             <FormInput label="Date" type="date" name="date" value={form.date} onChange={handleChange} required />
                             
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection <span className="text-rose-500">*</span></label>
-                                <ClientAutocomplete
-                                    value={form.client}
-                                    onChange={handleClientChange}
-                                    division={form.division}
-                                    placeholder="Search client..."
-                                />
+                                <div className="flex justify-between items-center">
+                                    <label className="text-xs font-semibold text-slate-500 uppercase mb-1 px-1">Client Selection <span className="text-rose-500">*</span></label>
+                                    {!isEditing && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsManualClient(!isManualClient);
+                                                setForm(prev => ({ ...prev, client: "", customerCode: "" }));
+                                            }}
+                                            className="text-xs text-brand-600 hover:text-brand-700 font-semibold underline"
+                                        >
+                                            {isManualClient ? "Select from List" : "Enter Manually"}
+                                        </button>
+                                    )}
+                                </div>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={form.client}
+                                        disabled
+                                        className="w-full border border-slate-200 px-3 py-2 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed text-sm font-semibold h-[38px] disabled:border-slate-200"
+                                    />
+                                ) : isManualClient ? (
+                                    <input
+                                        type="text"
+                                        name="client"
+                                        value={form.client}
+                                        onChange={(e) => setForm({ ...form, client: e.target.value, customerCode: "" })}
+                                        className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm"
+                                        placeholder="Enter client/company name manually"
+                                        required
+                                    />
+                                ) : (
+                                    <ClientAutocomplete
+                                        value={form.client}
+                                        onChange={handleClientChange}
+                                        division={form.division}
+                                        placeholder="Search client..."
+                                    />
+                                )}
                             </div>
 
 
@@ -326,12 +367,20 @@ export default function CreateQuotation() {
                             <FormInput 
                                 label="Customer Code" 
                                 name="customerCode" 
-                                value={form.customerCode} 
+                                value={isManualClient ? "Manual Entry" : form.customerCode} 
                                 disabled 
                                 placeholder="Auto-generated"
                             />
 
-                            <FormInput label="Project Name" name="project" value={form.project} placeholder="e.g. ALWAAAB RESIDENCY MAIN ENTRANCE" onChange={handleChange} required />
+                            <FormInput 
+                                label="Project Name" 
+                                name="project" 
+                                value={form.project} 
+                                placeholder="e.g. ALWAAAB RESIDENCY MAIN ENTRANCE" 
+                                onChange={handleChange} 
+                                required 
+                                disabled={isEditing}
+                            />
                         </div>
                     </div>
 
@@ -368,8 +417,53 @@ export default function CreateQuotation() {
                                             required
                                         />
                                     </div>
+                                    <div className="w-28">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit</label>
+                                        {item.unit !== undefined && !["pcs", "sqm", "meter", "cm", "nos"].includes(item.unit) ? (
+                                            <div className="flex gap-1 items-center">
+                                                <input
+                                                    type="text"
+                                                    value={item.unit || ""}
+                                                    onChange={(e) => handleItemChange(index, "unit", e.target.value)}
+                                                    className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-brand-500 text-sm"
+                                                    placeholder="Enter unit"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleItemChange(index, "unit", "pcs")}
+                                                    className="text-slate-400 hover:text-red-500 text-lg font-bold px-1"
+                                                    title="Reset to list"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <select
+                                                value={item.unit || "pcs"}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    if (val === "other") {
+                                                        handleItemChange(index, "unit", "");
+                                                    } else {
+                                                        handleItemChange(index, "unit", val);
+                                                    }
+                                                }}
+                                                className="w-full px-2 py-2 bg-white border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-brand-500 text-sm"
+                                            >
+                                                <option value="pcs">pcs</option>
+                                                <option value="sqm">sqm</option>
+                                                <option value="meter">meter</option>
+                                                <option value="cm">cm</option>
+                                                <option value="nos">nos</option>
+                                                <option value="other">Other...</option>
+                                            </select>
+                                        )}
+                                    </div>
                                     <div className="w-32">
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Unit Price</label>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                                            {item.unit ? `${item.unit} Price` : "Unit Price"}
+                                        </label>
                                         <input
                                             type="text"
                                             value={item.unitPrice || ''}

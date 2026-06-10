@@ -221,29 +221,39 @@ export default function CreateBOQ() {
                             placeholder="e.g. Al Rayyan Mall Fit-out"
                             onChange={handleChange}
                             required
+                            disabled={isEdit}
                         />
                     </div>
 
                     <div className="col-span-2 md:col-span-1">
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Client Name *</label>
-                        <select
-                            name="client"
-                            value={form.client_id}
-                            onChange={handleChange}
-                            className="w-full border border-slate-200 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-brand-500 hover:border-slate-300 transition-all outline-none font-medium text-slate-700 shadow-sm"
-                            required
-                        >
-                            <option value="">Choose a Client...</option>
-                            {isLoadingClients ? (
-                                <option disabled>Synchronizing client list...</option>
-                            ) : clients.length === 0 ? (
-                                <option disabled>No clients found in this sector</option>
-                            ) : (
-                                clients.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name} {c.company_name ? `(${c.company_name})` : ''}</option>
-                                ))
-                            )}
-                        </select>
+                        {isEdit ? (
+                            <input
+                                type="text"
+                                value={form.client_name}
+                                disabled
+                                className="w-full border border-slate-200 px-4 py-2.5 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed font-medium h-[42px] disabled:border-slate-200"
+                            />
+                        ) : (
+                            <select
+                                name="client"
+                                value={form.client_id}
+                                onChange={handleChange}
+                                className="w-full border border-slate-200 rounded-lg px-4 py-2.5 bg-white focus:ring-2 focus:ring-brand-500 hover:border-slate-300 transition-all outline-none font-medium text-slate-700 shadow-sm"
+                                required
+                            >
+                                <option value="">Choose a Client...</option>
+                                {isLoadingClients ? (
+                                    <option disabled>Synchronizing client list...</option>
+                                ) : clients.length === 0 ? (
+                                    <option disabled>No clients found in this sector</option>
+                                ) : (
+                                    clients.map((c) => (
+                                        <option key={c.id} value={c.id}>{c.name} {c.company_name ? `(${c.company_name})` : ''}</option>
+                                    ))
+                                )}
+                            </select>
+                        )}
                     </div>
 
 

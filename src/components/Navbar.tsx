@@ -3,8 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import DivisionSwitcher from "./DivisionSwitcher";
-import GlobalSearch from "./GlobalSearch";
-
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
@@ -20,7 +18,7 @@ function Navbar({ onToggleSidebar }: NavbarProps) {
   const isCreateClientPage = location.pathname === "/create-client";
   const isCreateInvoicePage = location.pathname.startsWith("/create-invoice") || location.pathname.startsWith("/edit-invoice");
   const isCreateQuotationPage = location.pathname.startsWith("/create-quotation") || location.pathname.startsWith("/edit-quotation");
-  const isBOQPage = location.pathname.includes("boq");
+  const isBOQPage = location.pathname !== "/boq" && location.pathname !== "/client/boq" && location.pathname.includes("boq");
   const isCreditControlPage = location.pathname === "/credit-control";
   const isPaymentsPage = location.pathname === "/payments";
   const isExpensesPage = location.pathname.startsWith("/expenses") || location.pathname.startsWith("/expense-details");
@@ -86,7 +84,7 @@ function Navbar({ onToggleSidebar }: NavbarProps) {
 
   return (
     <div className="print:hidden h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm">
-      {/* Left Section: Mobile Menu & Search Bar (Search hidden on Create Client) */}
+      {/* Left Section: Mobile Menu (Search removed) */}
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
@@ -94,8 +92,6 @@ function Navbar({ onToggleSidebar }: NavbarProps) {
         >
           <Menu size={20} />
         </button>
-
-        {!hideSearch && <GlobalSearch />}
       </div>
 
       {/* Middle Section: Division Switcher (Hidden on Create Client) */}

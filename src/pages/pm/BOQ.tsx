@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import DataTable from "../../components/DataTable";
 import StatusBadge from "../../components/StatusBadge";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, ChevronDown } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { boqService } from "../../services/boqService";
 import { useAuth } from "../../context/AuthContext";
-import DivisionTiles from "../../components/forms/DivisionTiles";
-import { getDivisionById, type DivisionId } from "../../constants/divisions";
+import { useDivision } from "../../context/DivisionContext";
+import { getDivisionById, type DivisionId, DIVISIONS } from "../../constants/divisions";
 
 const columns = ["ID", "Project", "Sector", "Client", "Total Amount", "Status", "Date", "Actions"];
 
@@ -27,18 +27,9 @@ function BOQ() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const isPM = user?.role === "PROJECT_MANAGER";
+  const { activeDivision } = useDivision();
   
-  const [selectedSector, setSelectedSector] = useState<string>(
-    isPM && user?.division ? user.division : "all"
-  );
-
-  const allowedSectors = useMemo(() => {
-    if (isPM && user?.division) {
-      return [user.division];
-    }
-    return [];
-  }, [isPM, user]);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const { data: boqs = [], isLoading } = useQuery({
     queryKey: ["boqs"],
@@ -65,9 +56,13 @@ function BOQ() {
   };
 
   const tableData = useMemo<BOQTableData[]>(() => {
-    const filtered = selectedSector === "all"
+    let filtered = activeDivision === "all"
       ? boqs
-      : boqs.filter((item: any) => (item.sector || item.division || "").toUpperCase() === selectedSector.toUpperCase());
+      : boqs.filter((item: any) => (item.sector || item.division || "").toUpperCase() === activeDivision.toUpperCase());
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((item: any) => (item.status || "").toLowerCase() === statusFilter.toLowerCase());
+    }
 
     return filtered.map((item: any) => {
       const division = getDivisionById(item.sector || item.division);
@@ -110,7 +105,7 @@ function BOQ() {
         )
       };
     });
-  }, [boqs, selectedSector]);
+  }, [boqs, activeDivision, statusFilter]);
 
   if (isLoading) return <div className="p-6">Loading BOQs...</div>;
 
@@ -129,17 +124,28 @@ function BOQ() {
         }
       />
 
-      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <DivisionTiles
-          selectedId={selectedSector as DivisionId}
-          onChange={(id) => setSelectedSector(id)}
-          showAll={!isPM}
-          allowedIds={allowedSectors}
-        />
-      </div>
-
       <div className="bg-white rounded-xl shadow-sm border border-slate-100">
-        <DataTable columns={columns} data={tableData} />
+        <DataTable
+          columns={columns}
+          data={tableData}
+          filters={
+            <div className="relative w-full sm:w-48">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="appearance-none w-full bg-white border border-slate-200 text-slate-600 pl-3 pr-9 py-2 rounded-lg hover:bg-slate-50 transition shadow-sm font-bold text-xs uppercase outline-none cursor-pointer focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+              >
+                <option value="all">All Statuses</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+                <option value="due">Due</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                <ChevronDown size={14} />
+              </div>
+            </div>
+          }
+        />
       </div>
     </div>
   );

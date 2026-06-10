@@ -33,8 +33,8 @@ function Sidebar({ onClose }: SidebarProps) {
       {/* ─── Brand Header ──────────────────────────────── */}
       <div className="px-6 py-5 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center">
-            <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain drop-shadow-md" />
+          <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
+            <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className="text-sm font-semibold text-white tracking-wide">

@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { financeService } from "../../services/financeService";
 import { Link } from "react-router-dom";
+import { getUploadUrl } from "../../services/api";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
 import StatCard from "../../components/StatCard";
 import ApprovalBadge from "../../components/ApprovalBadge";
-import { Plus, Trash2, Eye, Receipt, Coins, Edit, DollarSign } from "lucide-react";
+import { Plus, Trash2, Eye, Coins, Edit, Clock, FileText } from "lucide-react";
 import { useDivision } from "../../context/DivisionContext";
 import { DIVISIONS } from "../../constants/divisions";
 import type { Expense } from "../../types/finance";
@@ -131,10 +132,15 @@ function Expenses() {
         maximumFractionDigits: 2,
       })}`,
       Status: <ApprovalBadge status={expense.approvalStatus || "approved"} />,
-      Attachment: expense.attachment ? (
-        <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+      "Upload Files": expense.attachment ? (
+        <a 
+          href={getUploadUrl(expense.attachment)} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium hover:bg-emerald-100 hover:underline cursor-pointer"
+        >
           📎 {expense.attachment}
-        </span>
+        </a>
       ) : (
         <span className="text-slate-300 text-xs">None</span>
       ),
@@ -226,7 +232,7 @@ function Expenses() {
     "Payment Method",
     "Amount",
     "Status",
-    "Attachment",
+    "Upload Files",
     "Actions",
   ];
 
@@ -252,7 +258,7 @@ function Expenses() {
           value={`QAR ${totalAmount.toLocaleString(undefined, {
             minimumFractionDigits: 2,
           })}`}
-          icon={<DollarSign size={20} />}
+          icon={<Coins size={20} />}
           onClick={() => setApprovalFilter("approved")}
         />
         <StatCard
@@ -261,7 +267,7 @@ function Expenses() {
             minimumFractionDigits: 2,
           })}`}
           icon={<div className="relative">
-            <Receipt size={20} className="text-amber-500" />
+            <Clock size={20} className="text-amber-500" />
             <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold border border-white">
               {pendingCount}
             </span>
@@ -271,7 +277,7 @@ function Expenses() {
         <StatCard
           title="Number of Records"
           value={rawExpenses.length.toString()}
-          icon={<Receipt size={20} />}
+          icon={<FileText size={20} />}
           onClick={() => setApprovalFilter("all")}
         />
       </div>
@@ -325,7 +331,7 @@ function Expenses() {
           <DataTable columns={columns} data={expenses} hideSearch={true} />
         ) : (
           <div className="p-12 text-center">
-            <Receipt size={48} className="mx-auto text-slate-300 mb-4" />
+            <FileText size={48} className="mx-auto text-slate-300 mb-4" />
             <h3 className="text-lg font-semibold text-slate-600 mb-1">
               No expenses found
             </h3>

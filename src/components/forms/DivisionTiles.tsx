@@ -8,9 +8,10 @@ interface DivisionTilesProps {
   error?: string;
   showAll?: boolean;
   allowedIds?: string[];
+  disabled?: boolean;
 }
 
-export default function DivisionTiles({ selectedId, onChange, label, error, showAll, allowedIds }: DivisionTilesProps) {
+export default function DivisionTiles({ selectedId, onChange, label, error, showAll, allowedIds, disabled }: DivisionTilesProps) {
   let items = showAll 
     ? [{ id: "all", label: "All Sectors", icon: "🏢", bg: "bg-slate-50", border: "border-slate-200", text: "text-slate-800", color: "#64748b" }, ...DIVISIONS]
     : DIVISIONS;
@@ -29,11 +30,14 @@ export default function DivisionTiles({ selectedId, onChange, label, error, show
             <button
               key={div.id}
               type="button"
+              disabled={disabled}
               onClick={() => onChange(div.id)}
               className={`relative flex flex-col items-center justify-center p-6 rounded-lg border-2 transition-all duration-300 group ${
                 isSelected
-                  ? `${div.bg} ${div.border} scale-[1.02] shadow-md ring-4 ring-offset-2 ring-opacity-10`
-                  : "bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50/50"
+                  ? `${div.bg} ${div.border} scale-[1.02] shadow-md ring-4 ring-offset-2 ring-opacity-10 ${disabled ? "opacity-80 cursor-not-allowed" : ""}`
+                  : disabled
+                    ? "bg-slate-50/50 border-slate-100 opacity-50 cursor-not-allowed"
+                    : "bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50/50"
               }`}
               style={{
                 "--ring-color": div.color,

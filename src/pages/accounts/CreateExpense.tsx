@@ -11,8 +11,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useActivity } from "../../context/ActivityContext";
 import { DIVISIONS } from "../../constants/divisions";
 import type { DivisionId } from "../../constants/divisions";
-import FileUploader from "../../components/FileUploader";
 import type { Invoice } from "../../types/finance";
+import FileUploader from "../../components/FileUploader";
 import { financeService } from "../../services/financeService";
 import { projectService } from "../../services/projectService";
 import { quotationService } from "../../services/quotationService";
@@ -568,7 +568,7 @@ function CreateExpense() {
             {/* File Upload */}
             <div className="mb-5">
               <label className="text-sm font-bold text-slate-700 mb-3 block">
-                Attach Bills / Receipts
+                Upload Files
               </label>
               <FileUploader 
                 onUpload={(_files: any[], urls: string[]) => {
@@ -596,6 +596,7 @@ function CreateExpense() {
                 </div>
               )}
             </div>
+
             <FormTextarea
               label="Notes"
               name="notes"

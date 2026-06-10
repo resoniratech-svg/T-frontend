@@ -148,16 +148,16 @@ export default function QuotationDetails() {
             </div>
 
             {/* A4 Document Container */}
-            <div className="w-[850px] mx-auto bg-[#e6e4ec] shadow-lg border border-slate-200 overflow-hidden print:shadow-none print:border-none print:m-0 font-['Arial',_Helvetica,_sans-serif] text-black leading-snug print-page">
+            <div className="w-[850px] mx-auto bg-white shadow-lg border border-slate-200 overflow-hidden print:shadow-none print:border-none print:m-0 font-['Arial',_Helvetica,_sans-serif] text-black leading-snug print-page">
 
                 {/* Header Section */}
                 <div className="p-8 pb-5 flex justify-between items-start">
-                    <div className="bg-[#2a2944] w-52 h-[170px] flex flex-col justify-center items-center p-4">
-                        <div className="w-[70px] h-[70px] mb-2 text-white">
+                    <div className="bg-[#e6e4ec] w-52 h-[170px] flex flex-col justify-center items-center p-4">
+                        <div className="w-[70px] h-[70px] mb-2 text-[#2a2944]">
                             {/* Logo */}
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/80?text=LOGO')} />
                         </div>
-                        <span className="text-white text-[16px] leading-[1.1] font-bold tracking-widest text-center uppercase font-sans">
+                        <span className="text-[#2a2944] text-[16px] leading-[1.1] font-bold tracking-widest text-center uppercase font-sans">
                             TREK GROUP<br />
                             <span className="text-[11px] font-bold tracking-normal opacity-90">{isTrading ? "Trading" : "Contracting"}</span>
                         </span>
@@ -220,7 +220,9 @@ export default function QuotationDetails() {
                                 <tr>
                                     <th className="border border-black px-3 py-1.5 text-center w-[58%]">Product Type</th>
                                     <th className="border border-black px-3 py-1.5 text-center">QTY</th>
-                                    <th className="border border-black px-3 py-1.5 text-center">UNIT PRICE</th>
+                                    <th className="border border-black px-3 py-1.5 text-center">
+                                        {items[0]?.unit ? `${items[0].unit.toUpperCase()} PRICE` : "UNIT PRICE"}
+                                    </th>
                                     <th className="border border-black px-3 py-1.5 text-center">Unite Rate</th>
                                 </tr>
                             </thead>
@@ -230,7 +232,7 @@ export default function QuotationDetails() {
                                         <td className="border border-black px-4 py-2.5 text-[15px] leading-[1.3] whitespace-pre-wrap">
                                             {item.description}
                                         </td>
-                                        <td className="border border-black px-3 py-3 text-center align-middle">{item.quantity}</td>
+                                        <td className="border border-black px-3 py-3 text-center align-middle">{item.quantity}{item.unit ? ` ${item.unit}` : ""}</td>
                                         <td className="border border-black px-3 py-3 text-center align-middle">{Number(item.unitPrice).toLocaleString()}</td>
                                         <td className="border border-black px-3 py-3 text-center align-middle">{Number(item.amount || (item.quantity * item.unitPrice)).toLocaleString()}</td>
                                     </tr>
@@ -315,8 +317,8 @@ export default function QuotationDetails() {
             margin: 0 auto !important;
             display: block !important;
           }
-          .bg-\\[\\#e6e4ec\\] { background-color: #e6e4ec !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          .bg-\\[\\#2a2944\\] { background-color: #2a2944 !important; color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .bg-white { background-color: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .bg-\\[\\#e6e4ec\\] { background-color: #e6e4ec !important; color: #2a2944 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .bg-\\[\\#8dc63f\\] { background-color: #8dc63f !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .bg-\\[\\#1a1a1a\\] { background-color: #1a1a1a !important; color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .bg-\\[\\#D3D3DF\\] { background-color: #D3D3DF !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }

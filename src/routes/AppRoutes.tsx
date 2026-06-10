@@ -14,7 +14,6 @@ import ProtectedRoute from "./ProtectedRoute";
 
 // Pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import Settings from "../pages/admin/Settings";
 import AccountsDashboard from "../pages/accounts/AccountsDashboard";
 import PMDashboard from "../pages/pm/PMDashboard";
 import Users from "../pages/admin/Users";
@@ -96,6 +95,9 @@ import EmployeeList from "../pages/employees/EmployeeList";
 import AddEditEmployee from "../pages/employees/AddEditEmployee";
 import EmployeeDetail from "../pages/employees/EmployeeDetail";
 import MyProfile from "../pages/common/MyProfile";
+import AdminEmployeeList from "../pages/employees/AdminEmployeeList";
+import AddEditAdminEmployee from "../pages/employees/AddEditAdminEmployee";
+import AdminEmployeeDetail from "../pages/employees/AdminEmployeeDetail";
 
 // Marketing
 import MarketingDashboard from "../modules/marketing/pages/Dashboard";
@@ -134,7 +136,6 @@ function AppRoutes() {
         {/* Dashboards (Role-based Base) */}
         <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/settings" element={<Settings />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["ACCOUNTS"]} />}>
           <Route path="/accounts/dashboard" element={<AccountsDashboard />} />
@@ -257,6 +258,14 @@ function AppRoutes() {
           <Route path="/employees/create" element={<AddEditEmployee />} />
           <Route path="/employees/edit/:id" element={<AddEditEmployee />} />
           <Route path="/employees/details/:id" element={<EmployeeDetail />} />
+        </Route>
+
+        {/* Admin Employee Management */}
+        <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER", "ACCOUNTS"]} />}>
+          <Route path="/admin-employees" element={<AdminEmployeeList />} />
+          <Route path="/admin-employees/create" element={<AddEditAdminEmployee />} />
+          <Route path="/admin-employees/edit/:id" element={<AddEditAdminEmployee />} />
+          <Route path="/admin-employees/details/:id" element={<AdminEmployeeDetail />} />
         </Route>
 
         {/* Marketing & Lead Management */}

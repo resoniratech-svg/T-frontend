@@ -121,7 +121,7 @@ export default function CreditControl() {
         />
         <StatCard
           title="Due Invoices"
-          value={`${summary?.overdueCount || 0} Invoices`}
+          value={`${summary?.overdueCount || 0} Invoices (QAR ${summary?.dueAmount ? summary.dueAmount.toLocaleString() : '0'})`}
           icon={<AlertCircle size={20} className="text-rose-500" />}
           onClick={() => setStatusFilter("DUE")}
           className={statusFilter === "DUE" ? "ring-2 ring-brand-500" : ""}
@@ -186,7 +186,6 @@ export default function CreditControl() {
                 >
                   <option value="all">All Status</option>
                   <option value="PAID">Paid</option>
-                  <option value="PARTIAL">Partial</option>
                   <option value="PENDING">Unpaid</option>
                   <option value="DUE">Due</option>
                 </select>

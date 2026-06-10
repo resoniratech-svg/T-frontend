@@ -347,6 +347,7 @@ export default function CreateInvoice() {
                         onChange={handleDivisionChange}
                         allowedIds={allowedSectors}
                         showAll={false}
+                        disabled={isEditing}
                     />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-slate-50">
@@ -369,30 +370,38 @@ export default function CreateInvoice() {
                                 <option value="Paid">Paid</option>
                                 <option value="Unpaid">Unpaid</option>
                                 <option value="Due">Due</option>
-                                <option value="Overdue">Overdue</option>
                             </select>
                         </div>
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Client Selection *</label>
-                            <div className="relative">
-                                <ClientAutocomplete
-                                    value={form.client!}
-                                    onChange={handleClientChange}
-                                    division={form.division!}
-                                    placeholder="Search client..."
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    value={form.client}
+                                    disabled
+                                    className="w-full border border-slate-200 px-3 py-2 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed text-sm font-semibold h-[38px] disabled:border-slate-200"
                                 />
-                                {form.clientId ? (
-                                    <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">
-                                        <RefreshCw size={10} className="animate-pulse" /> Verified
-                                    </div>
-                                ) : form.client ? (
-                                    <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-lg">
-                                        Invalid
-                                    </div>
-                                ) : null}
-                            </div>
-                            {!form.clientId && form.client && (
+                            ) : (
+                                <div className="relative">
+                                    <ClientAutocomplete
+                                        value={form.client!}
+                                        onChange={handleClientChange}
+                                        division={form.division!}
+                                        placeholder="Search client..."
+                                    />
+                                    {form.clientId ? (
+                                        <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">
+                                            <RefreshCw size={10} className="animate-pulse" /> Verified
+                                        </div>
+                                    ) : form.client ? (
+                                        <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-lg">
+                                            Invalid
+                                        </div>
+                                    ) : null}
+                                </div>
+                            )}
+                            {!isEditing && !form.clientId && form.client && (
                                 <p className="text-[10px] text-rose-500 font-bold mt-1">Please select a matching client from the list.</p>
                             )}
                         </div>
@@ -458,7 +467,7 @@ export default function CreateInvoice() {
                             />
                             {fieldErrors.qid && <p className="text-[10px] text-red-500 font-bold mt-1">{fieldErrors.qid}</p>}
                         </div>
-                        <FormInput label="Project Name *" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" required />
+                        <FormInput label="Project Name *" name="projectName" value={form.projectName} onChange={handleFormChange} placeholder="Enter Project Name" required disabled={isEditing} />
 
                         <div className="md:col-span-2 flex flex-col gap-1">
                             <label className="text-xs font-semibold text-slate-500 uppercase">Address</label>

@@ -123,8 +123,8 @@ function CreateClient() {
     e.preventDefault();
     
     // Check mandatory fields
-    if (!form.name || !form.email || !form.qid || !form.crNumber || !form.computerCard || licenses.some(l => !l.number)) {
-      alert("Please fill in all mandatory fields: Contact Person, Email, QID, CR, Computer Card, and at least one License.");
+    if (!form.name || !form.email) {
+      alert("Contact Person and Email are required to create a client profile.");
       return;
     }
 
@@ -183,8 +183,8 @@ function CreateClient() {
         qid: form.qid,
         cr_number: form.crNumber,
         computer_card: form.computerCard,
-        start_date: form.startDate,
-        renewal_date: form.renewalDate,
+        start_date: form.startDate || null,
+        renewal_date: form.renewalDate || null,
         contract_type: form.contractType,
         licenses: updatedLicenses.filter(l => l.number),
         documents: uploadedDocs,
@@ -226,9 +226,8 @@ function CreateClient() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Contact Person *</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Contact Person</label>
                   <input
-                    required
                     name="name"
                     value={form.name}
                     onChange={handleChange}
@@ -239,9 +238,8 @@ function CreateClient() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Company *</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
                   <input
-                    required
                     name="company"
                     value={form.company}
                     onChange={handleChange}
@@ -252,9 +250,8 @@ function CreateClient() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                   <input
-                    required
                     type="email"
                     name="email"
                     value={form.email}
@@ -265,9 +262,8 @@ function CreateClient() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Phone *</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
                   <input
-                    required
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
@@ -303,14 +299,13 @@ function CreateClient() {
                 </div>
 
                 <div className="col-span-2">
-                  <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2 mt-4">Mandatory Business Documents</h3>
+                  <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2 mt-4">Business Documents</h3>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Qatar ID (QID) *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Qatar ID (QID)</label>
                     <input
-                      required
                       name="qid"
                       value={form.qid}
                       onChange={handleChange}
@@ -328,9 +323,8 @@ function CreateClient() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">CR Number *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">CR Number</label>
                     <input
-                      required
                       name="crNumber"
                       value={form.crNumber}
                       onChange={handleChange}
@@ -348,9 +342,8 @@ function CreateClient() {
 
                 <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Computer Card *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Computer Card</label>
                     <input
-                      required
                       name="computerCard"
                       value={form.computerCard}
                       onChange={handleChange}
@@ -368,7 +361,7 @@ function CreateClient() {
 
                 <div className="col-span-2 space-y-4">
                   <div className="flex justify-between items-center">
-                    <label className="block text-sm font-medium text-slate-700">Licenses *</label>
+                    <label className="block text-sm font-medium text-slate-700">Licenses</label>
                     <button 
                       type="button" 
                       onClick={addLicense}
@@ -390,9 +383,8 @@ function CreateClient() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">License No. *</label>
+                        <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">License No.</label>
                         <input
-                          required
                           value={license.number}
                           onChange={(e) => handleLicenseChange(index, "number", e.target.value)}
                           className="w-full border border-slate-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-brand-500"
