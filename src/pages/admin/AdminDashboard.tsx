@@ -4,7 +4,7 @@ import StatCard from "../../components/StatCard";
 import ChartCard from "../../components/ChartCard";
 import StatusBadge from "../../components/StatusBadge";
 import ActivityLog from "../../components/ActivityLog";
-import { Banknote, Folder, TrendingUp, AlertTriangle, Target, ArrowRight, BarChart3, CreditCard, Briefcase, Clock, Eye, Edit, Trash2, Landmark, CheckCircle } from "lucide-react";
+import { Banknote, Folder, TrendingUp, AlertTriangle, Target, ArrowRight, BarChart3, CreditCard, Briefcase, Clock, Eye, Edit, Trash2, Landmark, CheckCircle, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useDivision } from "../../context/DivisionContext";
 import { useInventory } from "../../hooks/useInventory";
@@ -42,6 +42,14 @@ export default function AdminDashboard() {
     // Credit Requests from localStorage
     const [creditRequests, setCreditRequests] = useState<any[]>([]);
     const [viewingCR, setViewingCR] = useState<any | null>(null);
+    const [dismissLowStock, setDismissLowStock] = useState(() => {
+        return sessionStorage.getItem("dismissLowStock") === "true";
+    });
+
+    const handleDismissLowStock = () => {
+        setDismissLowStock(true);
+        sessionStorage.setItem("dismissLowStock", "true");
+    };
 
     useEffect(() => {
         const fetchCreditRequests = async () => {
@@ -113,7 +121,7 @@ export default function AdminDashboard() {
     return (
         <div className="space-y-6">
             {/* Low Stock Alert */}
-            {lowStockItems.length > 0 && (
+            {lowStockItems.length > 0 && !dismissLowStock && (
                 <div className="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl shadow-sm">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -125,9 +133,14 @@ export default function AdminDashboard() {
                                 <p className="text-xs text-rose-700 font-medium">There are {lowStockItems.length} products currently below minimum stock levels.</p>
                             </div>
                         </div>
-                        <Link to="/inventory/low-stock" className="text-xs font-black text-rose-600 hover:underline px-4 py-2 bg-white rounded-lg border border-rose-200 shadow-sm">
-                            View Items
-                        </Link>
+                        <div className="flex items-center gap-4">
+                            <Link to="/inventory/low-stock" className="text-xs font-black text-rose-600 hover:underline px-4 py-2 bg-white rounded-lg border border-rose-200 shadow-sm">
+                                View Items
+                            </Link>
+                            <button onClick={handleDismissLowStock} className="text-rose-400 hover:text-rose-600 transition-colors p-1" title="Dismiss Alert">
+                                <X size={20} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

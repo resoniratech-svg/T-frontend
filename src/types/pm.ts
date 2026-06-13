@@ -34,6 +34,8 @@ export interface Quotation {
   createdAt?: string;
   totalAmount?: number;
   approvalStatus?: ApprovalStatus;
+  formatVersion?: 1 | 2;
+  phone?: string;
 }
 
 export interface BOQItem {

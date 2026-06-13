@@ -10,11 +10,12 @@ interface Client {
     division: string;
     sector?: string;
     company_name?: string;
+    phone?: string;
 }
 
 interface Props {
     value: string;
-    onChange: (clientName: string, clientId?: string) => void;
+    onChange: (clientName: string, clientId?: string, phone?: string) => void;
     division?: string;
     placeholder?: string;
     className?: string;
@@ -102,7 +103,7 @@ export default function ClientAutocomplete({ value, onChange, division, placehol
         const displayName = client.name;
         setInputValue(displayName);
         // Prioritize client_id for database linking, fallback to user id
-        onChange(displayName, client.client_id || client.id);
+        onChange(displayName, client.client_id || client.id, client.phone);
         setShowSuggestions(false);
     };
 

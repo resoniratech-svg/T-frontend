@@ -98,7 +98,10 @@ function Invoices() {
         "Total": `QAR ${Number(invoice.total_amount || 0).toLocaleString()}`,
         "Balance": `QAR ${Number(invoice.balance_amount || 0).toLocaleString()}`,
         "Status": <StatusBadge status={invoice.status} />,
-        "Date": invoice.invoice_date || invoice.date || invoice.createdAt || "-",
+        "Date": (() => {
+            const dateStr = String(invoice.invoice_date || invoice.date || invoice.createdAt || "-");
+            return dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+        })(),
         "Actions": (
             <div className="flex gap-2 items-center">
                 <Link to={`/invoice-details/${invoice.id}`} title="View" className="p-1 text-slate-400 hover:text-brand-600 transition-colors">

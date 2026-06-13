@@ -61,7 +61,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                 <div className="flex-1 p-20 flex flex-col items-center justify-center text-center">
                     <h2 className="text-7xl font-serif italic mb-12 text-[#1a1a1a]">About Us</h2>
                     <p className="text-lg leading-relaxed text-slate-600 max-w-2xl whitespace-pre-wrap">
-                        {quotation.aboutUs || "Trek Group Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services."}
+                        {quotation.aboutUs ?? "Trek Group Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services."}
                     </p>
                 </div>
 
@@ -84,7 +84,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                     </p>
 
                     <ul className="space-y-6 text-slate-600">
-                        {(quotation.whatWeDo || "Company formation and trade license registration\nIndustrial license applications and approvals\nGovernment liaison and PRO services\nSpecial approval coordination for industrial projects\nComprehensive project documentation and compliance").split('\n').filter((l: string) => l.trim()).map((item: string, i: number) => (
+                        {(quotation.whatWeDo ?? "Company formation and trade license registration\nIndustrial license applications and approvals\nGovernment liaison and PRO services\nSpecial approval coordination for industrial projects\nComprehensive project documentation and compliance").split('\n').filter((l: string) => l.trim()).map((item: string, i: number) => (
                             <li key={i} className="flex gap-4 items-start">
                                 <span className="w-1.5 h-1.5 rounded-full bg-black mt-2 shrink-0"></span>
                                 <span>{item}</span>
@@ -138,7 +138,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
 
                 <div className="flex-1">
                     <div className="whitespace-pre-wrap text-sm text-slate-700 leading-relaxed font-medium">
-                        {quotation.financialTerms || "Total Package Cost: QAR 11,000 (all-inclusive)..."}
+                        {quotation.financialTerms ?? "Total Package Cost: QAR 11,000 (all-inclusive)..."}
                     </div>
                 </div>
 
@@ -153,7 +153,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                     <div className="space-y-12 h-full overflow-hidden flex flex-col">
                         <h2 className="text-4xl font-serif border-b pb-4">Client Duties</h2>
                         <div className="text-[12px] text-slate-600 whitespace-pre-wrap leading-relaxed flex-1 italic overflow-y-auto">
-                            {quotation.clientDuties || "1. Provide required documents..."}
+                            {quotation.clientDuties ?? "1. Provide required documents..."}
                         </div>
                     </div>
 
@@ -161,7 +161,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                         <div className="pt-20">
                             <h2 className="text-4xl font-serif border-b pb-4">Payment Terms</h2>
                             <div className="mt-10 text-[13px] font-medium whitespace-pre-wrap leading-relaxed italic">
-                                {quotation.paymentTerms || "50% advance payment..."}
+                                {quotation.paymentTerms ?? "50% advance payment..."}
                             </div>
                         </div>
 

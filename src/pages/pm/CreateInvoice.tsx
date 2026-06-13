@@ -52,7 +52,7 @@ export default function CreateInvoice() {
         qid: "",
         address: "",
         advance: 0,
-        invoiceType: "Credit" as "Credit" | "Cash",
+        invoiceType: "Credit" as "Credit" | "Cash" | "Online",
         projectName: ""
     });
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -425,8 +425,8 @@ export default function CreateInvoice() {
                             />
                         </div>
 
-                        <FormInput label="Ref Number" name="refNo" value={form.refNo} onChange={handleFormChange} placeholder="e.g. PROP-001" />
                         
+
                         <div>
                             <FormInput label="Invoice Date *" name="date" type="date" value={form.date} onChange={handleFormChange} />
                         </div>
@@ -451,6 +451,7 @@ export default function CreateInvoice() {
                             >
                                 <option value="Credit">Credit</option>
                                 <option value="Cash">Cash</option>
+                                <option value="Online">Online</option>
                             </select>
                         </div>
 

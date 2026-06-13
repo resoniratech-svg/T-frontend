@@ -49,9 +49,62 @@ export const downloadMockFile = (filename: string, content: string = "Placeholde
   downloadBlob(blob, filename);
 };
 
-export const printDocument = () => {
-  // Triggers the native browser print dialog, allowing easy "Save as PDF" 
-  window.print();
+export const exportToWord = (elementId: string, filename: string) => {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error(`Element with id ${elementId} not found`);
+    return;
+  }
+
+  // Get all styles to try to preserve some formatting in Word
+  let styles = '';
+  for (const sheet of document.styleSheets) {
+    try {
+      if (sheet.cssRules) {
+        for (const rule of sheet.cssRules) {
+          styles += rule.cssText + '\n';
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read stylesheet", e);
+    }
+  }
+
+  const header = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+          xmlns:w='urn:schemas-microsoft-com:office:word' 
+          xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <meta charset='utf-8'>
+      <title>${filename}</title>
+      <style>
+        ${styles}
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid black; padding: 8px; }
+      </style>
+    </head><body>
+  `;
+  const footer = "</body></html>";
+  const sourceHTML = header + element.outerHTML + footer;
+  
+  const blob = new Blob(['\ufeff', sourceHTML], {
+    type: 'application/msword'
+  });
+  downloadBlob(blob, filename.endsWith('.doc') ? filename : `${filename}.doc`);
+};
+
+export const printDocument = (title?: string) => {
+  if (title) {
+    const originalTitle = document.title;
+    document.title = title;
+    window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 500);
+  } else {
+    window.print();
+  }
 };
 
 const downloadBlob = (blob: Blob, filename: string) => {

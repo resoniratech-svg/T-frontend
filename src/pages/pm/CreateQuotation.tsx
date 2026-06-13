@@ -60,6 +60,8 @@ export default function CreateQuotation() {
         status: "PENDING_APPROVAL",
         date: new Date().toISOString().split('T')[0],
         discount: 0,
+        formatVersion: 1 as 1 | 2,
+        phone: "",
         ...initialDefaults
     });
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -106,6 +108,28 @@ export default function CreateQuotation() {
         }
     };
 
+    const FORMAT_2_TERMS = "Order to be confirmed by LPO/contract.\nPayment: 60% in advance and 40% upon completion\nMaterial: Available\nScaffolding to be provided by client.\nIf any removal of existing film that cost will be added separately.\nVariation: If any additional items or variation in sizes, technical specifications or material specifications will attract cost variation.";
+
+    const handleFormatChange = (version: 1 | 2) => {
+        setForm(prev => {
+            let newFinancialTerms = prev.financialTerms;
+            const isStandardDefault = prev.financialTerms === DEFAULTS.standard.financialTerms || prev.financialTerms === DEFAULTS.service.financialTerms || !prev.financialTerms;
+            
+            if (version === 2 && isStandardDefault && !isEditing) {
+                newFinancialTerms = FORMAT_2_TERMS;
+            } else if (version === 1 && prev.financialTerms === FORMAT_2_TERMS && !isEditing) {
+                const defaults = prev.division === "SERVICE" ? DEFAULTS.service : DEFAULTS.standard;
+                newFinancialTerms = defaults.financialTerms;
+            }
+
+            return {
+                ...prev,
+                formatVersion: version,
+                financialTerms: newFinancialTerms
+            };
+        });
+    };
+
     const [items, setItems] = useState<QuotationItem[]>([
         { description: "", quantity: 1, unit: "pcs", unitPrice: 0, amount: 0 }
     ]);
@@ -130,12 +154,14 @@ export default function CreateQuotation() {
                 status: found.status || found.Status || prev.status,
                 date: found.start_date || (found.created_at ? new Date(found.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]),
                 discount: found.discount != null ? Number(found.discount) : 0,
-                aboutUs: found.aboutUs || prev.aboutUs,
-                whatWeDo: found.whatWeDo || prev.whatWeDo,
-                proposalIntro: found.proposalIntro || prev.proposalIntro,
-                financialTerms: found.financialTerms || prev.financialTerms,
-                clientDuties: found.clientDuties || prev.clientDuties,
-                paymentTerms: found.paymentTerms || prev.paymentTerms,
+                aboutUs: found.aboutUs ?? prev.aboutUs,
+                whatWeDo: found.whatWeDo ?? prev.whatWeDo,
+                proposalIntro: found.proposalIntro ?? prev.proposalIntro,
+                financialTerms: found.financialTerms ?? prev.financialTerms,
+                clientDuties: found.clientDuties ?? prev.clientDuties,
+                paymentTerms: found.paymentTerms ?? prev.paymentTerms,
+                formatVersion: (found.formatVersion === 2 ? 2 : 1) as 1 | 2,
+                phone: found.phone || "",
             }));
 
             if (found.items && found.items.length > 0) {
@@ -195,8 +221,13 @@ export default function CreateQuotation() {
         }
     };
 
-    const handleClientChange = (name: string, clientId?: string) => {
-        setForm({ ...form, client: name, customerCode: clientId || "" });
+    const handleClientChange = (name: string, clientId?: string, phone?: string) => {
+        setForm(prev => ({ 
+            ...prev, 
+            client: name, 
+            customerCode: clientId || "",
+            ...(phone ? { phone } : {})
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -247,7 +278,15 @@ export default function CreateQuotation() {
             discount: Number(form.discount),
             start_date: form.date,
             valid_until: new Date(new Date(form.date).getTime() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-            terms: form.financialTerms + "\n" + form.paymentTerms
+            terms: form.financialTerms + "\n" + form.paymentTerms,
+            proposalIntro: form.proposalIntro,
+            financialTerms: form.financialTerms,
+            clientDuties: form.clientDuties,
+            paymentTerms: form.paymentTerms,
+            aboutUs: form.aboutUs,
+            whatWeDo: form.whatWeDo,
+            formatVersion: form.formatVersion,
+            phone: form.phone
         };
 
         try {
@@ -305,6 +344,27 @@ export default function CreateQuotation() {
                         showAll={false}
                         disabled={isEditing}
                     />
+
+                    {/* Format Selection */}
+                    <div className="pt-6 border-t border-slate-50">
+                        <label className="text-xs font-semibold text-slate-500 uppercase mb-3 block px-1">Select Quotation Format</label>
+                        <div className="flex gap-4">
+                            <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer flex-1 transition-all duration-200 ${form.formatVersion === 1 ? 'border-brand-500 bg-brand-50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
+                                <input type="radio" name="formatVersion" className="accent-brand-600 w-4 h-4 cursor-pointer" checked={form.formatVersion === 1} onChange={() => handleFormatChange(1)} />
+                                <div>
+                                    <p className={`font-bold text-sm ${form.formatVersion === 1 ? 'text-brand-700' : 'text-slate-700'}`}>Format 1 (Standard)</p>
+                                    <p className="text-xs text-slate-500 mt-0.5">Classic detailed proposal layout.</p>
+                                </div>
+                            </label>
+                            <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer flex-1 transition-all duration-200 ${form.formatVersion === 2 ? 'border-brand-500 bg-brand-50 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
+                                <input type="radio" name="formatVersion" className="accent-brand-600 w-4 h-4 cursor-pointer" checked={form.formatVersion === 2} onChange={() => handleFormatChange(2)} />
+                                <div>
+                                    <p className={`font-bold text-sm ${form.formatVersion === 2 ? 'text-brand-700' : 'text-slate-700'}`}>Format 2 (Alternative)</p>
+                                    <p className="text-xs text-slate-500 mt-0.5">Clean table-focused layout.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
 
                     {/* Header Details */}
                     <div className="pt-6 border-t border-slate-50">
@@ -380,6 +440,14 @@ export default function CreateQuotation() {
                                 onChange={handleChange} 
                                 required 
                                 disabled={isEditing}
+                            />
+
+                            <FormInput 
+                                label="Phone Number / Mobile" 
+                                name="phone" 
+                                value={form.phone} 
+                                placeholder="e.g. +974 1234 5678" 
+                                onChange={handleChange} 
                             />
                         </div>
                     </div>

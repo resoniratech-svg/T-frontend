@@ -134,16 +134,18 @@ export default function ClientBilling() {
               {filteredInvoices.length > 0 ? filteredInvoices.map((inv: any) => {
                 const invStatusUpper = (inv.status || "").toUpperCase();
                 const isOverdue = invStatusUpper !== "PAID" && dayjs(inv.dueDate).isBefore(dayjs(), 'day');
+                const displayDate = String(inv.date || "-").split('T')[0];
+                const displayDueDate = String(inv.dueDate || "-").split('T')[0];
                 return (
                   <tr key={inv.id} className={`hover:bg-slate-50 transition-colors ${isOverdue ? 'bg-rose-50/30' : ''}`}>
                     <td className="px-6 py-5 font-bold text-slate-900">{inv.number}</td>
-                    <td className="px-6 py-5 text-slate-500 font-medium">{inv.date}</td>
+                    <td className="px-6 py-5 text-slate-500 font-medium">{displayDate}</td>
                     <td className="px-6 py-5 font-medium text-slate-500">
                       {isOverdue ? (
                         <div className="flex items-center gap-1.5 text-rose-600">
-                           <AlertCircle size={14} /> {inv.dueDate}
+                           <AlertCircle size={14} /> {displayDueDate}
                         </div>
-                      ) : inv.dueDate}
+                      ) : displayDueDate}
                     </td>
                     <td className="px-6 py-5 text-right font-black text-slate-900">QAR {(inv.amount || 0).toLocaleString()}</td>
                     <td className="px-6 py-5">

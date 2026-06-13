@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Printer, Edit, Loader2 } from "lucide-react";
+import { ArrowLeft, Printer, Edit, Loader2, FileText } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../context/AuthContext";
 import { financeService } from "../../services/financeService";
+import { exportToWord, printDocument } from "../../utils/exportUtils";
 import type { Invoice, InvoiceItem } from "../../types/finance";
 
 export default function InvoiceDetails() {
@@ -100,7 +101,15 @@ export default function InvoiceDetails() {
     }
 
     const handlePrint = () => {
-        window.print();
+        const currentDate = new Date().toISOString().split('T')[0];
+        const safeClientName = (invoice.client || "Client").replace(/[^a-zA-Z0-9 -]/g, '').trim();
+        printDocument(`${safeClientName}_${currentDate}`);
+    };
+
+    const handleWordExport = () => {
+        const currentDate = new Date().toISOString().split('T')[0];
+        const safeClientName = (invoice.client || "Client").replace(/[^a-zA-Z0-9 -]/g, '').trim();
+        exportToWord('invoice-content', `${safeClientName}_${currentDate}`);
     };
 
 
@@ -127,6 +136,9 @@ export default function InvoiceDetails() {
                             Edit
                         </button>
                     )}
+                    <button onClick={handleWordExport} className="flex items-center gap-2 bg-[#2a2bb5] text-white px-4 py-2 rounded-lg hover:bg-[#1a1a85] transition shadow-sm font-medium">
+                        <FileText size={16} /> Download Word
+                    </button>
                     <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition shadow-sm">
                         <Printer size={16} />
                         Print / Download PDF
@@ -135,12 +147,12 @@ export default function InvoiceDetails() {
             </div>
 
             {/* NEW CONTRACTING INVOICE DESIGN (Visual Match) */}
-            <div className="max-w-[900px] mx-auto bg-white shadow-xl border border-black overflow-hidden print:shadow-none print:border-none print:m-0 print:w-full font-sans text-black">
+            <div id="invoice-content" className="max-w-[900px] mx-auto bg-white shadow-xl border border-black overflow-hidden print:shadow-none print:border-none print:m-0 print:w-full font-sans text-black">
 
                 {/* Header Section */}
                 <div className="p-8 pb-4 flex justify-between items-start border-b border-black">
                     <div className="flex items-center gap-4">
-                        <img src="/logo.png" alt="TrekGroup Logo" className="w-16 h-16 object-contain" />
+                        <img src="/logo.png" alt="TrekGroup Logo" className="w-28 h-28 object-contain" />
                         <h1 className="text-4xl font-black tracking-tight self-center uppercase">INVOICE</h1>
                     </div>
 
@@ -206,12 +218,11 @@ export default function InvoiceDetails() {
                 </div>
 
                 {/* Main Table */}
-                <div className="min-h-[400px]">
+                <div>
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="border-b border-black text-sm font-black">
                                 <th className="border-r border-black p-2 w-12 text-center uppercase">No.</th>
-                                <th className="border-r border-black p-2 w-24 text-center uppercase">Item Code</th>
                                 <th className="border-r border-black p-2 text-left uppercase">Item Description</th>
                                 <th className="border-r border-black p-2 w-20 text-center uppercase">Qty</th>
                                 <th className="border-r border-black p-2 w-28 text-center uppercase">Unit Price</th>
@@ -221,9 +232,8 @@ export default function InvoiceDetails() {
                         </thead>
                         <tbody>
                             {items.length > 0 ? items.map((item, idx: number) => (
-                                <tr key={idx} className="border-b border-black leading-tight h-10">
+                                <tr key={idx} className="border-b border-black leading-tight min-h-[40px]">
                                     <td className="border-r border-black p-2 text-center align-top">{idx + 1}</td>
-                                    <td className="border-r border-black p-2 text-center align-top">{item.code || ""}</td>
                                     <td className="border-r border-black p-2 text-[12px] align-top whitespace-pre-wrap font-medium">
                                         {item.description}
                                     </td>
@@ -233,30 +243,10 @@ export default function InvoiceDetails() {
                                     <td className="p-2 text-right font-medium align-top">{Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                 </tr>
                             )) : (
-                                Array.from({ length: 12 }).map((_, i) => (
-                                    <tr key={i} className="border-b border-black h-8 opacity-10">
-                                        <td className="border-r border-black"></td>
-                                        <td className="border-r border-black"></td>
-                                        <td className="border-r border-black"></td>
-                                        <td className="border-r border-black"></td>
-                                        <td className="border-r border-black"></td>
-                                        <td className="border-r border-black"></td>
-                                        <td></td>
-                                    </tr>
-                                ))
-                            )}
-                            {/* Filling empty space with grid lines */}
-                            {items.length > 0 && items.length < 12 && Array.from({ length: 12 - items.length }).map((_, i) => (
-                                <tr key={`empty-${i}`} className="border-b border-black h-8">
-                                    <td className="border-r border-black"></td>
-                                    <td className="border-r border-black"></td>
-                                    <td className="border-r border-black"></td>
-                                    <td className="border-r border-black"></td>
-                                    <td className="border-r border-black"></td>
-                                    <td className="border-r border-black"></td>
-                                    <td></td>
+                                <tr>
+                                    <td colSpan={6} className="p-8 text-center text-slate-400 italic border-b border-black">No items found</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

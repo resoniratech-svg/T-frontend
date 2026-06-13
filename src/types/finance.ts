@@ -41,7 +41,7 @@ export interface Invoice {
   salesman?: string;
   qid?: string;
   address?: string;
-  invoiceType?: "Credit" | "Cash";
+  invoiceType?: "Credit" | "Cash" | "Online";
   approvalStatus?: "pending" | "approved" | "rejected";
   createdAt?: string;
   project?: string;

@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Printer, Edit } from "lucide-react";
+import { ArrowLeft, Printer, Edit, FileText } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
 import { numberToWords } from "../../utils/numberToWords";
-import { printDocument } from "../../utils/exportUtils";
+import { printDocument, exportToWord } from "../../utils/exportUtils";
 import BusinessProposalView from "./BusinessProposalView";
+import QuotationFormat2View from "./QuotationFormat2View";
 import type { Quotation, QuotationItem } from "../../types/pm";
 import { useQuery } from "@tanstack/react-query";
 import { quotationService } from "../../services/quotationService";
@@ -66,7 +67,15 @@ export default function QuotationDetails() {
     };
 
     const handlePrint = () => {
-        printDocument();
+        const currentDate = new Date().toISOString().split('T')[0];
+        const safeProjectName = (quotation.project || quotation["Quote ID"] || "Quotation").replace(/[^a-zA-Z0-9 -]/g, '').trim();
+        printDocument(`${safeProjectName}_${currentDate}`);
+    };
+
+    const handleWordExport = () => {
+        const currentDate = new Date().toISOString().split('T')[0];
+        const safeProjectName = (quotation.project || quotation["Quote ID"] || "Quotation").replace(/[^a-zA-Z0-9 -]/g, '').trim();
+        exportToWord('quotation-content', `${safeProjectName}_${currentDate}`);
     };
 
     const branch = quotation.branch || "Contracting";
@@ -114,12 +123,17 @@ export default function QuotationDetails() {
                                     <Edit size={16} /> Edit
                                 </button>
                             )}
+                            <button onClick={handleWordExport} className="flex items-center gap-2 bg-[#2a2bb5] text-white px-4 py-2 rounded-lg hover:bg-[#1a1a85] transition shadow-sm font-medium">
+                                <FileText size={16} /> Download Word
+                            </button>
                             <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition shadow-sm font-medium">
                                 <Printer size={16} /> Print / Download PDF
                             </button>
                         </div>
                     </div>
-                    <BusinessProposalView quotation={quotation} />
+                    <div id="quotation-content">
+                        <BusinessProposalView quotation={quotation} />
+                    </div>
                 </div>
             </div>
         );
@@ -141,16 +155,21 @@ export default function QuotationDetails() {
                             <Edit size={16} /> Edit
                         </button>
                     )}
+                    <button onClick={handleWordExport} className="flex items-center gap-2 bg-[#2a2bb5] text-white px-4 py-2 rounded-lg hover:bg-[#1a1a85] transition shadow-sm font-medium">
+                        <FileText size={16} /> Download Word
+                    </button>
                     <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition shadow-sm font-medium">
                         <Printer size={16} /> Print / Download PDF
                     </button>
                 </div>
             </div>
 
-            {/* A4 Document Container */}
-            <div className="w-[850px] mx-auto bg-white shadow-lg border border-slate-200 overflow-hidden print:shadow-none print:border-none print:m-0 font-['Arial',_Helvetica,_sans-serif] text-black leading-snug print-page">
+            {quotation.formatVersion === 2 ? (
+                <QuotationFormat2View quotation={quotation} />
+            ) : (
+                <div id="quotation-content" className="w-[850px] mx-auto bg-white shadow-lg border border-slate-200 overflow-hidden print:shadow-none print:border-none print:m-0 font-['Arial',_Helvetica,_sans-serif] text-black leading-snug print-page">
 
-                {/* Header Section */}
+                    {/* Header Section */}
                 <div className="p-8 pb-5 flex justify-between items-start">
                     <div className="bg-[#e6e4ec] w-52 h-[170px] flex flex-col justify-center items-center p-4">
                         <div className="w-[70px] h-[70px] mb-2 text-[#2a2944]">
@@ -209,7 +228,7 @@ export default function QuotationDetails() {
                     <div className="space-y-1 font-bold">
                         <p>Dear sir</p>
                         <div className="font-normal text-[16px] pb-1 whitespace-pre-wrap">
-                            {quotation.proposalIntro || "With reference to the above-mentioned subject and your inquiry, please find below our final\nrock bottom prices: -"}
+                            {quotation.proposalIntro ?? "With reference to the above-mentioned subject and your inquiry, please find below our final\nrock bottom prices: -"}
                         </div>
                     </div>
 
@@ -249,13 +268,15 @@ export default function QuotationDetails() {
                                     <td className="border border-black px-4 py-1.5 uppercase">DISCOUNT ({discountPercent}%)</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center">{Number(discountAmount).toLocaleString()}</td>
+                                    <td className="border border-black px-3 py-1.5 text-center text-red-600">
+                                        -{Number(discountAmount).toLocaleString()}
+                                    </td>
                                 </tr>
-                                <tr className="font-bold">
-                                    <td className="border border-black px-4 py-1.5 uppercase">NET TOTAL</td>
+                                <tr className="font-bold bg-[#D3D3DF]">
+                                    <td className="border border-black px-4 py-1.5 uppercase tracking-wide">Net Total</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center">{Number(netTotal).toLocaleString()}</td>
+                                    <td className="border border-black px-3 py-1.5 text-center text-[16px]">{Number(netTotal).toLocaleString()}</td>
                                 </tr>
                                 {/* Price in Words Row */}
                                 <tr className="bg-[#D3D3DF]">
@@ -270,7 +291,7 @@ export default function QuotationDetails() {
                         <div className="space-y-1 pb-10">
                             <h3 className="underline font-bold text-[14px] font-['Arial',_Helvetica,_sans-serif]">Terms & Condition:</h3>
                             <div className="text-[13px] font-normal font-['Arial',_Helvetica,_sans-serif] whitespace-pre-wrap leading-[1.4] break-inside-avoid">
-                                {quotation.financialTerms || (
+                                {quotation.financialTerms ?? (
                                     <ol className="list-decimal pl-5 space-y-1">
                                         <li><span className="font-bold">Payment:</span> 50% advance, 30% upon delivery, and 20% upon completion</li>
                                         <li><span className="font-bold">Delivery:</span> with 15 days from the advance payment.</li>
@@ -295,7 +316,8 @@ export default function QuotationDetails() {
                         </div>
                     </div>
                 </div>
-            </div>
+                </div>
+            )}
 
             <style>{`
         @media print {
