@@ -79,7 +79,6 @@ function Users() {
                   <th className="text-left p-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Phone</th>
                   <th className="text-left p-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Role</th>
                   <th className="text-left p-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Sector</th>
-                  <th className="text-left p-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Status</th>
                   <th className="text-right p-4 font-black text-slate-400 uppercase tracking-widest text-[10px]">Actions</th>
                 </tr>
               </thead>
@@ -113,12 +112,9 @@ function Users() {
                         {user.sector || user.division || "N/A"}
                       </span>
                     </td>
-                    <td className="p-4">
-                      <StatusBadge status={user.status} />
-                    </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end items-center gap-2 transition-opacity">
-                        {user.role !== "CLIENT" && (
+                        {user.role !== "CLIENT" && user.role !== "PROJECT_MANAGER" && user.role !== "ACCOUNTS" && (
                           <Link
                             to={`/edit-user/${user.id}`}
                             className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
@@ -194,15 +190,17 @@ function Users() {
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-50 pt-3">
                   <div className="flex items-center gap-2">
-                    <StatusBadge status={user.status} />
+                    
                   </div>
                   <div className="flex gap-1">
-                    <Link
-                      to={`/edit-user/${user.id}`}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
-                    >
-                      <Edit size={14} />
-                    </Link>
+                    {user.role !== "ACCOUNTS" && (
+                      <Link
+                        to={`/edit-user/${user.id}`}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
+                      >
+                        <Edit size={14} />
+                      </Link>
+                    )}
                     {String(user.id) !== "1" && (
                       <button
                         onClick={() => setDeleteModal({ id: String(user.id), name: user.name })}

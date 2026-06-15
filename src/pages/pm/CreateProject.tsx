@@ -68,13 +68,6 @@ function CreateProject() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
-    // Block past dates for startDate
-    if (name === 'startDate' && value) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (new Date(value) < today) return; // silently reject past dates
-    }
-
     // Block endDate before startDate
     if (name === 'endDate' && value && form.startDate) {
       if (new Date(value) < new Date(form.startDate)) return;
@@ -248,7 +241,6 @@ function CreateProject() {
               name="startDate"
               value={form.startDate}
               onChange={handleChange}
-              min={new Date().toLocaleDateString('en-CA')}
             />
 
             <FormInput

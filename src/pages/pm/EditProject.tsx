@@ -204,6 +204,7 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
                             name="endDate"
                             value={form.endDate}
                             onChange={handleChange}
+                            min={form.startDate}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none"
                         />
                     </div>
