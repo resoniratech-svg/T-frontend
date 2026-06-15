@@ -226,6 +226,7 @@ function EditClient() {
             label="Select Division / Sector" 
             selectedId={form.division} 
             onChange={handleDivisionChange} 
+            disabled={true}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-50">
@@ -240,7 +241,8 @@ function EditClient() {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                disabled
+                className="w-full border border-slate-200 p-2.5 rounded-lg outline-none bg-slate-50 text-slate-500 cursor-not-allowed"
                 placeholder="Full Name"
               />
             </div>
@@ -252,7 +254,8 @@ function EditClient() {
                 name="company"
                 value={form.company}
                 onChange={handleChange}
-                className="w-full border border-slate-200 p-2.5 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                disabled
+                className="w-full border border-slate-200 p-2.5 rounded-lg outline-none bg-slate-50 text-slate-500 cursor-not-allowed"
                 placeholder="Company Name"
               />
             </div>
