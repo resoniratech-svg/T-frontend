@@ -142,7 +142,8 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
                             name="name"
                             value={form.name}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none"
+                            disabled
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none bg-slate-50 text-slate-500 cursor-not-allowed"
                             required
                         />
                     </div>
