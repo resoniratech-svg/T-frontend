@@ -148,11 +148,10 @@ function ProjectEditForm({ project, id }: { project: Project, id: string }) {
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1 text-gray-700">Client <span className="text-rose-500">*</span></label>
-                        <ClientAutocomplete
+                        <input
                             value={form.client}
-                            onChange={(name, id) => setForm({ ...form, client: name, client_id: id || "" })}
-                            division={form.division === "service" ? "business" : form.division}
-                            placeholder="Search client..."
+                            disabled
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 outline-none bg-slate-50 text-slate-500 cursor-not-allowed"
                         />
                     </div>
                     <div>
