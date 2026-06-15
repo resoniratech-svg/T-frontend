@@ -415,7 +415,7 @@ export default function AdminDashboard() {
             {/* === Row 4: Active Projects + Recent Activity === */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Active Projects */}
-                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden self-start">
                     <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
