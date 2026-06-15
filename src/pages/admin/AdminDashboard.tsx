@@ -412,190 +412,193 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* === Row 4: Active Projects + Recent Activity === */}
+            {/* === Main Content Area === */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
-                {/* Active Projects */}
-                <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
-                                <Briefcase size={16} />
+                {/* Left Column */}
+                <div className="lg:col-span-2 flex flex-col gap-5">
+                    {/* Active Projects */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
+                                    <Briefcase size={16} />
+                                </div>
+                                <h2 className="text-sm font-semibold text-gray-800">Active Projects</h2>
                             </div>
-                            <h2 className="text-sm font-semibold text-gray-800">Active Projects</h2>
+                            <Link to="/projects" className="text-xs text-brand-600 font-bold hover:underline">Manage All</Link>
                         </div>
-                        <Link to="/projects" className="text-xs text-brand-600 font-bold hover:underline">Manage All</Link>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="bg-gray-50/50 text-left">
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Project</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {activeProjects.length > 0 ? activeProjects.map((proj) => {
+                                        const divKey = (proj.division?.toLowerCase() === "business" || proj.division?.toLowerCase() === "service") ? "service" : (proj.division?.toLowerCase() || "contracting") as DivisionId;
+                                        const divMeta = DIVISIONS.find(d => d.id === divKey);
+                                        return (
+                                            <tr key={proj.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/projects`)}>
+                                                <td className="px-5 py-3">
+                                                    <p className="font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{proj.name}</p>
+                                                    {proj.deadline && <p className="text-[10px] text-gray-400 mt-0.5">Due: {proj.deadline}</p>}
+                                                </td>
+                                                <td className="px-5 py-3 text-gray-600">{proj.client}</td>
+                                                <td className="px-5 py-3 hidden md:table-cell">
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${divMeta?.bg || 'bg-gray-100'} ${divMeta?.text || 'text-gray-600'}`}>
+                                                        {divMeta?.label?.replace(' Sector', '') || proj.division}
+                                                    </span>
+                                                </td>
+                                                <td className="px-5 py-3">
+                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                                        proj.status === "Active" || proj.status === "Ongoing" ? 'bg-emerald-100 text-emerald-600' :
+                                                        proj.status === "Completed" ? 'bg-blue-100 text-blue-600' :
+                                                        'bg-amber-100 text-amber-600'
+                                                    }`}>
+                                                        {proj.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    }) : (
+                                        <tr>
+                                            <td colSpan={5} className="py-10 text-center text-gray-400 italic text-sm">No active projects found.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="bg-gray-50/50 text-left">
-                                    <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Project</th>
-                                    <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
-                                    <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                                    <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {activeProjects.length > 0 ? activeProjects.map((proj) => {
-                                    const divKey = (proj.division?.toLowerCase() === "business" || proj.division?.toLowerCase() === "service") ? "service" : (proj.division?.toLowerCase() || "contracting") as DivisionId;
-                                    const divMeta = DIVISIONS.find(d => d.id === divKey);
-                                    return (
-                                        <tr key={proj.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/projects`)}>
-                                            <td className="px-5 py-3">
-                                                <p className="font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{proj.name}</p>
-                                                {proj.deadline && <p className="text-[10px] text-gray-400 mt-0.5">Due: {proj.deadline}</p>}
-                                            </td>
-                                            <td className="px-5 py-3 text-gray-600">{proj.client}</td>
+
+                    {/* Recent Invoices */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <Banknote size={16} />
+                                </div>
+                                <h2 className="text-sm font-semibold text-gray-800">Recent Invoices</h2>
+                            </div>
+                            <Link to="/invoices" className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1">
+                                Manage All <ArrowRight size={12} />
+                            </Link>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="bg-gray-50/50 text-left">
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Invoice</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {recentInvoices.length > 0 ? recentInvoices.map((inv) => (
+                                        <tr key={inv.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/invoice-details/${inv.id}`)}>
+                                            <td className="px-5 py-3 font-medium text-brand-600 group-hover:underline underline-offset-4">{inv.id}</td>
+                                            <td className="px-5 py-3 text-gray-700">{inv.client}</td>
                                             <td className="px-5 py-3 hidden md:table-cell">
-                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${divMeta?.bg || 'bg-gray-100'} ${divMeta?.text || 'text-gray-600'}`}>
-                                                    {divMeta?.label?.replace(' Sector', '') || proj.division}
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                                    inv.division?.toLowerCase() === 'service' ? 'bg-blue-100 text-blue-600' :
+                                                    inv.division?.toLowerCase() === 'trading' ? 'bg-amber-100 text-amber-600' :
+                                                    'bg-violet-100 text-violet-600'
+                                                }`}>
+                                                    {inv.division}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-3">
+                                            <td className="px-5 py-3 font-bold text-gray-900">QAR {inv.amount.toLocaleString()}</td>
+                                            <td className="px-5 py-3"><StatusBadge status={inv.status} /></td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={5} className="py-10 text-center text-gray-400 italic text-sm">No invoices recorded yet.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Recent Expenses */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                                    <CreditCard size={16} />
+                                </div>
+                                <h2 className="text-sm font-semibold text-gray-800">Recent Expenses</h2>
+                            </div>
+                            <Link to="/expenses" className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1">
+                                Manage All <ArrowRight size={12} />
+                            </Link>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="bg-gray-50/50 text-left">
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Expense ID</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Title</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Created By</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {recentExpenses.length > 0 ? recentExpenses.map((exp) => (
+                                        <tr key={exp.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/expenses`)}>
+                                            <td className="px-5 py-3 font-medium text-brand-600 group-hover:underline underline-offset-4">{exp.id}</td>
+                                            <td className="px-5 py-3 text-gray-700 font-medium">{exp.title}</td>
+                                            <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">{exp.createdBy}</td>
+                                            <td className="px-5 py-3 hidden md:table-cell">
                                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                                    proj.status === "Active" || proj.status === "Ongoing" ? 'bg-emerald-100 text-emerald-600' :
-                                                    proj.status === "Completed" ? 'bg-blue-100 text-blue-600' :
-                                                    'bg-amber-100 text-amber-600'
+                                                    exp.sector?.toLowerCase().includes('service') ? 'bg-blue-100 text-blue-600' :
+                                                    exp.sector?.toLowerCase().includes('trading') ? 'bg-amber-100 text-amber-600' :
+                                                    exp.sector?.toLowerCase().includes('pending') ? 'bg-gray-100 text-gray-600' :
+                                                    'bg-violet-100 text-violet-600'
                                                 }`}>
-                                                    {proj.status}
+                                                    {exp.sector}
                                                 </span>
+                                            </td>
+                                            <td className="px-5 py-3 font-bold text-gray-900">QAR {exp.amount.toLocaleString()}</td>
+                                            <td className="px-5 py-3">
+                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                                                    exp.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                                    exp.status === 'Rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                                                    'bg-amber-50 text-amber-600 border-amber-100'
+                                                }`}>
+                                                    {exp.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-3 text-gray-500 text-xs hidden lg:table-cell">
+                                                {exp.date ? new Date(exp.date).toLocaleDateString() : 'N/A'}
                                             </td>
                                         </tr>
-                                    );
-                                }) : (
-                                    <tr>
-                                        <td colSpan={5} className="py-10 text-center text-gray-400 italic text-sm">No active projects found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={7} className="py-10 text-center text-gray-400 italic text-sm">No expenses recorded yet.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                {/* Recent Activity */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col">
+                {/* Right Column: Recent Activity */}
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col h-full">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-sm font-semibold text-gray-800">Recent Activity</h2>
                         <TrendingUp size={16} className="text-gray-400" />
                     </div>
-                    <ActivityLog maxItems={6} divisionFilter={activeDivision} />
-                </div>
-            </div>
-
-            {/* === Row 5: Recent Invoices (Full Width) === */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <Banknote size={16} />
-                        </div>
-                        <h2 className="text-sm font-semibold text-gray-800">Recent Invoices</h2>
-                    </div>
-                    <Link to="/invoices" className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1">
-                        Manage All <ArrowRight size={12} />
-                    </Link>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="bg-gray-50/50 text-left">
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Invoice</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {recentInvoices.length > 0 ? recentInvoices.map((inv) => (
-                                <tr key={inv.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/invoice-details/${inv.id}`)}>
-                                    <td className="px-5 py-3 font-medium text-brand-600 group-hover:underline underline-offset-4">{inv.id}</td>
-                                    <td className="px-5 py-3 text-gray-700">{inv.client}</td>
-                                    <td className="px-5 py-3 hidden md:table-cell">
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                            inv.division?.toLowerCase() === 'service' ? 'bg-blue-100 text-blue-600' :
-                                            inv.division?.toLowerCase() === 'trading' ? 'bg-amber-100 text-amber-600' :
-                                            'bg-violet-100 text-violet-600'
-                                        }`}>
-                                            {inv.division}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-3 font-bold text-gray-900">QAR {inv.amount.toLocaleString()}</td>
-                                    <td className="px-5 py-3"><StatusBadge status={inv.status} /></td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan={5} className="py-10 text-center text-gray-400 italic text-sm">No invoices recorded yet.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* === Row 6: Recent Expenses (Full Width) === */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-6">
-                <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
-                            <CreditCard size={16} />
-                        </div>
-                        <h2 className="text-sm font-semibold text-gray-800">Recent Expenses</h2>
-                    </div>
-                    <Link to="/expenses" className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1">
-                        Manage All <ArrowRight size={12} />
-                    </Link>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="bg-gray-50/50 text-left">
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Expense ID</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Title</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Created By</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden md:table-cell">Sector</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Amount</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                <th className="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden lg:table-cell">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {recentExpenses.length > 0 ? recentExpenses.map((exp) => (
-                                <tr key={exp.id} className="hover:bg-brand-50/30 transition-colors group cursor-pointer" onClick={() => navigate(`/expenses`)}>
-                                    <td className="px-5 py-3 font-medium text-brand-600 group-hover:underline underline-offset-4">{exp.id}</td>
-                                    <td className="px-5 py-3 text-gray-700 font-medium">{exp.title}</td>
-                                    <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">{exp.createdBy}</td>
-                                    <td className="px-5 py-3 hidden md:table-cell">
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                                            exp.sector?.toLowerCase().includes('service') ? 'bg-blue-100 text-blue-600' :
-                                            exp.sector?.toLowerCase().includes('trading') ? 'bg-amber-100 text-amber-600' :
-                                            exp.sector?.toLowerCase().includes('pending') ? 'bg-gray-100 text-gray-600' :
-                                            'bg-violet-100 text-violet-600'
-                                        }`}>
-                                            {exp.sector}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-3 font-bold text-gray-900">QAR {exp.amount.toLocaleString()}</td>
-                                    <td className="px-5 py-3">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                                            exp.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                            exp.status === 'Rejected' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                                            'bg-amber-50 text-amber-600 border-amber-100'
-                                        }`}>
-                                            {exp.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-3 text-gray-500 text-xs hidden lg:table-cell">
-                                        {exp.date ? new Date(exp.date).toLocaleDateString() : 'N/A'}
-                                    </td>
-                                </tr>
-                            )) : (
-                                <tr>
-                                    <td colSpan={7} className="py-10 text-center text-gray-400 italic text-sm">No expenses recorded yet.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                    <ActivityLog maxItems={12} divisionFilter={activeDivision} />
                 </div>
             </div>
             {/* === Row 7: Recent Credit Requests (Full Width) === */}
