@@ -80,11 +80,12 @@ export default function QuotationFormat2View({ quotation }: Props) {
                     <thead>
                         <tr className="font-bold">
                             <th className="border border-black p-2 w-[8%] text-center">SL.no</th>
-                            <th className="border border-black p-2 w-[52%] text-center">Item</th>
+                            <th className="border border-black p-2 w-[42%] text-center">Item</th>
                             <th className="border border-black p-2 w-[12%] text-center">QTY</th>
                             <th className="border border-black p-2 w-[13%] text-center">
                                 {items[0]?.unit ? `${items[0].unit.toLowerCase()} price` : "Unit price"}
                             </th>
+                            <th className="border border-black p-2 w-[10%] text-center">Disc (%)</th>
                             <th className="border border-black p-2 w-[15%] text-center">Total QR.</th>
                         </tr>
                     </thead>
@@ -104,7 +105,10 @@ export default function QuotationFormat2View({ quotation }: Props) {
                                     {Number(item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </td>
                                 <td className="border border-black p-2 text-center font-bold">
-                                    {Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {item.discount ? `${item.discount}%` : "-"}
+                                </td>
+                                <td className="border border-black p-2 text-center font-bold">
+                                    {Number(item.amount || (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0)/100)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </td>
                             </tr>
                         ))}

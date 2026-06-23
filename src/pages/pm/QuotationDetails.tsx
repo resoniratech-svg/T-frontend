@@ -237,11 +237,12 @@ export default function QuotationDetails() {
                         <table className="w-full border-collapse border border-black mb-6 text-black">
                             <thead className="bg-[#D3D3DF] font-bold">
                                 <tr>
-                                    <th className="border border-black px-3 py-1.5 text-center w-[58%]">Product Type</th>
+                                    <th className="border border-black px-3 py-1.5 text-center w-[50%]">Product Type</th>
                                     <th className="border border-black px-3 py-1.5 text-center">QTY</th>
                                     <th className="border border-black px-3 py-1.5 text-center">
                                         {items[0]?.unit ? `${items[0].unit.toUpperCase()} PRICE` : "UNIT PRICE"}
                                     </th>
+                                    <th className="border border-black px-3 py-1.5 text-center">DISC (%)</th>
                                     <th className="border border-black px-3 py-1.5 text-center">Unite Rate</th>
                                 </tr>
                             </thead>
@@ -253,7 +254,8 @@ export default function QuotationDetails() {
                                         </td>
                                         <td className="border border-black px-3 py-3 text-center align-middle">{item.quantity}{item.unit ? ` ${item.unit}` : ""}</td>
                                         <td className="border border-black px-3 py-3 text-center align-middle">{Number(item.unitPrice).toLocaleString()}</td>
-                                        <td className="border border-black px-3 py-3 text-center align-middle">{Number(item.amount || (item.quantity * item.unitPrice)).toLocaleString()}</td>
+                                        <td className="border border-black px-3 py-3 text-center align-middle">{item.discount ? `${item.discount}%` : "-"}</td>
+                                        <td className="border border-black px-3 py-3 text-center align-middle">{Number(item.amount || (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0)/100)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                     </tr>
                                 ))}
 
@@ -262,25 +264,28 @@ export default function QuotationDetails() {
                                     <td className="border border-black px-4 py-1.5 uppercase">TOTAL</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center">{Number(subtotal).toLocaleString()}</td>
+                                    <td className="border border-black"></td>
+                                    <td className="border border-black px-3 py-1.5 text-center">{Number(subtotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                 </tr>
                                 <tr className="font-bold">
                                     <td className="border border-black px-4 py-1.5 uppercase">DISCOUNT ({discountPercent}%)</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
+                                    <td className="border border-black"></td>
                                     <td className="border border-black px-3 py-1.5 text-center text-red-600">
-                                        -{Number(discountAmount).toLocaleString()}
+                                        -{Number(discountAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </td>
                                 </tr>
                                 <tr className="font-bold bg-[#D3D3DF]">
                                     <td className="border border-black px-4 py-1.5 uppercase tracking-wide">Net Total</td>
                                     <td className="border border-black"></td>
                                     <td className="border border-black"></td>
-                                    <td className="border border-black px-3 py-1.5 text-center text-[16px]">{Number(netTotal).toLocaleString()}</td>
+                                    <td className="border border-black"></td>
+                                    <td className="border border-black px-3 py-1.5 text-center text-[16px]">{Number(netTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                 </tr>
                                 {/* Price in Words Row */}
                                 <tr className="bg-[#D3D3DF]">
-                                    <td colSpan={4} className="border border-black px-4 py-2 text-center font-bold uppercase tracking-tight text-[14px]">
+                                    <td colSpan={5} className="border border-black px-4 py-2 text-center font-bold uppercase tracking-tight text-[14px]">
                                         {numberToWords(netTotal)}
                                     </td>
                                 </tr>

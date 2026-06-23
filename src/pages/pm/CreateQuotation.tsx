@@ -194,17 +194,19 @@ export default function CreateQuotation() {
     const handleItemChange = (index: number, field: keyof QuotationItem, value: string) => {
         const newItems = [...items];
         
-        // Block non-numeric for Qty and Price
-        if (field === "quantity" || field === "unitPrice") {
+        // Block non-numeric for Qty, Price, and Discount
+        if (field === "quantity" || field === "unitPrice" || field === "discount") {
             if (value !== "" && !/^\d*\.?\d*$/.test(value)) return;
         }
 
-        const numValue = value === "" ? 0 : Number(value);
-        const updatedItem = { ...newItems[index], [field]: (field === "description" || field === "unit") ? value : numValue };
+        const updatedItem = { ...newItems[index], [field]: value };
         
         // Recalculate item amount
-        if (field === 'quantity' || field === 'unitPrice') {
-            updatedItem.amount = Number(updatedItem.quantity) * Number(updatedItem.unitPrice);
+        if (field === 'quantity' || field === 'unitPrice' || field === 'discount') {
+            const qty = Number(updatedItem.quantity);
+            const price = Number(updatedItem.unitPrice);
+            const disc = Number(updatedItem.discount || 0);
+            updatedItem.amount = qty * price * (1 - (disc / 100));
         }
         
         newItems[index] = updatedItem;
@@ -212,7 +214,7 @@ export default function CreateQuotation() {
     };
 
     const addItem = () => {
-        setItems([...items, { description: "", quantity: 1, unit: "pcs", unitPrice: 0, amount: 0 }]);
+        setItems([...items, { description: "", quantity: 1, unit: "pcs", unitPrice: 0, discount: 0, amount: 0 }]);
     };
 
     const removeItem = (index: number) => {
@@ -256,10 +258,18 @@ export default function CreateQuotation() {
         }
 
         // Calculate totals
-        const calculatedItems = items.map(item => ({
-            ...item,
-            amount: Number(item.quantity) * Number(item.unitPrice)
-        }));
+        const calculatedItems = items.map(item => {
+            const qty = Number(item.quantity);
+            const price = Number(item.unitPrice);
+            const disc = Number(item.discount || 0);
+            return {
+                ...item,
+                quantity: qty,
+                unitPrice: price,
+                discount: disc,
+                amount: qty * price * (1 - (disc / 100))
+            };
+        });
 
         const totalAmount = calculatedItems.reduce((sum, item) => sum + item.amount, 0);
         const discountAmount = totalAmount * (Number(form.discount) / 100);
@@ -540,10 +550,19 @@ export default function CreateQuotation() {
                                             required
                                         />
                                     </div>
+                                    <div className="w-24">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Disc (%)</label>
+                                        <input
+                                            type="text"
+                                            value={item.discount || ''}
+                                            onChange={(e) => handleItemChange(index, "discount", e.target.value)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-md outline-none focus:ring-1 focus:ring-brand-500 text-right"
+                                        />
+                                    </div>
                                     <div className="w-32">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total</label>
                                         <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-md text-slate-600 font-medium text-right">
-                                            {(item.quantity * item.unitPrice).toLocaleString()}
+                                            {(Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0) / 100))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </div>
                                     </div>
                                     <div className="pt-6">
@@ -565,7 +584,7 @@ export default function CreateQuotation() {
                         <div className="w-64 space-y-3">
                             <div className="flex justify-between items-center text-sm font-medium text-slate-600">
                                 <span>Subtotal</span>
-                                <span>{items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0).toLocaleString()}</span>
+                                <span>{items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0) / 100))), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                              <div className="flex justify-between items-center text-sm font-medium text-slate-600">
                                  <span>Discount (%)</span>
@@ -582,7 +601,7 @@ export default function CreateQuotation() {
                              </div>
                             <div className="flex justify-between items-center text-lg font-black text-slate-900 pt-2 border-t">
                                 <span>Net Total</span>
-                                <span>{(items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) * (1 - (form.discount / 100))).toLocaleString()} QAR</span>
+                                <span>{(items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0) / 100))), 0) * (1 - (form.discount / 100))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} QAR</span>
                             </div>
                         </div>
                     </div>

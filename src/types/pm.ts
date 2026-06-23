@@ -3,9 +3,10 @@ import type { ApprovalStatus } from "./approvals";
 
 export interface QuotationItem {
   description: string;
-  quantity: number;
+  quantity: number | string;
   unit?: string;
-  unitPrice: number;
+  unitPrice: number | string;
+  discount?: number | string;
   amount: number;
 }
 
