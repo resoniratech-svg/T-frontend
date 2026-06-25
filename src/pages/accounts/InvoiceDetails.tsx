@@ -179,8 +179,7 @@ export default function InvoiceDetails() {
                                     new TableCell({
                                         width: { size: 50, type: WidthType.PERCENTAGE },
                                         children: [
-                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "TREK GROUP TRADING CONTRACTING AND SERVICES", bold: true, color: "2563eb", size: 18 })] }),
-                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: sectorName.toUpperCase(), bold: true, color: "2563eb", size: 26 })] })
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "TREK GROUP TRADING CONTRACTING AND SERVICES", bold: true, color: "000000", size: 18 })] })
                                         ],
                                         borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
                                         verticalAlign: VerticalAlign.BOTTOM
@@ -370,11 +369,6 @@ export default function InvoiceDetails() {
                     <div className="text-right flex flex-col items-end">
                         <div className="text-brand-600 font-bold text-xl flex flex-col items-end leading-tight max-w-[400px] text-right">
                             <span className="text-black text-xs font-bold opacity-60">TREK GROUP TRADING CONTRACTING AND SERVICES</span>
-                            <span className="text-brand-600 text-lg font-black tracking-[0.2em] uppercase mt-1">
-                                {(invoice.branch?.toLowerCase() === "service" || invoice.branch?.toLowerCase() === "business") ? "Service Sector" :
-                                    invoice.branch?.toLowerCase() === "trading" ? "Trading Sector" :
-                                        "Contracting Sector"}
-                            </span>
                         </div>
                     </div>
                 </div>
