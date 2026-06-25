@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer, Edit, FileText } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
 import { numberToWords } from "../../utils/numberToWords";
-import { printDocument, exportToWord } from "../../utils/exportUtils";
+import { printDocument, exportToWord, downloadDocx } from "../../utils/exportUtils";
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, VerticalAlign, ImageRun } from "docx";
 import BusinessProposalView from "./BusinessProposalView";
 import QuotationFormat2View from "./QuotationFormat2View";
 import type { Quotation, QuotationItem } from "../../types/pm";
@@ -72,10 +73,240 @@ export default function QuotationDetails() {
         printDocument(`${safeProjectName}_${currentDate}`);
     };
 
-    const handleWordExport = () => {
+    const handleWordExport = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
         const safeProjectName = (quotation.project || quotation["Quote ID"] || "Quotation").replace(/[^a-zA-Z0-9 -]/g, '').trim();
-        exportToWord('quotation-content', `${safeProjectName}_${currentDate}`);
+        const blob = await generateQuotationDocx(quotation);
+        downloadDocx(blob, `${safeProjectName}_${currentDate}`);
+    };
+
+    const generateQuotationDocx = async (quotation: Quotation): Promise<Blob> => {
+        const items = quotation.items || [];
+        const qDate = new Date(quotation.date || new Date().toISOString());
+        const dateStr = qDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const client = quotation.client || "Client";
+        const quoteId = quotation["Quote ID"] || quotation.id || "N/A";
+        const project = quotation.project || "N/A";
+
+        let logoImage: ArrayBuffer | null = null;
+        try {
+            const response = await fetch('/logo.png');
+            if (response.ok) {
+                logoImage = await response.arrayBuffer();
+            }
+        } catch (e) {
+            console.error("Failed to load logo", e);
+        }
+
+        const createCell = (text: string, bold: boolean = false, align: AlignmentType = AlignmentType.LEFT, colspan: number = 1, borders: any = {}, fill?: string, color?: string) => {
+            return new TableCell({
+                columnSpan: colspan,
+                margins: { top: 100, bottom: 100, left: 100, right: 100 },
+                borders: borders,
+                verticalAlign: VerticalAlign.CENTER,
+                shading: fill ? { fill: fill } : undefined,
+                children: [new Paragraph({
+                    alignment: align,
+                    children: [new TextRun({ text: text, bold: bold, size: 20, color: color })]
+                })]
+            });
+        };
+
+        const greenBorders = {
+            top: { style: BorderStyle.SINGLE, size: 12, color: "16a34a" },
+            bottom: { style: BorderStyle.SINGLE, size: 12, color: "16a34a" },
+            left: { style: BorderStyle.SINGLE, size: 12, color: "16a34a" },
+            right: { style: BorderStyle.SINGLE, size: 12, color: "16a34a" },
+        };
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE }, insideHorizontal: { style: BorderStyle.NONE }, insideVertical: { style: BorderStyle.NONE } },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        children: [
+                                            new Paragraph({
+                                                children: logoImage ? [
+                                                    new ImageRun({
+                                                        data: logoImage,
+                                                        transformation: { width: 100, height: 100 }
+                                                    })
+                                                ] : [new TextRun({ text: "TREK GROUP", bold: true, size: 28 })]
+                                            })
+                                        ],
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } }
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        children: [
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "PO Box: 96347, Doha - Qatar", size: 18 })] }),
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Mob: +974 71716559", size: 18 })] }),
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Email: info@trekgroup.com", size: 18 })] }),
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Web: www.trekgroup.com", size: 18 })] }),
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "TREK GROUP W.L.L", bold: true, size: 22 })] })
+                                        ],
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        verticalAlign: VerticalAlign.BOTTOM
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [new TextRun({ text: "QUOTATION", bold: true, size: 36 })]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: greenBorders,
+                        margins: { top: 150, bottom: 150, left: 150, right: 150 },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "CLIENT: " + client.toUpperCase(), bold: true, size: 22, color: "16a34a" })] })
+                                        ]
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "QTN# EXO: " + quoteId, bold: true, size: 22, color: "dc2626" })] })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        columnSpan: 2,
+                                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [new Paragraph({ text: "" })]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "Doha, Qatar", size: 20 })] })
+                                        ]
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Date: " + dateStr, bold: true, size: 20, color: "dc2626" })] })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        columnSpan: 2,
+                                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [new Paragraph({ text: "" })]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        columnSpan: 2,
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "Project : ", bold: true, size: 20 }), new TextRun({ text: project, size: 20 })] })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        columnSpan: 2,
+                                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [new Paragraph({ text: "" })]
+                                    })
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "Attention: ", bold: true, size: 20 }), new TextRun({ text: "To Whom It May Concern", size: 20 })] })
+                                        ]
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Mob: ", bold: true, size: 20 }), new TextRun({ text: quotation.phone || "N/A", size: 20 })] })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ children: [new TextRun({ text: "Sale Quotation For " + project, bold: true, size: 22 })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Dear Sir,", bold: true, size: 22 })] }),
+                    new Paragraph({ children: [new TextRun({ text: quotation.proposalIntro ?? "With reference to the above-mentioned subject and your inquiry, please find below our final rock bottom prices: -", size: 20 })] }),
+                    new Paragraph({ text: "" }),
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    createCell("SL.no", true, AlignmentType.CENTER),
+                                    createCell("Item", true, AlignmentType.CENTER),
+                                    createCell("QTY", true, AlignmentType.CENTER),
+                                    createCell(items[0]?.unit ? `${items[0].unit.toLowerCase()} price` : "Unit price", true, AlignmentType.CENTER),
+                                    createCell("Disc (%)", true, AlignmentType.CENTER),
+                                    createCell("Total QR.", true, AlignmentType.CENTER),
+                                ]
+                            }),
+                            ...items.map((item, idx) => new TableRow({
+                                children: [
+                                    createCell((idx + 1).toString() + ".", true, AlignmentType.CENTER),
+                                    new TableCell({
+                                        margins: { top: 100, bottom: 100, left: 100, right: 100 },
+                                        verticalAlign: VerticalAlign.TOP,
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "OPTION: " + (idx + 1), bold: true, size: 20, underline: { type: "single" } })] }),
+                                            new Paragraph({ children: [new TextRun({ text: item.description, size: 20 })] })
+                                        ]
+                                    }),
+                                    createCell(item.quantity.toString(), false, AlignmentType.CENTER),
+                                    createCell(Number(item.unitPrice).toLocaleString(), false, AlignmentType.CENTER),
+                                    createCell(item.discount ? item.discount.toString() + "%" : "-", false, AlignmentType.CENTER),
+                                    createCell(Number(item.amount || (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0)/100)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.CENTER),
+                                ]
+                            }))
+                        ]
+                    }),
+                    new Paragraph({ text: "" })
+                ]
+            }]
+        });
+
+        return Packer.toBlob(doc);
     };
 
     const branch = quotation.branch || "Contracting";

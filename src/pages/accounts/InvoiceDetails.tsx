@@ -4,7 +4,8 @@ import { ArrowLeft, Printer, Edit, Loader2, FileText } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../context/AuthContext";
 import { financeService } from "../../services/financeService";
-import { exportToWord, printDocument } from "../../utils/exportUtils";
+import { printDocument, downloadDocx } from "../../utils/exportUtils";
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, VerticalAlign, ImageRun } from "docx";
 import type { Invoice, InvoiceItem } from "../../types/finance";
 
 export default function InvoiceDetails() {
@@ -106,10 +107,220 @@ export default function InvoiceDetails() {
         printDocument(`${safeClientName}_${currentDate}`);
     };
 
-    const handleWordExport = () => {
+    const handleWordExport = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
         const safeClientName = (invoice.client || "Client").replace(/[^a-zA-Z0-9 -]/g, '').trim();
-        exportToWord('invoice-content', `${safeClientName}_${currentDate}`);
+        const blob = await generateDocx(invoice);
+        downloadDocx(blob, `${safeClientName}_${currentDate}`);
+    };
+
+    const generateDocx = async (invoice: Invoice): Promise<Blob> => {
+        const items = invoice.items || [];
+        const totalAmount = invoice.total || 0;
+        const advance = invoice.advance || 0;
+        const discount = invoice.discount || 0;
+        const balance = invoice.balance || (totalAmount - advance);
+
+        let sectorName = "Contracting Sector";
+        if (invoice.branch?.toLowerCase() === "service" || invoice.branch?.toLowerCase() === "business") {
+            sectorName = "Service Sector";
+        } else if (invoice.branch?.toLowerCase() === "trading") {
+            sectorName = "Trading Sector";
+        }
+
+        const createCell = (text: string, bold: boolean = false, align: AlignmentType = AlignmentType.LEFT, colspan: number = 1, borders: any = {}, fill?: string) => {
+            return new TableCell({
+                columnSpan: colspan,
+                margins: { top: 100, bottom: 100, left: 100, right: 100 },
+                borders: borders,
+                verticalAlign: VerticalAlign.CENTER,
+                shading: fill ? { fill: fill } : undefined,
+                children: [new Paragraph({
+                    alignment: align,
+                    children: [new TextRun({ text: text, bold: bold, size: 20 })]
+                })]
+            });
+        };
+
+        let logoImage: ArrayBuffer | null = null;
+        try {
+            const response = await fetch('/logo.png');
+            if (response.ok) {
+                logoImage = await response.arrayBuffer();
+            }
+        } catch (e) {
+            console.error("Failed to load logo", e);
+        }
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE }, insideHorizontal: { style: BorderStyle.NONE }, insideVertical: { style: BorderStyle.NONE } },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        children: [
+                                            new Paragraph({
+                                                children: logoImage ? [
+                                                    new ImageRun({
+                                                        data: logoImage,
+                                                        transformation: { width: 120, height: 120 }
+                                                    })
+                                                ] : [new TextRun({ text: "TREK GROUP", bold: true, size: 36 })]
+                                            })
+                                        ],
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } }
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        children: [
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "TREK GROUP TRADING CONTRACTING AND SERVICES", bold: true, color: "2563eb", size: 18 })] }),
+                                            new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: sectorName.toUpperCase(), bold: true, color: "2563eb", size: 26 })] })
+                                        ],
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        verticalAlign: VerticalAlign.BOTTOM
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [new TextRun({ text: "INVOICE", bold: true, size: 40 })]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        margins: { top: 100, bottom: 100, left: 100, right: 100 },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "Invoice Type: ", bold: true, size: 20 }), new TextRun({ text: invoice.invoiceType || "Credit", size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "Customer Name: ", bold: true, size: 20 }), new TextRun({ text: invoice.client, bold: true, size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "PROJECT: ", bold: true, size: 20 }), new TextRun({ text: invoice.refNo ? invoice.refNo : (invoice.project || ""), bold: true, size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "Address: ", bold: true, size: 20 }), new TextRun({ text: invoice.address || "", size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "QID: ", bold: true, size: 20 }), new TextRun({ text: invoice.qid || "", size: 20 })] }),
+                                        ]
+                                    }),
+                                    new TableCell({
+                                        width: { size: 50, type: WidthType.PERCENTAGE },
+                                        margins: { top: 100, bottom: 100, left: 100, right: 100 },
+                                        children: [
+                                            new Paragraph({ children: [new TextRun({ text: "Invoice No.: ", bold: true, size: 20 }), new TextRun({ text: invoice.invoiceNo.split('-').pop() || "", bold: true, size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "Date: ", bold: true, size: 20 }), new TextRun({ text: new Date(invoice.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'), size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "LPO No.: ", bold: true, size: 20 }), new TextRun({ text: invoice.lpoNo || "", bold: true, size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "Salesman: ", bold: true, size: 20 }), new TextRun({ text: invoice.salesman || "", size: 20 })] }),
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    createCell("No.", true, AlignmentType.CENTER, 1, {}, "f8fafc"),
+                                    createCell("Item Description", true, AlignmentType.LEFT, 1, {}, "f8fafc"),
+                                    createCell("Qty", true, AlignmentType.CENTER, 1, {}, "f8fafc"),
+                                    createCell("Unit Price", true, AlignmentType.RIGHT, 1, {}, "f8fafc"),
+                                    createCell("Discount", true, AlignmentType.RIGHT, 1, {}, "f8fafc"),
+                                    createCell("Amount", true, AlignmentType.RIGHT, 1, {}, "f8fafc"),
+                                ]
+                            }),
+                            ...items.map((item, idx) => new TableRow({
+                                children: [
+                                    createCell((idx + 1).toString(), false, AlignmentType.CENTER),
+                                    createCell(item.description, false, AlignmentType.LEFT),
+                                    createCell(item.quantity.toString(), false, AlignmentType.CENTER),
+                                    createCell(Number(item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), false, AlignmentType.RIGHT),
+                                    createCell(item.discount ? item.discount.toString() : "-", false, AlignmentType.RIGHT),
+                                    createCell(Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), false, AlignmentType.RIGHT),
+                                ]
+                            })),
+                            new TableRow({
+                                children: [
+                                    createCell("TOTAL", true, AlignmentType.RIGHT, 5),
+                                    createCell(Number(items.reduce((sum, i) => sum + Number(i.amount), 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.RIGHT),
+                                ]
+                            })
+                        ]
+                    }),
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE }, insideHorizontal: { style: BorderStyle.NONE }, insideVertical: { style: BorderStyle.NONE } },
+                        rows: [
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        width: { size: 60, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Table({
+                                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                                borders: { top: { style: BorderStyle.NONE } },
+                                                rows: [
+                                                    new TableRow({ children: [new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "REMARKS:", bold: true, size: 20 })] })] })] }),
+                                                    new TableRow({ children: [new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "NOTES:", bold: true, size: 20 })] }), new Paragraph({ children: [new TextRun({ text: invoice.notes || "", size: 20 })] })] })] })
+                                                ]
+                                            })
+                                        ]
+                                    }),
+                                    new TableCell({
+                                        width: { size: 40, type: WidthType.PERCENTAGE },
+                                        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
+                                        children: [
+                                            new Table({
+                                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                                borders: { top: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE } },
+                                                rows: [
+                                                    new TableRow({
+                                                        children: [
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "ADVANCE:", bold: true, size: 20 })] })] }),
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: Number(advance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), size: 20 })] })] })
+                                                        ]
+                                                    }),
+                                                    new TableRow({
+                                                        children: [
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "DISCOUNT:", bold: true, size: 20 })] })] }),
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: discount > 0 ? Number(discount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00", size: 20 })] })] })
+                                                        ]
+                                                    }),
+                                                    new TableRow({
+                                                        children: [
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "BALANCE PAYABLE:", bold: true, size: 20 })] })] }),
+                                                            new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), bold: true, size: 24 })] })] })
+                                                        ]
+                                                    })
+                                                ]
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    }),
+                    new Paragraph({ text: "" }), // Spacer
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [new TextRun({ text: "Thanks for your business! Please Visit Again.", bold: true, italics: true, size: 20 })]
+                    })
+                ]
+            }]
+        });
+
+        return Packer.toBlob(doc);
     };
 
 
@@ -187,10 +398,7 @@ export default function InvoiceDetails() {
                             <span className="font-bold">Address:</span>
                             <span className="whitespace-pre-wrap">{invoice.address || ""}</span>
                         </div>
-                        <div className="grid grid-cols-[130px_1fr]">
-                            <span className="font-bold">Tel:</span>
-                            <span>{invoice.tel || "+974 71716559"}</span>
-                        </div>
+
                         <div className="grid grid-cols-[130px_1fr]">
                             <span className="font-bold">QID:</span>
                             <span>{invoice.qid || ""}</span>

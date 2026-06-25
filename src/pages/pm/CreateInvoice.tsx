@@ -90,7 +90,6 @@ export default function CreateInvoice() {
 
             const subtotalForCalc = mappedItems.reduce((sum: number, item: any) => sum + item.amount, 0);
             const discountAmt = Number(dataObj.discount) || 0;
-            const calculatedDiscountRate = subtotalForCalc > 0 ? (discountAmt / subtotalForCalc) * 100 : 0;
 
             setForm({
                 invoiceNo: dataObj.invoice_number || dataObj.invoiceNo || "",
@@ -103,7 +102,7 @@ export default function CreateInvoice() {
                 dueDate: dataObj.due_date ? dataObj.due_date.split('T')[0] : (dataObj.dueDate || ""),
                 status: dataObj.status || "Unpaid",
                 taxRate: Number(dataObj.tax_rate) || dataObj.taxRate || 0,
-                discount: Math.round(calculatedDiscountRate * 100) / 100,
+                discount: discountAmt,
                 notes: dataObj.notes || "",
                 paymentTerms: dataObj.payment_terms || dataObj.paymentTerms || "Payable within 15 days",
                 division: (dataObj.division || dataObj.branch) as DivisionId || "contracting",
@@ -147,8 +146,7 @@ export default function CreateInvoice() {
     useEffect(() => {
         const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
         const taxAmount = (subtotal * ((form.taxRate ?? 0) / 100));
-        const discountRate = form.discount ?? 0;
-        const discountAmount = (subtotal * (discountRate / 100));
+        const discountAmount = form.discount ?? 0;
         const total = subtotal + taxAmount - discountAmount;
         const balance = total - (form.advance || 0);
         setTotals({ subtotal, taxAmount, total, balance });
@@ -292,7 +290,7 @@ export default function CreateInvoice() {
             subtotal: totals.subtotal,
             tax_rate: form.taxRate,
             tax_amount: totals.taxAmount,
-            discount: (totals.subtotal * ((form.discount ?? 0) / 100)),
+            discount: form.discount ?? 0,
             total_amount: totals.total,
             status: invoiceStatus,
             approval_status: (isApproved ? "approved" : "pending"),
@@ -538,15 +536,10 @@ export default function CreateInvoice() {
                                 </div>
                             </div>
                             <div className="flex justify-between items-center gap-4 text-slate-600 border-b pb-2">
-                                <span>Discount (%)</span>
+                                <span>Discount (Amount)</span>
                                 <div className="flex flex-col items-end">
                                     <input type="text" name="discount" value={form.discount ?? ''} onChange={handleFormChange} className={`w-20 text-right border rounded p-1 outline-none focus:ring-1 focus:ring-brand-500 ${fieldErrors.discount ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
                                     {fieldErrors.discount && <span className="text-[9px] text-red-500 font-bold">{fieldErrors.discount}</span>}
-                                    {totals.subtotal > 0 && form.discount ? (
-                                        <span className="text-[10px] text-slate-400 mt-1">
-                                            - QAR {(totals.subtotal * (Number(form.discount) / 100)).toLocaleString()}
-                                        </span>
-                                    ) : null}
                                 </div>
                             </div>
                             <div className="flex justify-between text-lg font-bold text-brand-700">
