@@ -199,7 +199,7 @@ function CreateExpense() {
     if (name === "amount" || name === "taxRate") {
       if (value === "" || /^\d*\.?\d*$/.test(value)) {
         setFieldErrors(prev => ({ ...prev, [name]: "" }));
-        setForm({ ...form, [name]: value === "" ? 0 : Number(value) });
+        setForm({ ...form, [name]: value });
       } else {
         setFieldErrors(prev => ({ ...prev, [name]: "Only numbers allowed" }));
       }

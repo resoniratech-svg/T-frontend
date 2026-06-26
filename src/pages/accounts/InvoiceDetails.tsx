@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { financeService } from "../../services/financeService";
 import { printDocument, downloadDocx } from "../../utils/exportUtils";
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, VerticalAlign, ImageRun } from "docx";
+import converter from 'number-to-words';
 import type { Invoice, InvoiceItem } from "../../types/finance";
 
 export default function InvoiceDetails() {
@@ -39,7 +40,7 @@ export default function InvoiceDetails() {
                     const mappedInvoice: Invoice = {
                         id: inv.id,
                         invoiceNo: inv.invoice_number,
-                        client: inv.client_name || inv.client,
+                        client: inv.client_company || inv.client_name || inv.client,
                         customerCode: inv.customer_code,
                         clientId: inv.client_id,
                         status: inv.status,
@@ -204,7 +205,7 @@ export default function InvoiceDetails() {
                                         margins: { top: 100, bottom: 100, left: 100, right: 100 },
                                         children: [
                                             new Paragraph({ children: [new TextRun({ text: "Invoice Type: ", bold: true, size: 20 }), new TextRun({ text: invoice.invoiceType || "Credit", size: 20 })] }),
-                                            new Paragraph({ children: [new TextRun({ text: "Customer Name: ", bold: true, size: 20 }), new TextRun({ text: invoice.client, bold: true, size: 20 })] }),
+                                            new Paragraph({ children: [new TextRun({ text: "Company Name: ", bold: true, size: 20 }), new TextRun({ text: invoice.client, bold: true, size: 20 })] }),
                                             new Paragraph({ children: [new TextRun({ text: "PROJECT: ", bold: true, size: 20 }), new TextRun({ text: invoice.refNo ? invoice.refNo : (invoice.project || ""), bold: true, size: 20 })] }),
                                             new Paragraph({ children: [new TextRun({ text: "Address: ", bold: true, size: 20 }), new TextRun({ text: invoice.address || "", size: 20 })] }),
                                             new Paragraph({ children: [new TextRun({ text: "QID: ", bold: true, size: 20 }), new TextRun({ text: invoice.qid || "", size: 20 })] }),
@@ -270,7 +271,10 @@ export default function InvoiceDetails() {
                                                 width: { size: 100, type: WidthType.PERCENTAGE },
                                                 borders: { top: { style: BorderStyle.NONE } },
                                                 rows: [
-                                                    new TableRow({ children: [new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "REMARKS:", bold: true, size: 20 })] })] })] }),
+                                                    new TableRow({ children: [new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [
+                                                        new Paragraph({ children: [new TextRun({ text: "REMARKS:", bold: true, size: 20 })] }),
+                                                        new Paragraph({ children: [new TextRun({ text: "AMOUNT IN WORDS: ", bold: true, size: 18 }), new TextRun({ text: `${converter.toWords(totalAmount).toUpperCase()} ONLY`, size: 18 })] })
+                                                    ] })] }),
                                                     new TableRow({ children: [new TableCell({ margins: { top: 100, bottom: 100, left: 100, right: 100 }, children: [new Paragraph({ children: [new TextRun({ text: "NOTES:", bold: true, size: 20 })] }), new Paragraph({ children: [new TextRun({ text: invoice.notes || "", size: 20 })] })] })] })
                                                 ]
                                             })
@@ -381,14 +385,14 @@ export default function InvoiceDetails() {
                             <span>{invoice.invoiceType || "Credit"}</span>
                         </div>
                         <div className="grid grid-cols-[130px_1fr]">
-                            <span className="font-bold">Customer Name:</span>
+                            <span className="font-bold">Company Name:</span>
                             <span className="font-black">{invoice.client}</span>
                         </div>
                         <div className="grid grid-cols-[130px_1fr]">
                             <span className="font-bold uppercase">PROJECT:</span>
                             <span className="font-black uppercase">{invoice.refNo ? invoice.refNo : (invoice.project || "")}</span>
                         </div>
-                        <div className="grid grid-cols-[130px_1fr] mt-4 min-h-[3rem]">
+                        <div className="grid grid-cols-[130px_1fr]">
                             <span className="font-bold">Address:</span>
                             <span className="whitespace-pre-wrap">{invoice.address || ""}</span>
                         </div>
@@ -467,6 +471,10 @@ export default function InvoiceDetails() {
                     <div className="flex-1 border-r border-black flex flex-col min-h-[160px]">
                         <div className="p-4 h-24 border-b border-black">
                             <span className="font-extrabold uppercase text-[14px]">Remarks:</span>
+                            <div className="mt-1 text-[13px]">
+                                <span className="font-bold uppercase">Amount in Words: </span>
+                                <span className="font-medium uppercase">{converter.toWords(totalAmount).toUpperCase()} ONLY</span>
+                            </div>
                         </div>
                         <div className="p-4 flex-1 relative">
                             <span className="font-extrabold uppercase text-[14px]">Notes:</span>
