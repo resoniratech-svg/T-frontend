@@ -22,6 +22,7 @@ dayjs.extend(relativeTime);
 
 import { useDivision } from "../../context/DivisionContext";
 import { useAuth } from "../../context/AuthContext";
+import { useClientDocuments, useClientContracts } from "../../hooks/useClientPortal";
 
 export default function ClientPROServices() {
   const navigate = useNavigate();
@@ -43,6 +44,9 @@ export default function ClientPROServices() {
     queryFn: proService.getAllDocuments
   });
 
+  const { data: clientDocs = [], isLoading: clientDocsLoading } = useClientDocuments();
+  const { data: clientContract, isLoading: clientContractLoading } = useClientContracts();
+
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
     queryKey: ["clients"],
     queryFn: () => import("../../services/clientService").then(m => m.clientService.getClients())
@@ -50,7 +54,12 @@ export default function ClientPROServices() {
 
   // Ensure data variables are arrays to prevent crashes
   const safeContracts = Array.isArray(contracts) ? contracts : [];
-  const safeDocuments = Array.isArray(documents) ? documents : [];
+  const safeClientDocs = Array.isArray(clientDocs) ? clientDocs.map((d: any) => ({
+    ...d,
+    companyName: user?.company_name || user?.name,
+    clientName: user?.name
+  })) : [];
+  const safeDocuments = [...(Array.isArray(documents) ? documents : []), ...safeClientDocs];
   const safeClients = Array.isArray(clients) ? clients : [];
 
   // Automatically filter by client company on mount or when user loads
@@ -94,10 +103,11 @@ export default function ClientPROServices() {
         const filterVal = selectedClient || user?.company_name || user?.name;
         if (!filterVal) return []; 
         base = base.filter((c: any) => 
-          c.companyName === filterVal || 
+          (c.companyName === filterVal || 
           c.clientName === filterVal ||
           c.companyName === user?.name ||
-          c.clientName === user?.name
+          c.clientName === user?.name) && 
+          !['ACCOUNTS', 'PROJECT_MANAGER', 'ADMIN'].includes(c.role?.toUpperCase())
         );
         return base;
     }
@@ -187,9 +197,9 @@ export default function ClientPROServices() {
           <div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
               <ShieldCheck className="text-brand-600" size={32} />
-              Employee PRO Tracking
+              PRO Compliance Tracking
             </h1>
-            <p className="text-slate-500 font-medium mt-1">Monitoring employee QID, Passport, and other critical compliance documents</p>
+            <p className="text-slate-500 font-medium mt-1">Monitoring company licenses, employee QID, Passport, and other critical compliance documents</p>
           </div>
           
           <button 
@@ -379,7 +389,7 @@ export default function ClientPROServices() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-100">
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Employee / Division</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Entity / Division</th>
                       <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Document Details</th>
                       <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Joining Info</th>
                       <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Expiry Date</th>

@@ -248,19 +248,20 @@ export default function ClientProjects() {
                     {/* Documents Section */}
                     {(() => {
                       const allDocs = [...(selectedProject.documents || [])];
-                      if (selectedProject.uploadedDocument) {
+                      const mainDoc = selectedProject.uploadedDocument || selectedProject.uploaded_document;
+                      if (mainDoc) {
                         // Determine extension for the name
                         let ext = ".pdf";
-                        if (selectedProject.uploadedDocument.includes("wordprocessingml") || selectedProject.uploadedDocument.includes("msword")) ext = ".docx";
-                        else if (selectedProject.uploadedDocument.includes("spreadsheetml") || selectedProject.uploadedDocument.includes("ms-excel")) ext = ".xlsx";
-                        else if (selectedProject.uploadedDocument.includes("png")) ext = ".png";
-                        else if (selectedProject.uploadedDocument.includes("jpeg")) ext = ".jpg";
+                        if (mainDoc.includes("wordprocessingml") || mainDoc.includes("msword")) ext = ".docx";
+                        else if (mainDoc.includes("spreadsheetml") || mainDoc.includes("ms-excel")) ext = ".xlsx";
+                        else if (mainDoc.includes("png")) ext = ".png";
+                        else if (mainDoc.includes("jpeg")) ext = ".jpg";
 
                         allDocs.unshift({
                           id: "main-project-doc",
                           name: `${selectedProject.project_name || selectedProject.projectName || selectedProject.name || 'Project'}_Document${ext}`,
-                          data: selectedProject.uploadedDocument,
-                          size: selectedProject.uploadedDocument.length * 0.75
+                          data: mainDoc,
+                          size: mainDoc.length * 0.75
                         });
                       }
 

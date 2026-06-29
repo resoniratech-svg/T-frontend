@@ -76,6 +76,22 @@ export default function QuotationDetails() {
     const handleWordExport = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
         const safeProjectName = (quotation.project || quotation["Quote ID"] || "Quotation").replace(/[^a-zA-Z0-9 -]/g, '').trim();
+        
+        const branch = quotation.branch || "Contracting";
+        const isBusiness = branch.toLowerCase() === "business" || branch.toLowerCase() === "service" || branch.toUpperCase() === "PRO";
+        
+        if (isBusiness) {
+            const { generateBusinessProposalDocx } = await import("./BusinessProposalDocx");
+            const blob = await generateBusinessProposalDocx(quotation);
+            downloadDocx(blob, `${safeProjectName}_${currentDate}`);
+            return;
+        }
+        
+        if (quotation.formatVersion === 2) {
+            exportToWord('quotation-content', `${safeProjectName}_${currentDate}`);
+            return;
+        }
+
         const blob = await generateQuotationDocx(quotation);
         downloadDocx(blob, `${safeProjectName}_${currentDate}`);
     };

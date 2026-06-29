@@ -238,6 +238,7 @@ function AppRoutes() {
           {/* Super Admin & Accounts Explicit Protections */}
           <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "ACCOUNTS"]} />}>
             <Route path="/inventory/create-purchase-order" element={<CreatePurchaseOrder />} />
+            <Route path="/inventory/edit-purchase-order/:id" element={<CreatePurchaseOrder />} />
           </Route>
 
           {/* Super Admin, Accounts & PM Explicit Protections */}
@@ -248,6 +249,7 @@ function AppRoutes() {
           {/* Super Admin & PM Explicit Protections */}
           <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "PROJECT_MANAGER"]} />}>
              <Route path="/inventory/create-sales-order" element={<CreateSalesOrder />} />
+             <Route path="/inventory/edit-sales-order/:id" element={<CreateSalesOrder />} />
           </Route>
         </Route>
 

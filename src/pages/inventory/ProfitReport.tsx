@@ -36,7 +36,6 @@ function ProfitReport() {
         <StatCard
           title="Total Revenue"
           value={`QAR ${totalRevenue.toLocaleString()}`}
-          icon={<DollarSign className="text-blue-600" />}
           trend={{ value: "Gross Sales", positive: true }}
           path="/invoices"
         />

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 interface Props {
   title: string;
   value: string | number;
-  icon: ReactNode;
+  icon?: ReactNode;
   trend?: { value: string; positive: boolean };
   path?: string;
   onClick?: () => void;
@@ -42,9 +42,11 @@ function StatCard({ title, value, icon, trend, path, onClick, className = "" }: 
           )}
         </div>
 
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-brand-50 text-brand-500 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-100 transition-colors duration-200">
-          {icon}
-        </div>
+        {icon && (
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-brand-50 text-brand-500 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-100 transition-colors duration-200">
+            {icon}
+          </div>
+        )}
       </div>
     </div>
   );

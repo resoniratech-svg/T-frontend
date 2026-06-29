@@ -71,18 +71,6 @@ function Clients() {
         >
           <Edit2 size={16} />
         </button>
-        <button
-          onClick={() => handleDelete(item.id)}
-          className="p-1 text-slate-400 hover:text-red-600 transition-colors"
-          disabled={deleteMutation.isPending}
-          title="Delete Client"
-        >
-          {deleteMutation.isPending && deleteMutation.variables === item.id ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Trash2 size={16} />
-          )}
-        </button>
       </div>
     )
   }));

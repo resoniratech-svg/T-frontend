@@ -129,7 +129,7 @@ export default function ClientDashboard() {
           path="/client/billing"
         />
         <StatCard
-          title="Expiring Employees"
+          title="Expiring Documents"
           value={stats.totalExpiringEmployees.toString()}
           icon={<AlertTriangle size={20} className={stats.totalExpiringEmployees > 0 ? "text-amber-500" : "text-emerald-500"} />}
           trend={stats.totalExpiringEmployees > 0 ? { value: "Needs Attention", positive: false } : undefined}
@@ -363,7 +363,7 @@ export default function ClientDashboard() {
             </Link>
           </div>
 
-          {/* PRO Services - Expiring Employees */}
+          {/* PRO Services - Expiring Documents */}
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-xl text-white shadow-xl shadow-slate-200">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
@@ -371,7 +371,7 @@ export default function ClientDashboard() {
               </div>
               <div>
                 <h3 className="text-xs font-black text-white/60 uppercase tracking-widest">PRO Services</h3>
-                <p className="text-[10px] text-white/40 mt-0.5">Employee document status</p>
+                <p className="text-[10px] text-white/40 mt-0.5">Document expiration status</p>
               </div>
             </div>
 
@@ -403,7 +403,7 @@ export default function ClientDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <ShieldCheck size={28} className="mx-auto text-emerald-400 mb-2" />
-                  <p className="text-xs font-bold text-white/60">All employee documents are valid</p>
+                  <p className="text-xs font-bold text-white/60">All documents are valid</p>
                   <p className="text-[10px] text-white/30 mt-1">No expiring or expired documents</p>
                 </div>
               )}

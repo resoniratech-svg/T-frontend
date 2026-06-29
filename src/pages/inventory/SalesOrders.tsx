@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
 import { useNavigate } from "react-router-dom";
-import { Plus, Eye, Trash2, Truck, Loader2, X } from "lucide-react";
+import { Plus, Eye, Trash2, Edit, Truck, Loader2, X } from "lucide-react";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { inventoryService } from "../../services/inventoryService";
@@ -93,18 +93,30 @@ function SalesOrders() {
             columns={columns}
             data={formattedData}
             hideSearch={true}
-            renderActions={(row: any) => (
+            renderActions={(row: any) => {
+              const order = salesOrders.find((o: any) => o.id === row.id);
+              const isPending = order?.status?.toLowerCase() === 'pending';
+
+              return (
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => {
-                    const order = salesOrders.find((o: any) => o.id === row.id);
                     if (order) setViewOrder(order);
                   }}
                   className="p-1.5 text-slate-400 hover:text-brand-600 transition-colors cursor-pointer"
                   title="View Details"
                 >
                   <Eye size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/inventory/edit-sales-order/${row.id}`)}
+                  className={`p-1.5 transition-colors ${isPending ? 'text-slate-400 hover:text-brand-600 cursor-pointer' : 'text-slate-200 cursor-not-allowed'}`}
+                  disabled={!isPending}
+                  title={isPending ? "Edit Order" : "Only pending orders can be edited"}
+                >
+                  <Edit size={16} />
                 </button>
                 <button
                   type="button"
@@ -120,7 +132,7 @@ function SalesOrders() {
                   )}
                 </button>
               </div>
-            )}
+            )}}
           />
         ) : (
           <div className="p-20 text-center text-gray-400">
