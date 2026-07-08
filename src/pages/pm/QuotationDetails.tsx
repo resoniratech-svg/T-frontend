@@ -88,7 +88,9 @@ export default function QuotationDetails() {
         }
         
         if (quotation.formatVersion === 2) {
-            exportToWord('quotation-content', `${safeProjectName}_${currentDate}`);
+            const { generateQuotationFormat2Docx } = await import("./QuotationFormat2Docx");
+            const blob = await generateQuotationFormat2Docx(quotation);
+            downloadDocx(blob, `${safeProjectName}_${currentDate}`);
             return;
         }
 
@@ -314,10 +316,51 @@ export default function QuotationDetails() {
                                     createCell(item.discount ? item.discount.toString() + "%" : "-", false, AlignmentType.CENTER),
                                     createCell(Number(item.amount || (Number(item.quantity) * Number(item.unitPrice) * (1 - (Number(item.discount || 0)/100)))).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.CENTER),
                                 ]
-                            }))
+                            })),
+                            new TableRow({
+                                children: [
+                                    createCell("TOTAL", true, AlignmentType.LEFT),
+                                    createCell("", false, AlignmentType.LEFT, 4),
+                                    createCell(Number(items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.CENTER),
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    createCell(`DISCOUNT (${Number(quotation.discountPercent || 0)}%)`, true, AlignmentType.LEFT),
+                                    createCell("", false, AlignmentType.LEFT, 4),
+                                    createCell("-" + Number((items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0) * Number(quotation.discountPercent || 0)) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.CENTER, 1, {}, undefined, "dc2626"),
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    createCell("Net Total", true, AlignmentType.LEFT, 1, {}, "D3D3DF"),
+                                    createCell("", false, AlignmentType.LEFT, 4, {}, "D3D3DF"),
+                                    createCell(Number(items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0) - ((items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0) * Number(quotation.discountPercent || 0)) / 100)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), true, AlignmentType.CENTER, 1, {}, "D3D3DF"),
+                                ]
+                            }),
+                            new TableRow({
+                                children: [
+                                    createCell(numberToWords(items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0) - ((items.reduce((sum: any, item: any) => sum + (Number(item.quantity) * Number(item.unitPrice)), 0) * Number(quotation.discountPercent || 0)) / 100)), true, AlignmentType.CENTER, 6, {}, "D3D3DF")
+                                ]
+                            })
                         ]
                     }),
-                    new Paragraph({ text: "" })
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ children: [new TextRun({ text: "Terms & Condition:", bold: true, size: 22, underline: { type: "single" } })], spacing: { after: 100 } }),
+                    ...(quotation.financialTerms ? quotation.financialTerms.split('\n').filter((t: string) => t.trim() !== "").map((term: string) => 
+                        new Paragraph({ children: [new TextRun({ text: term, size: 20 })] })
+                    ) : [
+                        new Paragraph({ children: [new TextRun({ text: "1. Payment: 50% advance, 30% upon delivery, and 20% upon completion", size: 20 })] }),
+                        new Paragraph({ children: [new TextRun({ text: "2. Delivery: with 15 days from the advance payment.", size: 20 })] }),
+                        new Paragraph({ children: [new TextRun({ text: "3. Above prices are subjected to change against the significant market prices fluctuation.", size: 20 })] }),
+                        new Paragraph({ children: [new TextRun({ text: "4. Offer is valid for 15 Days", size: 20, bold: true })] }),
+                    ]),
+                    new Paragraph({ spacing: { before: 400, after: 200 } }),
+                    new Paragraph({ children: [new TextRun({ text: "Best regards,", bold: true, size: 20 })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Mr. Afzal", bold: true, size: 20 })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Manager", bold: true, size: 20 })] }),
+                    new Paragraph({ children: [new TextRun({ text: "(+974) 7171 6559", bold: true, size: 20 })] }),
+                    new Paragraph({ children: [new TextRun({ text: "Email: info@trekgroups.com", bold: true, size: 20 })] })
                 ]
             }]
         });

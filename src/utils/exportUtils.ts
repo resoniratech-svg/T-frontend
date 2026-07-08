@@ -91,7 +91,7 @@ export const exportToWord = (elementId: string, filename: string) => {
   const blob = new Blob(['\ufeff', sourceHTML], {
     type: 'application/msword'
   });
-  downloadBlob(blob, filename.endsWith('.doc') ? filename : `${filename}.doc`);
+  downloadBlob(blob, filename.endsWith('.docx') ? filename : `${filename}.docx`);
 };
 
 export const exportHTMLToWord = (htmlContent: string, filename: string) => {
@@ -114,7 +114,7 @@ export const exportHTMLToWord = (htmlContent: string, filename: string) => {
   const blob = new Blob(['\ufeff', sourceHTML], {
     type: 'application/msword'
   });
-  downloadBlob(blob, filename.endsWith('.doc') ? filename : `${filename}.doc`);
+  downloadBlob(blob, filename.endsWith('.docx') ? filename : `${filename}.docx`);
 };
 
 export const downloadDocx = (blob: Blob, filename: string) => {

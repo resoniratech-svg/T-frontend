@@ -204,7 +204,6 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                 </div>
             </div>
 
-            {/* Print Styles */}
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@300;400;700&display=swap');
                 
@@ -214,29 +213,38 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                 @media print {
                     .no-print { display: none !important; }
                     .shadow-2xl { box-shadow: none !important; }
-                    .bg-slate-200 { background: none !important; padding: 0 !important; }
+                    .bg-slate-200 { background: none !important; padding: 0 !important; gap: 0 !important; display: block !important; margin: 0 !important; }
                     body { 
-                        margin: 0; 
-                        padding: 0; 
+                        margin: 0 !important; 
+                        padding: 0 !important; 
                         background: white !important; 
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                     }
                     @page { 
                         size: A4 portrait; 
-                        margin: 10mm; 
+                        margin: 0 !important; 
                     }
                     .print-page { 
-                        break-after: page; 
-                        margin: 0 auto !important; 
+                        page-break-after: always !important;
+                        break-after: page !important;
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                        margin: 0 !important; 
+                        padding: 0 !important;
                         box-shadow: none !important; 
                         border: none !important; 
-                        width: 210mm !important; 
-                        max-width: 100% !important;
-                        height: 297mm !important; 
-                        display: block !important;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
+                    }
+                    .print-page > * {
+                        /* This ensures flex children don't accidentally break */
+                        page-break-inside: avoid !important;
+                        break-inside: avoid !important;
+                    }
+                    .print-page:last-child {
+                        page-break-after: auto !important;
+                        break-after: auto !important;
                     }
                 }
             `}</style>
