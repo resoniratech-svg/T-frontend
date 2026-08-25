@@ -27,7 +27,7 @@ export default function Landing() {
               <Layers size={18} className="text-white" />
             </div>
             <span className="text-xl font-extrabold tracking-tight text-gray-900">
-              Trek Group <span className="text-blue-600">ERP</span>
+              Qubexe <span className="text-blue-600">ERP</span>
             </span>
           </Link>
 
@@ -70,7 +70,7 @@ export default function Landing() {
             <h1 className="text-5xl lg:text-6xl font-black leading-tight text-gray-900 mb-6">
               Streamline Your Business with{" "}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Trek Group ERP
+                Qubexe ERP
               </span>
             </h1>
 
@@ -130,7 +130,7 @@ export default function Landing() {
                   <div className="w-3 h-3 rounded-full bg-amber-400"></div>
                   <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
                 </div>
-                <div className="bg-gray-50 rounded-lg px-4 py-1.5 text-xs text-gray-400 font-medium">erp.trekgroup.com</div>
+                <div className="bg-gray-50 rounded-lg px-4 py-1.5 text-xs text-gray-400 font-medium">erp.qubexe.com</div>
                 <div></div>
               </div>
 
@@ -277,7 +277,7 @@ export default function Landing() {
             viewport={{ once: true }} transition={{ delay: 0.2 }}
             className="text-blue-100 mb-8 max-w-xl mx-auto"
           >
-            Join Trek Group ERP and manage your entire business from one unified platform.
+            Join Qubexe ERP and manage your entire business from one unified platform.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
@@ -311,10 +311,10 @@ export default function Landing() {
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                   <Layers size={18} className="text-white" />
                 </div>
-                <span className="text-lg font-bold text-white">Trek Group</span>
+                <span className="text-lg font-bold text-white">Qubexe</span>
               </div>
               <p className="text-sm leading-relaxed mb-4">
-                TREK GROUP TRADING CONTRACTING AND SERVICES — Your trusted partner for business formation, contracting, and trading in Qatar.
+                QUBEXE TRADING CONTRACTING AND SERVICES — Your trusted partner for business formation, contracting, and trading in Qatar.
               </p>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
@@ -323,11 +323,11 @@ export default function Landing() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Phone size={14} className="text-blue-400 flex-shrink-0" />
-                  <span>+974 7171 6559</span>
+                  <span>+974 7171 6449</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Mail size={14} className="text-blue-400 flex-shrink-0" />
-                  <span>info@trekgroup.qa</span>
+                  <span>info@qubexe.qa</span>
                 </div>
               </div>
             </div>
@@ -362,7 +362,7 @@ export default function Landing() {
 
             {/* ERP Visual */}
             <div>
-              <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-4">Powered by Trek ERP</h4>
+              <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-4">Powered by Qubexe ERP</h4>
               <div className="bg-gray-800 rounded-xl p-4 border border-gray-700/50">
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -394,7 +394,7 @@ export default function Landing() {
 
           {/* Bottom bar */}
           <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">© 2026 Trek Group Trading Contracting and Services. All rights reserved.</p>
+            <p className="text-xs text-gray-500">© 2026 Qubexe Trading Contracting and Services. All rights reserved.</p>
             <div className="flex gap-6 text-xs text-gray-500">
               <a href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-gray-300 transition-colors">Terms of Service</a>

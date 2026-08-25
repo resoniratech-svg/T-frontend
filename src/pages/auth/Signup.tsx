@@ -86,7 +86,7 @@ export default function Signup() {
                         <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-4xl font-bold leading-tight mb-4">
-                        TrekGroup
+                        Qubexe <br />
                         <br />
                         <span className="text-brand-200">Client Portal</span>
                     </h1>
@@ -230,7 +230,7 @@ export default function Signup() {
                     </div>
 
                     <p className="text-center text-xs text-gray-400 mt-6">
-                        © 2026 TrekGroup. All rights reserved.
+                        © 2026 Qubexe. All rights reserved.
                     </p>
                 </motion.div>
             </div>

@@ -126,7 +126,7 @@ export default function Login() {
             <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl font-bold leading-tight mb-4">
-            TrekGroup
+            Qubexe <br />
             <br />
             <span className="text-brand-200">ERP System</span>
           </h1>
@@ -286,7 +286,7 @@ export default function Login() {
         
         {/* Bottom Copyright Bar */}
         <div className="bg-white py-2 px-6 flex flex-col md:flex-row justify-between items-center text-[9px] sm:text-[10px] text-slate-600 border-t border-slate-200">
-          <p>© Copyright TrekGroup ERP 2026 All Rights Reserved.</p>
+          <p>© Copyright Qubexe ERP 2026 All Rights Reserved.</p>
           <p className="mt-1 md:mt-0 font-medium">
             Designed & Developed by <a href="https://resonira.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:text-blue-700 hover:underline transition-all">Resonira Technologies</a> - +91 91542 89324
           </p>

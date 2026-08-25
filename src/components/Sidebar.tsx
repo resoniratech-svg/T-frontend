@@ -38,7 +38,7 @@ function Sidebar({ onClose }: SidebarProps) {
           </div>
           <div>
             <h1 className="text-sm font-semibold text-white tracking-wide">
-              TrekGroup
+              Qubexe
             </h1>
             <p className="text-[10px] text-slate-500 font-medium">
               ERP System
@@ -108,7 +108,7 @@ function Sidebar({ onClose }: SidebarProps) {
       {/* ─── Footer ────────────────────────────────────── */}
       <div className="px-5 py-4 border-t border-sidebar-border">
         <p className="text-[10px] text-slate-600 text-center">
-          © 2026 TrekGroup
+          © 2026 Qubexe. All rights reserved.
         </p>
       </div>
     </aside>
