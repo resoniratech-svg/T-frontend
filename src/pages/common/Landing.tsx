@@ -20,27 +20,27 @@ export default function Landing() {
     <div className="min-h-screen bg-white text-gray-900 overflow-x-hidden">
 
       {/* ─── NAVBAR ───────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-blue-100/60">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#e7f1ff] border border-blue-200/70 flex items-center justify-center shadow-sm">
-              <Layers size={18} className="text-slate-700" />
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-100 to-sky-100 border border-blue-300/80 flex items-center justify-center shadow-xs">
+              <Layers size={18} className="text-blue-600" />
             </div>
             <span className="text-xl font-extrabold tracking-tight text-slate-900">
-              Qubexe <span className="text-slate-600">ERP</span>
+              Qubexe <span className="text-blue-600">ERP</span>
             </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <a href="#home" className="hover:text-slate-900 transition-colors">Home</a>
-            <a href="#modules" className="hover:text-slate-900 transition-colors">ERP Features</a>
-            <a href="#services" className="hover:text-slate-900 transition-colors">Services</a>
-            <a href="#contact" className="hover:text-slate-900 transition-colors">Contact</a>
+            <a href="#home" className="hover:text-blue-600 transition-colors">Home</a>
+            <a href="#modules" className="hover:text-blue-600 transition-colors">ERP Features</a>
+            <a href="#services" className="hover:text-blue-600 transition-colors">Services</a>
+            <a href="#contact" className="hover:text-blue-600 transition-colors">Contact</a>
           </div>
 
           <Link
             to="/login"
-            className="bg-[#e7f1ff] hover:bg-[#d5e5fa] text-slate-800 border border-blue-200/80 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow"
+            className="bg-gradient-to-r from-blue-100 to-sky-100 hover:from-blue-200 hover:to-sky-200 text-blue-950 border border-blue-300 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-xs hover:shadow"
           >
             Login to ERP
           </Link>
@@ -48,11 +48,11 @@ export default function Landing() {
       </nav>
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
-      <section id="home" className="relative pt-28 pb-20 overflow-hidden">
+      <section id="home" className="relative pt-28 pb-20 overflow-hidden bg-gradient-to-b from-blue-50/70 via-sky-50/30 to-white">
         {/* Background decoration */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-slate-100/80 blur-3xl opacity-70 -translate-y-1/2 translate-x-1/4"></div>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[#e7f1ff]/60 blur-3xl opacity-60 translate-y-1/2 -translate-x-1/4"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-blue-100/60 blur-3xl opacity-70 -translate-y-1/2 translate-x-1/4"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-sky-100/60 blur-3xl opacity-60 translate-y-1/2 -translate-x-1/4"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -62,14 +62,14 @@ export default function Landing() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="inline-flex items-center gap-2 bg-[#e7f1ff] border border-blue-200/60 text-slate-700 text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-500 animate-pulse"></span>
+            <span className="inline-flex items-center gap-2 bg-blue-100/80 border border-blue-300/70 text-blue-900 text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
               Enterprise Resource Planning
             </span>
 
             <h1 className="text-5xl lg:text-6xl font-black leading-tight text-slate-900 mb-6">
               Streamline Your Business with{" "}
-              <span className="text-slate-600">
+              <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
                 Qubexe ERP
               </span>
             </h1>
@@ -82,14 +82,14 @@ export default function Landing() {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/login"
-                className="group flex items-center gap-2 bg-[#e7f1ff] hover:bg-[#d5e5fa] text-slate-800 border border-blue-200/80 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow"
+                className="group flex items-center gap-2 bg-gradient-to-r from-blue-100 to-sky-100 hover:from-blue-200 hover:to-sky-200 text-blue-950 border border-blue-300 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-xs hover:shadow"
               >
                 Login to ERP
-                <ArrowRight size={16} className="text-slate-700 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={16} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
                 href="#modules"
-                className="flex items-center gap-2 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm"
+                className="flex items-center gap-2 border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-xs"
               >
                 Learn More
                 <ChevronRight size={16} className="text-slate-400" />
@@ -122,7 +122,7 @@ export default function Landing() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative bg-white rounded-xl shadow-xl shadow-slate-100 border border-slate-200/80 p-5 overflow-hidden">
+            <div className="relative bg-white rounded-xl shadow-xl shadow-blue-100/60 border border-blue-100 p-5 overflow-hidden">
               {/* Fake dashboard header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function Landing() {
               </div>
 
               {/* Chart placeholder */}
-              <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 mb-3">
+              <div className="bg-gradient-to-br from-blue-50/50 to-sky-50/40 border border-blue-100/60 rounded-xl p-4 mb-3">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-bold text-slate-700">Monthly Analytics</span>
                   <span className="text-[10px] text-slate-400 font-medium">Jan - Mar 2026</span>
@@ -154,7 +154,7 @@ export default function Landing() {
                       initial={{ height: 0 }}
                       animate={{ height: `${h}%` }}
                       transition={{ delay: 0.8 + i * 0.05, duration: 0.5 }}
-                      className={`flex-1 rounded-t-sm ${i % 2 === 0 ? "bg-blue-400/80" : "bg-blue-300/60"}`}
+                      className={`flex-1 rounded-t-sm ${i % 2 === 0 ? "bg-blue-400/80" : "bg-sky-300/70"}`}
                     />
                   ))}
                 </div>
@@ -169,8 +169,8 @@ export default function Landing() {
             </div>
 
             {/* Floating decoration */}
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-[#e7f1ff] rounded-lg opacity-60 blur-xl"></div>
-            <div className="absolute -top-4 -left-4 w-16 h-16 bg-slate-100 rounded-xl opacity-80 blur-xl"></div>
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-200/50 rounded-lg opacity-60 blur-xl"></div>
+            <div className="absolute -top-4 -left-4 w-16 h-16 bg-sky-200/50 rounded-xl opacity-70 blur-xl"></div>
           </motion.div>
         </div>
       </section>
@@ -182,7 +182,7 @@ export default function Landing() {
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <motion.span variants={fadeUp} custom={0} className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-[#e7f1ff] border border-blue-200/60 px-3 py-1 rounded-full">
+            <motion.span variants={fadeUp} custom={0} className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-100/80 border border-blue-300/70 px-3 py-1 rounded-full">
               Powerful Modules
             </motion.span>
             <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-black text-slate-900 mt-4 mb-4">
@@ -204,9 +204,9 @@ export default function Landing() {
                 key={i}
                 initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={fadeUp} custom={i}
-                className="bg-white rounded-xl p-6 border border-slate-200/70 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
+                className="bg-white rounded-xl p-6 border border-slate-200/70 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
               >
-                <div className={`w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 text-slate-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   {mod.icon}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{mod.title}</h3>
@@ -224,7 +224,7 @@ export default function Landing() {
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <motion.span variants={fadeUp} custom={0} className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-[#e7f1ff] border border-blue-200/60 px-3 py-1 rounded-full">
+            <motion.span variants={fadeUp} custom={0} className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-100/80 border border-blue-300/70 px-3 py-1 rounded-full">
               What We Offer
             </motion.span>
             <motion.h2 variants={fadeUp} custom={1} className="text-4xl font-black text-slate-900 mt-4 mb-4">
@@ -246,11 +246,11 @@ export default function Landing() {
                 key={i}
                 initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={fadeUp} custom={i}
-                className="group relative bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                className="group relative bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="h-1.5 bg-[#e7f1ff]"></div>
+                <div className="h-1.5 bg-gradient-to-r from-blue-400 to-sky-300"></div>
                 <div className="p-6">
-                  <div className="w-12 h-12 rounded-xl bg-[#e7f1ff] border border-blue-200/60 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     {svc.icon}
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">{svc.title}</h3>
@@ -263,7 +263,7 @@ export default function Landing() {
       </section>
 
       {/* ─── CTA BANNER ───────────────────────────────────── */}
-      <section className="py-16 bg-[#e7f1ff] border-y border-blue-200/70">
+      <section className="py-16 bg-gradient-to-r from-blue-100 via-sky-50 to-blue-200/70 border-y border-blue-200/80">
         <div className="max-w-4xl mx-auto px-6 text-center text-slate-900">
           <motion.h2
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -286,13 +286,13 @@ export default function Landing() {
           >
             <Link
               to="/login"
-              className="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 px-8 py-3.5 rounded-xl font-bold text-sm shadow-sm hover:shadow transition-all"
+              className="bg-white hover:bg-slate-50 text-blue-950 border border-blue-200 px-8 py-3.5 rounded-xl font-bold text-sm shadow-xs hover:shadow transition-all"
             >
               Get Started Now
             </Link>
             <a
               href="#contact"
-              className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold text-sm shadow-sm hover:shadow transition-all"
+              className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl font-semibold text-sm shadow-xs hover:shadow transition-all"
             >
               Contact Us
             </a>

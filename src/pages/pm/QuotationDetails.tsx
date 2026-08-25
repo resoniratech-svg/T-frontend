@@ -360,7 +360,7 @@ export default function QuotationDetails() {
                     new Paragraph({ children: [new TextRun({ text: "Mr. Afzal", bold: true, size: 20 })] }),
                     new Paragraph({ children: [new TextRun({ text: "Manager", bold: true, size: 20 })] }),
                     new Paragraph({ children: [new TextRun({ text: "(+974) 7171 6559", bold: true, size: 20 })] }),
-                    new Paragraph({ children: [new TextRun({ text: "Email: info@trekgroups.com", bold: true, size: 20 })] })
+                    new Paragraph({ children: [new TextRun({ text: "Email: info@qubexe.com", bold: true, size: 20 })] })
                 ]
             }]
         });
@@ -371,7 +371,7 @@ export default function QuotationDetails() {
     const branch = quotation.branch || "Contracting";
     const isTrading = branch.toLowerCase() === "trading";
     const isBusiness = branch.toLowerCase() === "business" || branch.toLowerCase() === "service";
-    const title = isTrading ? "Trek Group Trading" : (isBusiness ? "Trek Group Business Services" : "Trek Group Contracting");
+    const title = isTrading ? "Qubexe Trading" : (isBusiness ? "Qubexe Business Services" : "Qubexe Contracting");
     const headerColor = isTrading ? "bg-[#8dc63f]" : (isBusiness ? "bg-[#1a1a1a]" : "bg-[#8dc63f]");
 
     // Ensure items exist
@@ -467,22 +467,22 @@ export default function QuotationDetails() {
                             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/80?text=LOGO')} />
                         </div>
                         <span className="text-[#2a2944] text-[16px] leading-[1.1] font-bold tracking-widest text-center uppercase font-sans">
-                            TREK GROUP<br />
+                            QUBEXE<br />
                             <span className="text-[11px] font-bold tracking-normal opacity-90">{isTrading ? "Trading" : "Contracting"}</span>
                         </span>
                     </div>
 
                     <div className="text-left text-[14px] font-bold space-y-0.5 pt-4 pr-16 text-[#000]">
-                        <h3 className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">TREK GROUP TRADING CONTRACTING AND SERVICES</h3>
+                        <h3 className="text-[12px] font-bold text-slate-500 uppercase tracking-widest mb-1">QUBEXE TRADING CONTRACTING AND SERVICES</h3>
                         <h2 className="text-[20px] font-bold text-black mb-2 tracking-wide uppercase font-['Arial',_Helvetica,_sans-serif]">{title}</h2>
                         <div className="grid grid-cols-[80px_10px_1fr] font-bold">
                             <span>MOB</span><span>:</span><span>+974 3051 6559 / +974 3005 6030<br />&nbsp;&nbsp;+974 4007 0727</span>
                         </div>
                         <div className="grid grid-cols-[80px_10px_1fr] font-bold">
-                            <span>EMAIL</span><span>:</span><span>info@trekgroups.com</span>
+                            <span>EMAIL</span><span>:</span><span>info@qubexe.com</span>
                         </div>
                         <div className="grid grid-cols-[80px_10px_1fr] font-bold">
-                            <span>WEB</span><span>:</span><span>www.trekgroups.com</span>
+                            <span>WEB</span><span>:</span><span>qubexe.com</span>
                         </div>
                         <div className="grid grid-cols-[80px_10px_1fr] font-bold">
                             <span>Location</span><span>:</span><span>Doha -Qatar</span>
@@ -607,7 +607,7 @@ export default function QuotationDetails() {
                             <p className="font-bold text-[15px]">Mr. Afzal</p>
                             <p className="font-bold text-[15px]">{isTrading ? "Manager" : "Contracting Manager"}</p>
                             <p className="font-bold text-[15px]">(+974) 7171 6559</p>
-                            <p className="font-bold text-[15px]">Email: info@trekgroups.com</p>
+                            <p className="font-bold text-[15px]">Email: info@qubexe.com</p>
                         </div>
                     </div>
                 </div>

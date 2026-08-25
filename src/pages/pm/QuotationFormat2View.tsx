@@ -32,9 +32,9 @@ export default function QuotationFormat2View({ quotation }: Props) {
                 <div className="text-right text-[11px] font-sans text-slate-800 space-y-0.5">
                     <p>PO Box: 96347, Doha - Qatar</p>
                     <p>Mob: +974 71716559</p>
-                    <p>Email: info@trekgroup.com</p>
-                    <p>Web: www.trekgroup.com</p>
-                    <p className="font-bold text-sm mt-1 uppercase">TREK GROUP W.L.L</p>
+                    <p>Email: info@qubexe.com</p>
+                    <p>Web: qubexe.com</p>
+                    <p className="font-bold text-sm mt-1 uppercase">QUBEXE W.L.L</p>
                 </div>
             </div>
 
@@ -135,7 +135,7 @@ export default function QuotationFormat2View({ quotation }: Props) {
                 </p>
                 <div className="space-y-0.5 font-bold">
                     <p>Best Regards,</p>
-                    <p>TREK GROUP</p>
+                    <p>QUBEXE</p>
                     <p>General Manager</p>
                     <p>Doha, Qatar</p>
                 </div>

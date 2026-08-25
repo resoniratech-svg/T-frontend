@@ -63,7 +63,7 @@ export const generateQuotationFormat2Docx = async (quotation: Quotation): Promis
                                                     data: logoImage,
                                                     transformation: { width: 120, height: 60 }
                                                 })
-                                            ] : [new TextRun({ text: "TREK GROUP", bold: true, size: 24 })]
+                                            ] : [new TextRun({ text: "QUBEXE", bold: true, size: 24 })]
                                         })
                                     ]
                                 }),
@@ -73,9 +73,9 @@ export const generateQuotationFormat2Docx = async (quotation: Quotation): Promis
                                     children: [
                                         new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "PO Box: 96347, Doha - Qatar", size: 18 })] }),
                                         new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Mob: +974 71716559", size: 18 })] }),
-                                        new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Email: info@trekgroup.com", size: 18 })] }),
-                                        new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Web: www.trekgroup.com", size: 18 })] }),
-                                        new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { before: 100 }, children: [new TextRun({ text: "TREK GROUP W.L.L", bold: true, size: 22 })] }),
+                                        new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Email: info@qubexe.com", size: 18 })] }),
+                                        new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "Web: qubexe.com", size: 18 })] }),
+                                        new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { before: 100 }, children: [new TextRun({ text: "QUBEXE W.L.L", bold: true, size: 22 })] }),
                                     ]
                                 })
                             ]
@@ -231,7 +231,7 @@ export const generateQuotationFormat2Docx = async (quotation: Quotation): Promis
                 new Paragraph({ children: [new TextRun({ text: "We hope that the above quotation is submitted in line with your requirements. If you need any further information for Approval, please do not hesitate to contact us.", italics: true, size: 22 })], spacing: { after: 400 } }),
 
                 new Paragraph({ children: [new TextRun({ text: "Best Regards,", bold: true, size: 22 })] }),
-                new Paragraph({ children: [new TextRun({ text: "TREK GROUP", bold: true, size: 22 })] }),
+                new Paragraph({ children: [new TextRun({ text: "QUBEXE", bold: true, size: 22 })] }),
                 new Paragraph({ children: [new TextRun({ text: "General Manager", bold: true, size: 22 })] }),
                 new Paragraph({ children: [new TextRun({ text: "Doha, Qatar", bold: true, size: 22 })] }),
             ]

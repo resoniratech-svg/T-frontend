@@ -383,7 +383,7 @@ export default function InvoiceDetails() {
 
                     <div className="text-right flex flex-col items-end">
                         <div className="text-brand-600 font-bold text-xl flex flex-col items-end leading-tight max-w-[400px] text-right">
-                            <span className="text-black text-xs font-bold opacity-60">TREK GROUP TRADING CONTRACTING AND SERVICES</span>
+                            <span className="text-black text-xs font-bold opacity-60">QUBEXE TRADING CONTRACTING AND SERVICES</span>
                         </div>
                     </div>
                 </div>

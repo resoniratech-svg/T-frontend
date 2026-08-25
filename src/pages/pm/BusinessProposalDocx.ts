@@ -15,14 +15,14 @@ export const generateBusinessProposalDocx = async (quotation: Quotation): Promis
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 2000, after: 400 },
                         children: [
-                            new TextRun({ text: "TREK GROUP TRADING CONTRACTING AND SERVICES", color: "666666", size: 24, allCaps: true })
+                            new TextRun({ text: "QUBEXE TRADING CONTRACTING AND SERVICES", color: "666666", size: 24, allCaps: true })
                         ]
                     }),
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
                         spacing: { after: 2000 },
                         children: [
-                            new TextRun({ text: "TREK GROUP BUSINESS SERVICES", bold: true, size: 28, allCaps: true })
+                            new TextRun({ text: "QUBEXE BUSINESS SERVICES", bold: true, size: 28, allCaps: true })
                         ]
                     }),
                     new Paragraph({
@@ -41,7 +41,7 @@ export const generateBusinessProposalDocx = async (quotation: Quotation): Promis
                     }),
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
-                        spacing: { after: 200 },
+                        spacing: { after: 2000 },
                         children: [
                             new TextRun({ text: "Prepared for:", color: "666666", size: 24 })
                         ]
@@ -72,7 +72,7 @@ export const generateBusinessProposalDocx = async (quotation: Quotation): Promis
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { line: 360 },
                         children: [
-                            new TextRun({ text: quotation.aboutUs ?? "Trek Group Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services.", size: 28 })
+                            new TextRun({ text: quotation.aboutUs ?? "Qubexe Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services.", size: 28 })
                         ]
                     }),
                     new Paragraph({ children: [new PageBreak()] }),

@@ -22,25 +22,25 @@ function Sidebar({ onClose }: SidebarProps) {
   }, []);
 
   return (
-    <aside className="print:hidden w-[260px] h-screen bg-slate-50 flex flex-col border-r border-slate-200 relative">
+    <aside className="print:hidden w-[260px] h-screen bg-[#e7f1ff] flex flex-col border-r border-blue-200/80 relative">
       {/* ─── Mobile Close Button ───────────────────────── */}
       <button
         onClick={onClose}
-        className="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 transition-colors"
+        className="lg:hidden absolute top-4 right-4 p-2 text-slate-500 hover:text-slate-900 transition-colors"
       >
         <X size={20} />
       </button>
       {/* ─── Brand Header ──────────────────────────────── */}
-      <div className="px-6 py-5 border-b border-slate-200">
+      <div className="px-6 py-5 border-b border-blue-200/70">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm border border-slate-200/80">
+          <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm border border-blue-200/80">
             <img src="/logo.png" alt="Qubexe Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className="text-sm font-bold text-slate-900 tracking-wide">
               Qubexe
             </h1>
-            <p className="text-[10px] text-slate-500 font-medium">
+            <p className="text-[10px] text-blue-600/80 font-semibold">
               ERP System
             </p>
           </div>
@@ -49,10 +49,10 @@ function Sidebar({ onClose }: SidebarProps) {
 
       {/* ─── Role Badge ────────────────────────────────── */}
       {userRole && (
-        <div className="px-5 py-3 border-b border-slate-200">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#e7f1ff] border border-blue-200/60">
+        <div className="px-5 py-3 border-b border-blue-200/70">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/80 border border-blue-200 shadow-2xs">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-semibold text-slate-700 tracking-wide">
+            <span className="text-[11px] font-bold text-slate-800 tracking-wide">
               {userRole.replace(/_/g, " ")}
             </span>
           </div>
@@ -63,7 +63,7 @@ function Sidebar({ onClose }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         {getAuthorizedSidebarSections(userRole).map((section, i) => (
           <div key={i}>
-            <p className="text-[10px] text-slate-400 uppercase tracking-[0.1em] font-bold mb-2 px-3">
+            <p className="text-[10px] text-slate-500 uppercase tracking-[0.1em] font-bold mb-2 px-3">
               {section.section}
             </p>
 
@@ -83,19 +83,19 @@ function Sidebar({ onClose }: SidebarProps) {
                       onClick={onClose}
                       className={`group flex items-center gap-3 px-3 py-2 text-[13px] rounded-lg transition-all duration-150
                         ${active
-                          ? "bg-[#e7f1ff] text-slate-900 border border-blue-200/80 font-semibold shadow-xs"
-                          : "text-slate-600 hover:bg-slate-200/60 hover:text-slate-900"
+                          ? "bg-white text-blue-900 border border-blue-200/90 font-bold shadow-xs"
+                          : "text-slate-700 hover:bg-white/60 hover:text-slate-900"
                         }
                       `}
                     >
                       <Icon
                         size={17}
                         strokeWidth={active ? 2.2 : 1.7}
-                        className={active ? "text-blue-600" : "text-slate-400 group-hover:text-slate-700"}
+                        className={active ? "text-blue-600" : "text-blue-500/70 group-hover:text-blue-700"}
                       />
                       <span className="flex-1">{item.label}</span>
                       {active && (
-                        <ChevronRight size={14} className="text-slate-400" />
+                        <ChevronRight size={14} className="text-blue-400" />
                       )}
                     </Link>
                   );
@@ -106,8 +106,8 @@ function Sidebar({ onClose }: SidebarProps) {
       </nav>
 
       {/* ─── Footer ────────────────────────────────────── */}
-      <div className="px-5 py-4 border-t border-slate-200">
-        <p className="text-[10px] text-slate-400 text-center font-medium">
+      <div className="px-5 py-4 border-t border-blue-200/70">
+        <p className="text-[10px] text-slate-500 text-center font-medium">
           © 2026 Qubexe. All rights reserved.
         </p>
       </div>

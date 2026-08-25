@@ -70,10 +70,10 @@ export default function Signup() {
     return (
         <div className="min-h-screen flex relative overflow-hidden">
             {/* ─── Left Panel (Branding) ───────────────────── */}
-            <div className="hidden lg:flex lg:w-1/2 bg-[#e7f1ff] relative items-center justify-center p-12 border-r border-slate-200/80">
-                <div className="absolute inset-0 opacity-40">
-                    <div className="absolute top-20 left-20 w-64 h-64 bg-blue-200/50 rounded-full blur-3xl" />
-                    <div className="absolute bottom-20 right-20 w-48 h-48 bg-slate-200/60 rounded-full blur-3xl" />
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-100 via-sky-50 to-blue-200/70 relative items-center justify-center p-12 border-r border-blue-200/80">
+                <div className="absolute inset-0 opacity-60">
+                    <div className="absolute top-20 left-20 w-64 h-64 bg-blue-300/40 rounded-full blur-3xl" />
+                    <div className="absolute bottom-20 right-20 w-48 h-48 bg-sky-200/50 rounded-full blur-3xl" />
                 </div>
 
                 <motion.div
@@ -82,12 +82,10 @@ export default function Signup() {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="relative z-10 text-slate-800 max-w-md"
                 >
-                    <div className="w-20 h-20 mb-8 bg-white rounded-xl p-2 shadow-md ring-1 ring-slate-200/60">
-                        <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
+                    <div className="mb-6">
+                        <img src="/logo.png" alt="Qubexe Logo" className="h-24 w-auto object-contain drop-shadow-sm" />
                     </div>
-                    <h1 className="text-4xl font-bold leading-tight mb-4 text-slate-900">
-                        Qubexe <br />
-                        <br />
+                    <h1 className="text-4xl font-bold leading-tight mb-4">
                         <span className="text-blue-600">Client Portal</span>
                     </h1>
                     <p className="text-slate-600 text-lg leading-relaxed">
@@ -212,7 +210,7 @@ export default function Signup() {
                             {/* Submit */}
                             <button
                                 type="submit"
-                                className="w-full inline-flex items-center justify-center gap-2 bg-[#e7f1ff] hover:bg-[#d5e5fa] text-slate-800 border border-blue-200/80 font-semibold py-3 mt-2 text-base rounded-lg transition-all duration-200 shadow-sm hover:shadow cursor-pointer"
+                                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-100 to-sky-100 hover:from-blue-200 hover:to-sky-200 text-blue-950 border border-blue-300 font-semibold py-3 mt-2 text-base rounded-lg transition-all duration-200 shadow-sm hover:shadow cursor-pointer"
                             >
                                 <UserPlus size={18} className="text-blue-600" />
                                 Create Account

@@ -14,8 +14,8 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
             <div className="w-[794px] h-[1123px] bg-[#f4f1ea] shadow-2xl relative overflow-hidden flex flex-col p-16 font-serif select-none print-page">
                 <header className="flex justify-between items-start mb-20">
                     <div className="flex flex-col">
-                        <span className="text-[10px] tracking-[0.2em] font-sans uppercase opacity-50 mb-1">TREK GROUP TRADING CONTRACTING AND SERVICES</span>
-                        <span className="text-sm tracking-[0.3em] font-sans uppercase font-bold text-black">Trek Group Business Services</span>
+                        <span className="text-[10px] tracking-[0.2em] font-sans uppercase opacity-50 mb-1">QUBEXE TRADING CONTRACTING AND SERVICES</span>
+                        <span className="text-sm tracking-[0.3em] font-sans uppercase font-bold text-black">Qubexe Business Services</span>
                     </div>
                     <div className="w-12 h-[1px] bg-black opacity-20"></div>
                 </header>
@@ -55,13 +55,13 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                         alt="Workspace"
                         className="w-full h-full object-cover opacity-60"
                     />
-                    <div className="absolute top-10 left-16 text-white text-xs tracking-[0.3em] uppercase opacity-80">trek group business services</div>
+                    <div className="absolute top-10 left-16 text-white text-xs tracking-[0.3em] uppercase opacity-80">qubexe business services</div>
                 </div>
 
                 <div className="flex-1 p-20 flex flex-col items-center justify-center text-center">
                     <h2 className="text-7xl font-serif italic mb-12 text-[#1a1a1a]">About Us</h2>
                     <p className="text-lg leading-relaxed text-slate-600 max-w-2xl whitespace-pre-wrap">
-                        {quotation.aboutUs ?? "Trek Group Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services."}
+                        {quotation.aboutUs ?? "Qubexe Business Services is a trusted provider of comprehensive corporate and industrial setup solutions in Qatar. We specialize in guiding investors and entrepreneurs through every stage of company formation, licensing, and operational setup, ensuring compliance with all local laws and regulations. Our expertise extends to supporting industrial projects with end-to-end documentation, approvals, and advisory services."}
                     </p>
                 </div>
 
@@ -172,7 +172,7 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
 
             {/* Page 7: Thank You */}
             <div className="w-[794px] h-[1123px] bg-[#1a1a1a] shadow-2xl relative flex flex-col items-center justify-center text-center text-white font-sans print-page">
-                <div className="absolute top-16 left-16 text-xs tracking-[0.4em] uppercase opacity-40">trek group business services</div>
+                <div className="absolute top-16 left-16 text-xs tracking-[0.4em] uppercase opacity-40">qubexe business services</div>
 
                 <h2 className="text-[120px] font-serif font-light leading-none mb-4 italic">Thank You</h2>
                 <div className="w-20 h-1 bg-white mb-16 opacity-30"></div>
@@ -187,11 +187,11 @@ const BusinessProposalView: React.FC<BusinessProposalViewProps> = ({ quotation }
                     </div>
                     <div className="space-y-2 text-right">
                         <p className="text-[10px] uppercase tracking-[.3em] opacity-40">Email</p>
-                        <p className="text-sm font-medium">info@trekgroups.com</p>
+                        <p className="text-sm font-medium">info@qubexe.com</p>
                     </div>
                     <div className="space-y-2">
                         <p className="text-[10px] uppercase tracking-[.3em] opacity-40">Website</p>
-                        <p className="text-sm font-medium">www.trekgroups.com</p>
+                        <p className="text-sm font-medium">qubexe.com</p>
                     </div>
                     <div className="space-y-2 text-right">
                         <p className="text-[10px] uppercase tracking-[.3em] opacity-40">Location</p>
