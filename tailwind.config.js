@@ -24,10 +24,10 @@ export default {
           950: '#1e1b4b',
         },
         sidebar: {
-          DEFAULT: '#0f172a',
-          hover:   '#1e293b',
-          active:  '#334155',
-          border:  '#1e293b',
+          DEFAULT: '#f8fafc',
+          hover:   '#f1f5f9',
+          active:  '#e2e8f0',
+          border:  '#e2e8f0',
         },
         surface: {
           DEFAULT: '#ffffff',

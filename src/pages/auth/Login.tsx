@@ -109,38 +109,38 @@ export default function Login() {
       </AnimatePresence>
 
       {/* ─── Left Panel (Branding) ───────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 relative items-center justify-center p-12">
-        {/* Background dots */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-white rounded-full blur-3xl" />
+      <div className="hidden lg:flex lg:w-1/2 bg-[#e7f1ff] relative items-center justify-center p-12 border-r border-slate-200/80">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-20 left-20 w-64 h-64 bg-blue-200/50 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-20 w-48 h-48 bg-slate-200/60 rounded-full blur-3xl" />
         </div>
 
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative z-10 text-white max-w-md"
+          className="relative z-10 text-slate-800 max-w-md"
         >
-          <div className="w-20 h-20 mb-8 bg-white rounded-lg p-2 shadow-lg ring-1 ring-white/20">
+          <div className="w-20 h-20 mb-8 bg-white rounded-xl p-2 shadow-md ring-1 ring-slate-200/60">
             <img src="/logo.png" alt="TrekGroup Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-4xl font-bold leading-tight mb-4">
+          <h1 className="text-4xl font-bold leading-tight mb-4 text-slate-900">
             Qubexe <br />
             <br />
-            <span className="text-brand-200">ERP System</span>
+            <span className="text-blue-600">ERP System</span>
           </h1>
-          <p className="text-brand-200 text-lg leading-relaxed">
+          <p className="text-slate-600 text-lg leading-relaxed">
             Streamline your operations with our enterprise resource planning
             solution. Manage projects, finances, and clients — all in one place.
           </p>
           <div className="flex items-center gap-4 mt-8">
             <div className="flex -space-x-2">
               {["bg-emerald-400", "bg-amber-400", "bg-rose-400", "bg-cyan-400"].map((c, i) => (
-                <div key={i} className={`w-8 h-8 rounded-full ${c} ring-2 ring-brand-700`} />
+                <div key={i} className={`w-8 h-8 rounded-full ${c} ring-2 ring-white shadow-sm`} />
               ))}
             </div>
-            <p className="text-brand-300 text-sm">
+            <p className="text-slate-600 text-sm font-medium">
               Used by 50+ businesses
             </p>
           </div>
@@ -232,12 +232,12 @@ export default function Login() {
               id="login-submit"
               onClick={handleLogin}
               disabled={loading}
-              className="w-full btn-primary justify-center py-3 text-base shadow-lg shadow-brand-500/25 disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#e7f1ff] hover:bg-[#d5e5fa] text-slate-800 border border-blue-200/80 font-semibold py-3 text-base rounded-lg transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
                 <span className="animate-spin mr-2">◌</span>
               ) : (
-                <LogIn size={18} />
+                <LogIn size={18} className="text-blue-600" />
               )}
               {loading ? "Signing In..." : "Sign In"}
             </button>
@@ -256,34 +256,7 @@ export default function Login() {
       </div>
       </div>
 
-      {/* ─── DIGITAL PARTNER FOOTER ────────────────── */}
-      <div className="w-full shrink-0 z-50">
-        <a 
-          href="https://resonira.com/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="bg-[#0b0920] py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 border-t border-indigo-900/30 hover:bg-[#110e30] transition-colors cursor-pointer group flex-wrap"
-        >
-          <h3 className="text-lg sm:text-xl font-black uppercase tracking-wider text-[#e6dbad] group-hover:text-yellow-200 transition-colors">OUR DIGITAL PARTNER</h3>
-          <div className="hidden sm:block w-px h-10 bg-white/10 group-hover:bg-white/20 transition-colors"></div>
-          <div className="flex items-center gap-3">
-            {/* Logo Icon Mockup */}
-            <div className="relative flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 rounded-lg overflow-hidden shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
-               <span className="text-lg font-black text-white relative z-10">R</span>
-               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-cyan-300 rounded-full blur-[2px] opacity-60"></div>
-            </div>
-            
-            <div className="flex flex-col">
-              <div className="flex items-baseline leading-none">
-                <span className="text-lg sm:text-xl font-medium text-blue-400 tracking-tight group-hover:text-blue-300 transition-colors">Reson</span>
-                <span className="text-lg sm:text-xl font-medium text-purple-400 tracking-tight group-hover:text-purple-300 transition-colors">ira</span>
-              </div>
-              <span className="text-[8px] sm:text-[10px] text-white tracking-[0.3em] font-medium mt-0.5 group-hover:text-slate-200 transition-colors">TECHNOLOGIES</span>
-              <span className="text-[5px] sm:text-[6px] text-slate-400 tracking-widest mt-0.5 uppercase leading-none group-hover:text-slate-300 transition-colors">TRUSTED IT. SMARTER AI. LASTING IMPACT</span>
-            </div>
-          </div>
-        </a>
-        
+
         {/* Bottom Copyright Bar */}
         <div className="bg-white py-2 px-6 flex flex-col md:flex-row justify-between items-center text-[9px] sm:text-[10px] text-slate-600 border-t border-slate-200">
           <p>© Copyright Qubexe ERP 2026 All Rights Reserved.</p>
@@ -292,6 +265,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-    </div>
+    
   );
 }
